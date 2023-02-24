@@ -48,7 +48,7 @@ const PartnerSalesList = () => {
 
   if(count>0){
     partnerDrop = (
-      <select className="form-control text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+      <select className="form-control text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-info">
         <option className="" default>
           Business Partner
         </option>
@@ -107,7 +107,7 @@ const PartnerSalesList = () => {
             <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Quantity</th>
             <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Amount</th>
             <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Paying Account</th>
-            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-success">
+            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-10 ps-2">
               {partnerDrop}
             </th>
             <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Customer Email</th>

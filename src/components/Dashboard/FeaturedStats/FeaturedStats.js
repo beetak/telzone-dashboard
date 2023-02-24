@@ -26,7 +26,7 @@ export default function FeaturedStats(){
                     </div>
                     <hr className="dark horizontal my-0" />
                     <div className="card-footer p-3">
-                        {/*<p className="mb-0"><span className="text-success text-sm font-weight-bolder">+0% </span>than last week</p>*/}
+                        <p className="mb-0"><span className="text-success text-sm font-weight-bolder">Upstream for the past 24 Hrs</span></p>
                     </div>
                 </div>
             </div>
@@ -45,7 +45,7 @@ export default function FeaturedStats(){
                     </div>
                     <hr className="dark horizontal my-0" />
                     <div className="card-footer p-3">
-                        {/*<p className="mb-0"><span className="text-success text-sm font-weight-bolder">+0% </span>than last month</p>*/}
+                        <p className="mb-0"><span className="text-success text-sm font-weight-bolder">Downstream for the past 24 Hrs</span></p>
                     </div>
                 </div>
             </div>
@@ -64,7 +64,7 @@ export default function FeaturedStats(){
                     </div>
                     <hr className="dark horizontal my-0" />
                     <div className="card-footer p-3">
-                        {/*<p className="mb-0"><span className="text-danger text-sm font-weight-bolder" style={{color: 'blue'}}>+0%</span> than yesterday</p>*/}
+                        <p className="mb-0"><span className="text-success text-sm font-weight-bolder" style={{color: 'blue'}}>Total Usage for the past 24 Hrs</span></p>
                     </div>
                 </div>
             </div>
@@ -83,7 +83,7 @@ export default function FeaturedStats(){
                     </div>
                     <hr className="dark horizontal my-0" />
                     <div className="card-footer p-3">
-                        {/*<p className="mb-0"><span className="text-success text-sm font-weight-bolder">+0% </span>than last week</p>*/}
+                        <p className="mb-0"><span className="text-success text-sm font-weight-bolder">Total visits for the past 24 Hrs</span></p>
                     </div>
                 </div>
             </div>

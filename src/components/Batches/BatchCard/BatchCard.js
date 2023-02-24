@@ -6,7 +6,7 @@ import { Button, Modal } from 'react-bootstrap';
 
 const userRole = localStorage.getItem('role')
 
-const BatchCard = ({index, id, name, status, suspended}) => {
+const BatchCard = ({index, id, name, status, suspended, firstname, lastname}) => {
 
   const [active, setActive] = useState('')
   const [batchName, setBatchName] = useState('')
@@ -57,7 +57,7 @@ const BatchCard = ({index, id, name, status, suspended}) => {
         )}
       </td>
       <td>
-        <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Username</p>
+        <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{firstname} {lastname}</p>
       </td>
       <td className="align-middle text-center">
         {

@@ -21,7 +21,9 @@ const BatchList = () => {
             id={batch.id}
             name={batch.batchName}
             status={batch.active}
-            suspended={batch.suspended}/>
+            suspended={batch.suspended}
+            firstname={batch.user.firstname}
+            lastname={batch.user.surname}/>
         </tr>
       ))
     )

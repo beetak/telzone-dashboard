@@ -143,6 +143,7 @@ const batchSlice = createSlice({
         createdBatch: '',
         createdVoucher: '',
         viewVouchers: '',
+        viewVoucherStatus: 'idle',
         loading: '',
         posting: '',
         vcode: [],
@@ -152,6 +153,7 @@ const batchSlice = createSlice({
     reducers: {
         clearVouchers(state, action){
             state.viewVouchers = false
+            state.viewVoucherStatus = 'idle'
         },
         vcodeCreation(state, action){
             state.vcode.push(action.payload)
@@ -216,6 +218,9 @@ const batchSlice = createSlice({
             })
             state.vouchers = loadedVouchers
         },
+        [fetchAsyncVouchersByBatch.pending]: (state, action)=>{
+            state.viewVoucherStatus = 'pending'
+        },
         [fetchAsyncVouchersByBatch.fulfilled]: (state, action)=>{
             console.log(action.payload)
             // return {...state, sales: payload}
@@ -223,9 +228,13 @@ const batchSlice = createSlice({
             //     return voucher
             // })
             state.viewVouchers = true
+            state.viewVoucherStatus = 'fulfilled'
             state.selectedBatch = action.payload
             state.batchActive = action.payload.status
             state.batchSuspended = action.payload.suspended
+        },
+        [fetchAsyncVouchersByBatch.rejected]: (state, action)=>{
+            state.viewVoucherStatus = 'fulfilled'
         },
         [fetchAsyncVouchers.rejected]: (state, {payload})=>{
             console.log("rejected")
@@ -334,6 +343,7 @@ export const getCreatedBatch = (state) => state.batch.createdBatch
 export const getVoucherType = (state) => state.batch.createdVoucher
 export const getSelectedBatch = (state) => state.batch.selectedBatch
 export const viewVouchers = (state) => state.batch.viewVouchers
+export const voucherViewStatus = (state) => state.batch.viewVoucherStatus
 export const getVCodes = (state) => state.batch.vcode
 export const getLoadingStatus = (state) => state.batch.loadingStatus
 export const getVBActive = (state) => state.batch.batchActive
