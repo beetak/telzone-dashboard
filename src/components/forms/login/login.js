@@ -19,7 +19,7 @@ export default class LoginForm extends Component {
       user: '',
       success: false,
       errMess: '',
-      loadingStatus: ''
+      loadingStatus: false
     }
   
     handleChange=(e)=>{
@@ -31,7 +31,7 @@ export default class LoginForm extends Component {
     loginToken = localStorage.getItem('token')
 
     handleSubmit = (e) => {
-      this.setState({loadingStatus: 'Logging ...'})
+      this.setState({loadingStatus: true})
       e.preventDefault();
       // console.log(user, pwd)
       // setUser('')
@@ -59,16 +59,15 @@ export default class LoginForm extends Component {
             this.routeTo()
          }
          else{
-          alert(response.data.message);
             this.setState({
               errMess:response.data.code,
-              loadingStatus: 'Login Failed'
+              loadingStatus: false
             })
          }
         })
         .catch(err=>{
           this.setState({
-            loadingStatus: 'Login Failed'
+            loadingStatus: false
           })
         })
     }
@@ -89,7 +88,6 @@ export default class LoginForm extends Component {
       
         <div className="page-header align-items-start min-vh-100" style={{backgroundImage: 'url("https://www.worldatlas.com/r/w768/upload/01/33/22/digital-revolution.jpg")'}}>
 
-     <p ref={this.state.errRef} className={this.state.errMess? "errmsg" : "offscreen"} aria-live="assertive">{this.state.errMess}</p>
 
   {/* <label id="notification" style={{color: 'red', textAlign: 'center'}}></label>
       <input id="email" className="iinput" type="email" placeholder="Email" value={this.state.email} onChange={this.onChange} name="email" required/>
@@ -123,7 +121,7 @@ export default class LoginForm extends Component {
             </div>
           </div>
           <div className="card-body">
-            <p ref={this.state.errRef} className={this.state.errMess? "errmsg" : "offscreen"} aria-live="assertive">{this.state.errMess}</p>
+            <p ref={this.state.errRef} aria-live="assertive">{this.state.errMess==='NOT_FOUND'? <p className="mb-0"><span className="text-success text-sm font-weight-bolder"></span>Incorrect Email or Password</p>:''}</p>
             <form role="form" className="text-start" onSubmit={this.handleSubmit}>
               <label className="form-label">Email</label>
               <div className="input-group input-group-outline my-3">
@@ -141,7 +139,7 @@ export default class LoginForm extends Component {
                 {/* <button type="button" onClick={this.handleClick} className="btn bg-gradient-primary w-100 my-4 mb-2">Sign in</button> */}
                 <button  className="btn bg-gradient-primary w-100 my-4 mb-2">Login</button>
               </div>
-              <label className="form-label">{this.state.loadingStatus}</label>
+              <label className="form-label">{this.state.loadingStatus?'logging...':''}</label>
               <p className="mt-4 text-sm text-center">
                 <img style={Style1} src={logo}/>
               </p>

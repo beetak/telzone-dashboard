@@ -78,11 +78,3 @@ const override = {
     top: '50%',
     left: '10%',
   }
-
-  const centered = {
-    position: 'fixed', /* or absolute */
-    top: '50%',
-    left: '50%',
-    marginTop: -50,
-    marginleft: -100
-  }

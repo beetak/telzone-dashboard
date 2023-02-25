@@ -99,6 +99,7 @@ const cartSlice = createSlice({
         clientDiscount: '',
         clientVAT: '',
         loadingStatus: 'idle',
+        retrieveStatus: 'idle',
         stateUpdate: 'idle'
     },
     reducers: {
@@ -204,11 +205,12 @@ const cartSlice = createSlice({
         [postSale.rejected]: (state, {payload})=>{
             console.log("rejected")
         },
-        [postVoucherSaleByBundleId.pending]: ()=>{
-            console.log("pending")
+        [postVoucherSaleByBundleId.pending]: (state)=>{
+            state.retrieveStatus = 'pending'
         },
         [postVoucherSaleByBundleId.fulfilled]: (state, action)=>{
             const voucherData = action.payload
+            state.retrieveStatus = 'fulfilled'
             console.log("the voucher",action.payload)
 
             voucherData.forEach(function(voucher, i){
@@ -218,7 +220,7 @@ const cartSlice = createSlice({
             // state.stateUpdate = 'successful'          
         },
         [postVoucherSaleByBundleId.rejected]: (state, {payload})=>{
-            console.log("rejected")
+            state.retrieveStatus = 'rejected'
         },
         [updateVoucherOnSale.pending]: ()=>{
             console.log("pending")
@@ -247,14 +249,17 @@ const cartSlice = createSlice({
         [updateVoucherStatus.pending]: (state)=>{
             console.log("pending")
             state.stateUpdate = 'pending'
+            state.retrieveStatus = 'pending'
         },
         [updateVoucherStatus.fulfilled]: (state, action)=>{
             state.orderPostStatus = 'success'           
             state.stateUpdate = 'successful'
+            state.retrieveStatus = 'fulfilled'
         },
         [updateVoucherStatus.rejected]: (state, {payload})=>{
             console.log("rejected")
             state.stateUpdate = 'rejected'
+            state.retrieveStatus = 'rejected'
         }
     }
 })
@@ -277,6 +282,7 @@ export const getDicountPercentage = (state) => state.cart.clientDiscount
 export const getVATPercentage = (state) => state.cart.clientVAT
 export const getCustomerLevel = (state) => state.cart.clientLevel
 export const getLoadingStatus = (state) => state.cart.loadingStatus
+export const getRetrievalStatus = (state) => state.cart.retrieveStatus
 export const getSoldVoucherIds = (state) => state.cart.soldId
 export const getStateUpdate = (state) => state.cart.stateUpdate
 export default cartSlice

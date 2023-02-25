@@ -13,7 +13,9 @@ import {
   getCustomerNumber, 
   getDicountPercentage, 
   getLastId, 
+  getLoadingStatus, 
   getOrderStatus, 
+  getRetrievalStatus, 
   getSaleVoucher, 
   getSoldVoucherIds, 
   getSoldVouchers, 
@@ -40,6 +42,7 @@ import { getPaymentMethod, getToggleStatus, toggleActions } from "../../../store
 import { Br, Cut, Line, Printer, Text, Row, render } from 'react-thermal-printer';
 import axios from  'axios'
 import { fetchAsyncBasePrice, getBasePrice } from "../../../store/basePrice-slice";
+import { BeatLoader } from "react-spinners";
 
 const userId = localStorage.getItem('userId')
 const img = "assets/img/telonelogo.png"
@@ -119,6 +122,7 @@ const CartItems = () => {
   const orderStatus = useSelector(getOrderStatus)
   const soldVouchers = useSelector(getSoldVouchers)
   const updateState = useSelector(getVoucherUpdateStatus)
+  const loading = useSelector(getRetrievalStatus)
 
   const getBusinessPartner =(id, name, discount, vat)=>{
     setBusinessPartnerId(id)
@@ -138,13 +142,6 @@ const CartItems = () => {
     }
     closeModal()
   }
-
-  // const updateVoucherState = () => {
-  //   console.log("",soldVouchersId)
-  //   dispatch(updateVoucherStatus(
-  //     soldVouchersId
-  //   ))
-  // }
 
   const updateVoucherState = (callback) => {
     console.log("",soldVouchersId)
@@ -339,43 +336,6 @@ const CartItems = () => {
       )
     });
 
-    // var blob = doc.output('blob');
-    // var formData = new FormData();
-    // formData.append('pdf', blob);
-
-    // var res = doc.output('datauristring');   //this line!!!!
-    // axios.post('/mailsender', res).then((res) => {
-    //     if(res.status === 'ok') console.log("Yeah!");
-    //     else console.log(":(");
-    // });
-
-
-    // const nodemailer = require("nodemailer")
-    // let mailTransporter = nodemailer.createTransport({
-    //   service: 'gmail',
-    //   auth: {
-    //     user: 'beetaktj1@gmail.com',
-    //     pass: '@Mywife1000'
-    //   }
-    // })
-    // let mailDetails = {
-    //   from: 'masiyablessingt@getCustomerEmail.com',
-    //   to: 'blessing.masiya@telone.co.zw',
-    //   subject: 'test mail',
-    //   text: 'Node js try out',
-    //   attachment: [{
-    //     path: data.filename
-    //   }]
-    // }
-    // mailTransporter.sendMail(mailDetails, function(err, data){
-    //   if(err){
-    //     console.log('error occurred')
-    //   }
-    //   else{
-    //     console.log('successful send')
-    //   }
-    // })
-    
     doc.save('invoice.pdf')
     window.location = '/sales'
   }
@@ -486,7 +446,31 @@ const CartItems = () => {
     )
   }
 
-  let single = printState? (''):('')
+  let loadingAnimation = 
+    <div className='text-center' style={anime}>
+        <h5 style={{color: '#055bb5'}}>Preparing Invoice</h5>
+        <BeatLoader
+        color={'#055bb5'}
+        loading={loading}
+        cssOverride={override}
+        size={15}
+        aria-label="Loading Spinner"
+        data-testid="loader"
+        />
+    </div>
+
+  let errorMsg =  
+    <div className='text-center'>
+      <h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5>
+    </div>
+
+  const successTimer = () =>{
+    setTimeout(() => {
+      <div className='text-center'>
+        <h5 style={{color: '#E91E63'}}>Success</h5>
+      </div>
+    }, 9000);
+  }
 
   let showData = printState? (
     <div className="">
@@ -543,10 +527,6 @@ const CartItems = () => {
           </div>
         </div>
         <h6 className="mt-3 mb-0">Payment</h6>
-        
-
-        
-          
         <table className="w-100">
           <thead>
             <tr className='border-top-lg border-bottom-lg'>
@@ -648,7 +628,18 @@ const CartItems = () => {
             >Generate Sale</button>
             :orderStatus==="success"?
               (stateUpdate === 'successful'?
-                <button onClick={printVouchers} type='button' className="btn btn-primary">Retrieve Vouchers</button>:<button onClick={updateVoucherState} type='button' className="btn btn-primary">Retry</button>):(<button disabled={true} type='button' className="btn btn-primary">Try Again</button>)
+                <button onClick={printVouchers} type='button' className="btn btn-primary">Retrieve Vouchers</button>:<button onClick={updateVoucherState} disabled={true} type='button' className="btn btn-primary">Can Not Procceed</button>):(<button disabled={true} type='button' className="btn btn-primary">Try Again</button>)
+          }
+
+          {loading === 'idle'?
+            '':(loading==='pending'?
+                loadingAnimation:(
+                  loading === 'fulfilled'?
+                    successTimer:(
+                      loading ==='rejected'?errorMsg: ''
+                  )
+                )
+              )
           }
         </div>
       </div>
@@ -696,4 +687,18 @@ const Style2 ={
 const lineStyle={
   lineHeight:'17px',
   fontSize: '14px',
+}
+
+const override = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "blue",
+};
+
+const anime = {
+  textAlign: 'center', 
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  width: '100%', 
+  height: '10vh'
 }
