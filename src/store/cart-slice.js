@@ -100,10 +100,12 @@ const cartSlice = createSlice({
         clientVAT: '',
         loadingStatus: 'idle',
         retrieveStatus: 'idle',
-        stateUpdate: 'idle'
+        stateUpdate: 'idle',
+        bundleId: ''
     },
     reducers: {
         addToCart(state, action){
+            state.bundleId = action.payload.id
             const newItem = action.payload 
             const existingItem = state.itemsList.find((item)=>item.id===newItem.id)
 
@@ -156,6 +158,9 @@ const cartSlice = createSlice({
             state.clientLevel = action.payload.level
             state.clientDiscount = action.payload.discount
             state.clientVAT = action.payload.vat
+        },
+        setBundleId(state, action){
+            state.bundleId= action.payload
         }
     },
     extraReducers: {
@@ -285,4 +290,5 @@ export const getLoadingStatus = (state) => state.cart.loadingStatus
 export const getRetrievalStatus = (state) => state.cart.retrieveStatus
 export const getSoldVoucherIds = (state) => state.cart.soldId
 export const getStateUpdate = (state) => state.cart.stateUpdate
+export const getBundleId = (state) => state.cart.bundleId
 export default cartSlice

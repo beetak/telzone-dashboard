@@ -8,7 +8,7 @@ const CurrencyDropdown = (props) => {
         <Dropdown.Item 
             onClick={
                 () => {
-                    props.setCurrency(data.id, data.name)
+                    props.setCurrency(data.id, data.name, data.symbol)
                 }
             }
             >{data.name}

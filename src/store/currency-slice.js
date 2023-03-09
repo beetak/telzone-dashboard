@@ -47,7 +47,8 @@ export const updateCurrency = createAsyncThunk('currency/updateCurrency',
 
 const initialState = {
     currencies: [],
-    loadingStatus: 'idle'
+    loadingStatus: 'idle',
+    globalCurrency: ''
 }
 const currencySlice = createSlice({
     name: 'currency',
@@ -55,6 +56,9 @@ const currencySlice = createSlice({
     reducers: {
         addCurrency: (state, {payload})=>{
             state.currencies = payload
+        },
+        setGlobaCurrency(state, action){
+            state.globalCurrency = action.payload
         }
     },
     extraReducers: {
@@ -105,7 +109,8 @@ const currencySlice = createSlice({
         }
     }
 })
-export const {addCurrency} = currencySlice.actions
+export const currencyActions = currencySlice.actions
 export const getAllCurrencies = (state) => state.currency.currencies
+export const getGlobalCurreny = (state) => state.currency.globalCurrency
 export const getLoadingStatus = (state) => state.currency.loadingStatus
 export default currencySlice

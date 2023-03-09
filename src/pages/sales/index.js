@@ -9,6 +9,7 @@ import { fetchAsyncBundles } from "../../store/bundle-slice";
 import { fetchAsyncBusiness } from "../../store/business-slice";
 import { fetchAsyncSales } from "../../store/cart-slice";
 import { getToggleStatus } from "../../store/toggle-slice";
+import { fetchAsyncCurrency } from "../../store/currency-slice";
 
 export default function Sales () {
     // return(
@@ -30,6 +31,7 @@ export default function Sales () {
       dispatch(fetchAsyncBundles(active))
       dispatch(fetchAsyncBusiness(active))
       dispatch(fetchAsyncSales())
+      dispatch(fetchAsyncCurrency(active))
     //   dispatch(fetchAsyncSoldVouchers())
     }, [dispatch]);
 

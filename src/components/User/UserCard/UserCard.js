@@ -32,6 +32,7 @@ const UserCard = (props) => {
         id,
         firstname,
         surname,
+        password,
         userId
       }
     ))
@@ -136,6 +137,17 @@ const UserCard = (props) => {
             defaultValue = {emailAddress}
             name = "emailAddress"
             onChange = {(e)=>setEmailAddress(e.target.value)}
+          />
+        </InputGroup>
+
+        <InputGroup className="mb-3">
+          <InputGroup.Text id="basic-addon2">Password</InputGroup.Text>
+          <FormControl
+            // value={roleSymbol}
+            aria-label="Password"
+            aria-describedby="basic-addon2"
+            name = "password"
+            onChange = {(e)=>setPassword(e.target.value)}
           />
         </InputGroup>
 

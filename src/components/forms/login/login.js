@@ -19,7 +19,7 @@ export default class LoginForm extends Component {
       user: '',
       success: false,
       errMess: '',
-      loadingStatus: false
+      loadingStatus: 'idle'
     }
   
     handleChange=(e)=>{
@@ -31,14 +31,14 @@ export default class LoginForm extends Component {
     loginToken = localStorage.getItem('token')
 
     handleSubmit = (e) => {
-      this.setState({loadingStatus: true})
+      this.setState({loadingStatus: 'pending'})
       e.preventDefault();
       // console.log(user, pwd)
       // setUser('')
       // setPwd('')
       // setSuccess(true)
       const user ={
-        emailAddress: this.state.email,
+        emailAddress: this.state.email+"@telone.co.zw",
         password : this.state.password,
       }
         // alert(user.email)    // "it shows the user email"
@@ -60,14 +60,13 @@ export default class LoginForm extends Component {
          }
          else{
             this.setState({
-              errMess:response.data.code,
-              loadingStatus: false
+              errMess:response.data.code
             })
          }
         })
         .catch(err=>{
           this.setState({
-            loadingStatus: false
+            loadingStatus: 'failed'
           })
         })
     }
@@ -125,7 +124,7 @@ export default class LoginForm extends Component {
             <form role="form" className="text-start" onSubmit={this.handleSubmit}>
               <label className="form-label">Email</label>
               <div className="input-group input-group-outline my-3">
-                <input onChange = {this.handleChange} type="email" id="email" name="email" className="form-control" ref={this.state.userRef} autoComplete="off" required/>
+                <input onChange = {this.handleChange} type="text" id="email" name="email" className="form-control" ref={this.state.userRef} autoComplete="off" required/>
               </div>
               <label className="form-label">Password</label>
               <div className="input-group input-group-outline mb-3">
@@ -139,7 +138,7 @@ export default class LoginForm extends Component {
                 {/* <button type="button" onClick={this.handleClick} className="btn bg-gradient-primary w-100 my-4 mb-2">Sign in</button> */}
                 <button  className="btn bg-gradient-primary w-100 my-4 mb-2">Login</button>
               </div>
-              <label className="form-label">{this.state.loadingStatus?'logging...':''}</label>
+              <label className="form-label">{this.state.loadingStatus ==='pending'?'logging...':(this.state.loadingStatus ==='failed'?'Logging in failed. Please try again ':'')}</label>
               <p className="mt-4 text-sm text-center">
                 <img style={Style1} src={logo}/>
               </p>

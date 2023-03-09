@@ -24,6 +24,18 @@ export const postBatch = createAsyncThunk(
     }
 );
 
+export const voucherVerification = createAsyncThunk(
+    'cart/voucherVerification',
+    async (initialData) => {
+      console.log(initialData);
+      return await Api
+        .post('/voucher/verify/', 
+          initialData
+        )
+        .then((res) => res.data);
+    }
+);
+
 export const fetchAsyncVouchers = createAsyncThunk('batch/fetchAsyncVouchers', async () => {
     try{
         const response = await Api
@@ -148,7 +160,10 @@ const batchSlice = createSlice({
         posting: '',
         vcode: [],
         loadingStatus: 'idle',
-        postStatus: 'idle'
+        postStatus: 'idle',
+        soldStatus: '',
+        usedStatus: '',
+        statusSearch: 'idle'
     },
     reducers: {
         clearVouchers(state, action){
@@ -157,6 +172,9 @@ const batchSlice = createSlice({
         },
         vcodeCreation(state, action){
             state.vcode.push(action.payload)
+        },
+        setVerify(state, action){
+            state.statusSearch = 'idle'
         }
     },
     extraReducers: {
@@ -204,6 +222,24 @@ const batchSlice = createSlice({
             console.log("rejected")
             state.posting = 'failed'
             state.postStatus = 'rejected'
+        },
+        [voucherVerification.pending]: (state)=>{
+            console.log("pending")
+            state.posting = 'pending'
+            state.statusSearch = 'pending'
+            state.voucherPostStatus = 'idle'
+        },
+        [voucherVerification.fulfilled]: (state, action)=>{
+            console.log('fulfilled')
+            console.log(action.payload)
+            state.soldStatus = action.payload.data.sold
+            state.usedStatus = action.payload.data.used
+            state.statusSearch = 'fulfilled'
+        },
+        [voucherVerification.rejected]: (state, {payload})=>{
+            state.batchPostStatus='failed'
+            state.posting = 'failed'
+            state.statusSearch = 'rejected'
         },
 
         //Voucher reducers
@@ -349,5 +385,8 @@ export const getLoadingStatus = (state) => state.batch.loadingStatus
 export const getVBActive = (state) => state.batch.batchActive
 export const getVBSuspended = (state) => state.batch.batchSuspended
 export const getPostingStatus = (state) => state.batch.postStatus
+export const getSoldStatus = (state) => state.batch.soldStatus
+export const getUsedStatus = (state) => state.batch.usedStatus
+export const getStatusSearch = (state) => state.batch.statusSearch
 export const {clearVouchers} = batchSlice.actions
 export default batchSlice

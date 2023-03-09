@@ -6,6 +6,7 @@ import {
   getAccount, 
   getAmount, 
   getBtnState, 
+  getBundleId, 
   getCustomerAddress, 
   getCustomerEmail, 
   getCustomerLevel, 
@@ -43,6 +44,8 @@ import { Br, Cut, Line, Printer, Text, Row, render } from 'react-thermal-printer
 import axios from  'axios'
 import { fetchAsyncBasePrice, getBasePrice } from "../../../store/basePrice-slice";
 import { BeatLoader } from "react-spinners";
+import CurrencyDropdown from "../../Currency/CurrencyDropdown/CurrencyDropdown";
+import { getAllCurrencies } from "../../../store/currency-slice";
 
 const userId = localStorage.getItem('userId')
 const img = "assets/img/telonelogo.png"
@@ -65,21 +68,7 @@ const CartItems = () => {
   const dispatch  = useDispatch()
   const prices  = useSelector(getBasePrice)
   const paymentValue = useSelector(getPaymentMethod)
-
-  let priceCount = ''
-  useEffect(() => {
-    dispatch(fetchAsyncBasePrice())
-      priceCount = Object.keys(prices).length
-      if(priceCount<=0){
-        setRateStatus(false)    
-      }
-      else{
-        setRateStatus(true)
-        setRate(prices[0].price)
-        setRateId(prices[0].id)
-      }
-  }, [dispatch]);
-
+  
   const bpname = useSelector(getCustomerName)
   const bpemail = useSelector(getCustomerEmail)
   const customerPhone = useSelector(getCustomerNumber)
@@ -95,9 +84,13 @@ const CartItems = () => {
   const [businessPartnerVat, setBusinessPartnerVat] = useState('')
   const [currentDate, setCurrentDate] = useState('')
   const [rateStatus, setRateStatus] = useState('')
-  const [rate, setRate] = useState('')
+  const [rate, setRate] = useState(1)
   const [rateId, setRateId] = useState('')
   const [payment, setPayment] = useState('Payment Method')
+  const[currencyId, setCurrencyID] = useState('')
+  const[currencyState, setCurrencyState] = useState('Currency')
+  const[currencyActioned, setCurrencyActioned]= useState('')
+  const[currencySymbol, setCurrencySymbol]= useState('')
 
   const voucherId = useSelector(getSaleVoucher)
   const btnState = useSelector(getBtnState)
@@ -106,7 +99,21 @@ const CartItems = () => {
   const clientLevel = useSelector(getCustomerLevel)
   const soldVouchersId = useSelector(getSoldVoucherIds)
   const stateUpdate = useSelector(getStateUpdate)
+  const postBundleId = useSelector(getBundleId)
 
+  let priceCount = ''
+  useEffect(() => {
+    dispatch(fetchAsyncBasePrice())
+      priceCount = Object.keys(prices).length
+      if(priceCount<=0){
+        setRateStatus(false)    
+      }
+      else{
+        setRateStatus(true)
+        currencySymbol === 'ZWL'?setRate(prices[0].price):setRate(1)
+        setRateId(prices[0].id)
+      }
+  }, [dispatch, currencySymbol, postBundleId]);
 
   const openModal = () => setIsOpen(true);
 
@@ -201,11 +208,11 @@ const CartItems = () => {
   // const cartItem = useSelector(getAllSales)
 
   itemsList.forEach((item) => {
-    subTotal += item.totalPrice;
+    subTotal += item.totalPrice*(100/(100+vatPercentage));
     totalQty += item.quantity
-    disc = (Math.round(subTotal * discountPercentage) / 100).toFixed(2)
-    valueAddedTax = (Math.round((subTotal - disc) * vatPercentage) / 100).toFixed(2)
-    total = (Math.round((subTotal - disc) * 100 + valueAddedTax * 100) / 100).toFixed(2)
+    disc = (Math.round(subTotal * discountPercentage * rate) / 100).toFixed(2)
+    valueAddedTax = (Math.round((subTotal * rate - disc) * vatPercentage) / 100).toFixed(2)
+    total = (Math.round((subTotal*rate - disc) * 100 + valueAddedTax * 100) / 100).toFixed(2)
   });
 
   let renderedItems = itemsList.map((item, index)=>(
@@ -216,7 +223,9 @@ const CartItems = () => {
         price={item.price}
         total={item.totalPrice}
         name={item.name}
-        product={item.product}/>
+        product={item.product}
+        rate={rate}
+        vat={vatPercentage}/>
     </tr>
   ))
 
@@ -242,7 +251,9 @@ const CartItems = () => {
     dispatch(postSale(
       {
         adminPortalUserId: userID,
+        bundleId: postBundleId,
         businessPartnerId,
+        currencyId,
         order: {
           amount: total,
           dateCreated: today,
@@ -339,6 +350,23 @@ const CartItems = () => {
     doc.save('invoice.pdf')
     window.location = '/sales'
   }
+  const getCurrency =(id, name, symbol)=>{
+    setCurrencyID(id)
+    setCurrencyActioned(name)
+    setCurrencyState(name)
+    setCurrencySymbol(symbol)
+  }
+
+  const currencyData = useSelector(getAllCurrencies)
+
+  let renderedCurrency = ''
+    renderedCurrency = currencyData ? (
+      currencyData.map((currency, index)=>(
+        <tr key={index}>
+          <CurrencyDropdown data={currency} setCurrency={getCurrency}/>
+        </tr>
+      ))
+    ):(<div><h1>Error</h1></div>)
 
   let paymentDrop = 
   <>
@@ -563,7 +591,7 @@ const CartItems = () => {
               <td></td>
               <td></td>
               <td style={{fontSize: '14px',fontWeight:'bold', textAlign:'right'}} className='border-top-lg border-bottom-lg'>Total</td>
-              <td style={{fontSize: '14px', textAlign:'right'}} className='border-top-xl border-bottom-xl'>${(Math.round(total * 100) / 100).toFixed(2)}</td>
+              <td style={{fontSize: '14px', textAlign:'right'}} className='border-top-xl border-bottom-xl'>${(Math.round(total * 100 * rate) / 100).toFixed(2)}</td>
             </tr>
           </tbody>
         </table>
@@ -598,7 +626,7 @@ const CartItems = () => {
                     <td colSpan={2}></td>
                     <td>Sub Total
                     </td>
-                    <td style={{textAlign: 'right'}}> ${(Math.round(subTotal * 100) / 100).toFixed(2)}</td>
+                    <td style={{textAlign: 'right'}}> ${(Math.round(subTotal * 100 * rate) / 100).toFixed(2)}</td>
                   </tr>
                   <tr>
                     <td colSpan={2}></td>
@@ -618,6 +646,20 @@ const CartItems = () => {
           </div>
           <label className="form-label" style={{marginBottom: '0px'}}>Customer</label>                  
           {renderedBusinessPartner}
+          <div className="dropdown">
+              <button 
+                  className="btn bg-gradient-primary dropdown-toggle" 
+                  type="button" 
+                  id="dropdownMenuButton" 
+                  data-bs-toggle="dropdown" 
+                  aria-expanded="false"
+                  >
+                  {currencyState}
+              </button>
+              <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedCurrency}
+              </ul>
+          </div>
 
           {orderStatus==="idle"?
             <button 

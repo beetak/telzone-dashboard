@@ -13,6 +13,12 @@ export const fetchAsyncSalesByPartnerId = createAsyncThunk('sale/fetchAsyncSales
     return [...response.data.data]
 })
 
+export const fetchAsyncSalesByAgent = createAsyncThunk('sale/fetchAsyncSalesByAgent', async ({curId, userID, date}) => {
+    const response = await Api
+    .get(`/order/currency${curId}/adminPortalUser${userID}/date${date}`)
+    return [...response.data.data]
+})
+
 export const postSale = createAsyncThunk(
     'sale/postAsyncSale',
     async (initialData) => {
@@ -31,6 +37,7 @@ const saleSlice = createSlice({
         itemsList: [],
         sales: [],
         partnerSales: [],
+        agentSales: [],
         voucherList: [],
         totalQuantity: 0,
         showCart: false,
@@ -74,6 +81,23 @@ const saleSlice = createSlice({
         }
     },
     extraReducers: {
+        [fetchAsyncSalesByAgent.pending]: (state)=>{
+            console.log("pending")
+            state.loadingStatus = 'pending'
+        },
+        [fetchAsyncSalesByAgent.fulfilled]: (state, action)=>{
+            console.log("fulfilled")
+            // return {...state, sales: payload}
+            const loadedSales = action.payload.map(sale=>{
+                return sale
+            })
+            state.agentSales = loadedSales
+            state.loadingStatus = 'fulfilled'
+        },
+        [fetchAsyncSalesByAgent.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.loadingStatus = 'rejected'
+        },
         [fetchAsyncSalesByPartnerId.pending]: (state)=>{
             console.log("pending")
             state.loadingStatus = 'pending'
@@ -134,5 +158,6 @@ const saleSlice = createSlice({
 export const saleActions = saleSlice.actions
 export const getAllSales = (state) => state.sale.sales
 export const getPartnerSales = (state) => state.sale.partnerSales
+export const getAgentSales = (state) => state.sale.agentSales
 export const getLoadingStatus = (state) => state.sale.loadingStatus
 export default saleSlice
