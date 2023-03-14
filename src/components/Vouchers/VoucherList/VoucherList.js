@@ -80,14 +80,15 @@ const VoucherList = () => {
     </tr>
 
   return (
-    <div>
-      
-          {
-            loading==='pending'?
-            loadingAnimation: 
-            loading ==='rejected'?
-              errorMsg: renderedVouchers
-          }
+    <div className="card-body px-0 pb-2">
+      <div className="table-responsive p-0">
+      {
+        loading==='pending'?
+        loadingAnimation: 
+        loading ==='rejected'?
+          errorMsg: renderedVouchers
+      }
+      </div>
     </div>
   );
 }

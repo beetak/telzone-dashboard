@@ -61,7 +61,9 @@ const BatchList = () => {
           <tr>
             <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style={{width: "5%"}}>Batch Number</th>
             <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style={{width: "5%"}}>Status</th>
-            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ">Created By</th>
+            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Created By</th>
+            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Product Type</th>
+            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style={{width: "5%"}}>Date Created</th>
             <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center" style={{width: "5%"}}>Action</th>
           </tr>
         </thead>

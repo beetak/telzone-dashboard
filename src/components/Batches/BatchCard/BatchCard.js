@@ -56,7 +56,7 @@ const BatchCard = ({index, id, name, status, suspended, firstname, lastname}) =>
           : (!status && !suspended ?  <span class="badge badge-sm bg-gradient-danger">Inactive</span>:'not')
         )}
       </td>
-      <td>
+      <td colSpan={3}>
         <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{firstname} {lastname}</p>
       </td>
       <td className="align-middle text-center">

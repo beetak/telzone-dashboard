@@ -13,8 +13,6 @@ export default function BatchVoucherDetails(){
 
         return(
 <div>
-  <div className="row">
-    <div className="col-12">
       <div className="card my-4">
         <div className="row">
           <div class="col-12">    
@@ -45,8 +43,6 @@ export default function BatchVoucherDetails(){
       </div>
     </div>
   </div>
-</div>
-</div>
         )
 }
 

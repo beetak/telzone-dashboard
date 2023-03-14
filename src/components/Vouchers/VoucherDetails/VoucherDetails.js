@@ -1,17 +1,21 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { batchActions, getLoadingStatus, getSoldStatus, getStatusSearch, getUsedStatus, voucherVerification } from '../../../store/batch-slice';
+import { batchActions, getLoadingStatus, getSearchMessage, getSoldStatus, getStatusSearch, getUsedStatus, getVerified, voucherVerification } from '../../../store/batch-slice';
 import { BeatLoader } from 'react-spinners';
+import VoucherVerification from '../VoucherVerification/VoucherVerification';
 
-const VoucherDetails = ({voucherCount, usedCount, soldCount, bundleType}) => {
+const VoucherDetails = ({ voucherCount, usedCount, soldCount, bundleType }) => {
 
-  const [voucherCode,setVoucherCode] = useState('');
+  const [voucherCode, setVoucherCode] = useState('');
 
   const soldState = useSelector(getSoldStatus)
   const usedState = useSelector(getUsedStatus)
+  const verified = useSelector(getVerified)
+
+  console.log("verified: ", verified.message)
 
   const today = new Date()
-  const date = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()}`;
+  const date = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
   console.log("date: ", date)
 
   const dispatch = useDispatch()
@@ -26,10 +30,11 @@ const VoucherDetails = ({voucherCount, usedCount, soldCount, bundleType}) => {
   };
 
   const loading = useSelector(getStatusSearch)
+  const message = useSelector(getSearchMessage)
+  console.log("response: ", `${verified.message}`)
 
-  let loadingAnimation = 
-  <tr className='' style={anime}>
-    <td colspan={6}>
+  let loadingAnimation =
+    <div className="align-middle text-center" style={anime}>
       <BeatLoader
         color={'#055bb5'}
         loading={loading}
@@ -38,38 +43,43 @@ const VoucherDetails = ({voucherCount, usedCount, soldCount, bundleType}) => {
         aria-label="Loading Spinner"
         data-testid="loader"
       />
-    </td>
-  </tr>
+    </div>
 
-  
-    let renderedVouchers = ''
-    let count = 1
-    if(count>0){
-      renderedVouchers = <div className="align-middle text-center">
-        {!soldState && !usedState? (
-          <span class="badge badge-sm bg-gradient-success">Available</span>
-        ) : (
-          soldState && !usedState?
-          <span class="badge badge-sm bg-gradient-info">sold</span>:(
-            soldState && useState?
-            <span class="badge badge-sm bg-gradient-secondary">used</span>:''
-          )
+
+  let renderedVouchers = ''
+  if (verified!=='') {
+    renderedVouchers = <div className="align-middle text-center">
+      {
+        !verified.data.sold && !verified.data.used ? (
+          <span class="badge badge-sm bg-gradient-success w-50 p-2">Available</span>) : 
+          (
+          verified.data.sold && !verified.data.used ?
+            <span class="badge badge-sm bg-gradient-info w-50 p-2">sold & Not Used</span> : 
+            (
+            verified.data.sold && verified.data.used ?
+              <span class="badge badge-sm bg-gradient-secondary w-50 p-2">Sold & used</span> : 
+              (
+              verified.message===`Voucher doesn't exist` ?
+                <span class="badge badge-sm bg-gradient-secondary w-50 p-2">Voucher Not Found</span> : ''
+              )
+            )
         )}
-      </div>
-    }
-    else{
-      renderedVouchers = <tr>
-        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No Vouchers Exist In This Batch</h5></td>
-      </tr>
-    }
+    </div>
+  }
+  else{
+    renderedVouchers = 
+    <div className="align-middle text-center">
+      <span class="badge badge-sm bg-gradient-secondary w-50 p-2">Voucher Not Found</span>
+    </div>
+  }
 
-    let errorMsg =  
+  let errorMsg =
     <tr>
-      <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>
+      <td colspan={7} className='text-center'><h5 style={{ color: '#E91E63' }}>Opps something went wrong. Please refresh page</h5></td>
     </tr>
 
   return (
-    <div className='row ms-3 pb-2'>
+    <div className='row pb-2'>
       <div className="col-md-6 mt-4">
         <div className="card h-100 mb-4">
           <div className="card-header pb-0 px-3">
@@ -92,7 +102,7 @@ const VoucherDetails = ({voucherCount, usedCount, soldCount, bundleType}) => {
                   </div>
                 </div>
                 <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                {bundleType}
+                  {bundleType}
                 </div>
               </li>
               <li className="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
@@ -102,7 +112,7 @@ const VoucherDetails = ({voucherCount, usedCount, soldCount, bundleType}) => {
                   </div>
                 </div>
                 <div className="d-flex align-items-center text-info text-gradient text-sm font-weight-bold">
-                {voucherCount - soldCount}
+                  {voucherCount - soldCount}
                 </div>
               </li>
               <li className="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
@@ -122,43 +132,15 @@ const VoucherDetails = ({voucherCount, usedCount, soldCount, bundleType}) => {
                   </div>
                 </div>
                 <div className="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold">
-                {usedCount}
+                  {usedCount}
                 </div>
               </li>
             </ul>
           </div>
         </div>
       </div>
-      <div className="col-md-5 mt-4">
-        <div className="card h-100 mb-4">
-          <div className="card-header pb-0 px-3">
-            <div className="row">
-              <div className="col-md-6">
-                <h6 className="mb-0">Voucher Status Verification</h6>
-              </div>
-            </div>
-          </div>
-          <div className="card-body pt-4 p-3">
-            <div className="p-4">
-              <form >
-                <label className="form-label">Voucher Code</label>
-                <div className="input-group input-group-dynamic mb-4">
-                    <input type="text" name="voucherCode" value={voucherCode} onChange={(e)=>setVoucherCode(e.target.value)} className="form-control" />
-                </div>
-
-                  {
-                    loading==='pending'?
-                      loadingAnimation: 
-                    loading ==='rejected'?
-                      errorMsg: 
-                    loading === 'fulfilled'?
-                      renderedVouchers: ''
-                  }
-                <button onClick={handleSubmit} className="btn btn-primary my-4">Submit</button>
-              </form>
-            </div>
-          </div>
-        </div>
+      <div className="col-md-6 mt-4 pb-2">
+        <VoucherVerification/>
       </div>
     </div>
   );
@@ -173,9 +155,9 @@ const override = {
 };
 
 const anime = {
-  textAlign: 'center', 
-  justifyContent: 'center', 
-  alignItems: 'center', 
-  width: '100%', 
+  textAlign: 'center',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '100%',
   height: '10vh'
 }

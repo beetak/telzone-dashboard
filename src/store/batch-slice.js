@@ -163,7 +163,10 @@ const batchSlice = createSlice({
         postStatus: 'idle',
         soldStatus: '',
         usedStatus: '',
-        statusSearch: 'idle'
+        statusSearch: 'idle',
+        message: 'idle',
+        verificationResponse: '',
+        showMore: false
     },
     reducers: {
         clearVouchers(state, action){
@@ -172,6 +175,9 @@ const batchSlice = createSlice({
         },
         vcodeCreation(state, action){
             state.vcode.push(action.payload)
+        },
+        showDetails(state, action){
+            state.showMore = true
         },
         setVerify(state, action){
             state.statusSearch = 'idle'
@@ -228,13 +234,25 @@ const batchSlice = createSlice({
             state.posting = 'pending'
             state.statusSearch = 'pending'
             state.voucherPostStatus = 'idle'
+            state.message = 'pending'
         },
         [voucherVerification.fulfilled]: (state, action)=>{
             console.log('fulfilled')
             console.log(action.payload)
-            state.soldStatus = action.payload.data.sold
-            state.usedStatus = action.payload.data.used
-            state.statusSearch = 'fulfilled'
+            if(action.payload.message !== `Voucher doesn't exist`){
+                state.verificationResponse = action.payload
+                state.soldStatus = action.payload.data.sold
+                state.usedStatus = action.payload.data.used
+                state.message = 'found'
+                state.statusSearch = 'fulfilled'
+                return
+            }
+            else{
+                state.message = 'not-found'
+                state.statusSearch = 'fulfilled'
+                return
+            }
+            
         },
         [voucherVerification.rejected]: (state, {payload})=>{
             state.batchPostStatus='failed'
@@ -388,5 +406,8 @@ export const getPostingStatus = (state) => state.batch.postStatus
 export const getSoldStatus = (state) => state.batch.soldStatus
 export const getUsedStatus = (state) => state.batch.usedStatus
 export const getStatusSearch = (state) => state.batch.statusSearch
+export const getSearchMessage = (state) => state.batch.message
+export const getVerified = (state) => state.batch.verificationResponse
+export const getShow = (state) => state.batch.showMore
 export const {clearVouchers} = batchSlice.actions
 export default batchSlice

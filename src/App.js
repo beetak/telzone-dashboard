@@ -16,6 +16,7 @@ import { useEffect } from 'react'
 import { fetchAsyncNetworkReports, fetchAsyncOrganisationReports } from "./store/report-slice";
 import UserLogin from "./pages/authentication/login";
 import SalesAgent from "./pages/dashboard/salesAgent";
+import VoucherVerificationPage from "./pages/sales/voucherVerification";
 
 const userRole = localStorage.getItem('role')
 
@@ -59,6 +60,7 @@ function App() {
           <Route path={"/sales"} element={<Sales/>} />
           <Route path={"/salesdash"} element={<SalesAgent/>} />
           <Route path={"/signup"} element={<Signup/>} />
+          <Route path={"/verify"} element={<VoucherVerificationPage/>} />
           <Route path={'/networks'} element={<NetworkMan/>} />
           <Route path={'/recharge'} element={<RechargeManagement/>} />
           <Route path={'/business-reports'} element={<BusReports/>} />

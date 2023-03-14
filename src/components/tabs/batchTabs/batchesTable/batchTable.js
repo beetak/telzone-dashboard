@@ -41,9 +41,7 @@ export default function BatchesTab(){
         </div>
       </div>
       <div className="card-body px-0 pb-2">
-        <div className="table-responsive p-0">
-          <BatchList/>
-        </div>
+        <BatchList/>
       </div>
     </div>
   </div>

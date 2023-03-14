@@ -42,7 +42,7 @@ export default function BusinessReports(){
     }
 
     return(
-    <div>
+    <>
       <div className="row">
           <div className="col-12">
               <div className="card my-4">
@@ -96,7 +96,7 @@ export default function BusinessReports(){
             </div>
           </div>
         </div>
-      </div>
+      </>
         )
     }
 
