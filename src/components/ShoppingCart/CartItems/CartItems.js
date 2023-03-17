@@ -75,6 +75,7 @@ const CartItems = () => {
   const customerAddress = useSelector(getCustomerAddress)
   const [isOpen, setIsOpen] = useState(false)
   const [printState, setPrintState] = useState(false)
+  const [empty, setEmpty] = useState('')
 
   const [businessPartnerName, setBusinessPartnerName] = useState(`Client's Name`)
   const [adminPortalUserId, setAdminPortalUserId] = useState(3)
@@ -248,25 +249,30 @@ const CartItems = () => {
   }
 
   const makeSale = (callback) => {
-    dispatch(postSale(
-      {
-        adminPortalUserId: userID,
-        bundleId: postBundleId,
-        businessPartnerId,
-        currencyId,
-        order: {
-          amount: total,
-          dateCreated: today,
-          payingAccountNumber: "TelOne",
-          quantity: totalQty
+    if(currencyId===''){
+      setEmpty("Please select currency")
+    }
+    else{
+      dispatch(postSale(
+        {
+          adminPortalUserId: userID,
+          bundleId: postBundleId,
+          businessPartnerId,
+          currencyId,
+          order: {
+            amount: total,
+            dateCreated: today,
+            payingAccountNumber: "TelOne",
+            quantity: totalQty
+          }
         }
-      }
-    ))
-    var todayDate = new Date().toLocaleDateString('en-US', {year: 'numeric', month: '2-digit', day: '2-digit'}); // 08/19/2020 (month and day with two digits)
-    setCurrentDate(todayDate)
-    console.log(todayDate);
-    setPrintState(true)
-    callback()
+      ))
+      var todayDate = new Date().toLocaleDateString('en-US', {year: 'numeric', month: '2-digit', day: '2-digit'}); // 08/19/2020 (month and day with two digits)
+      setCurrentDate(todayDate)
+      console.log(todayDate);
+      setPrintState(true)
+      callback()
+    }
   }
 
   const saleByBundle = (bundleId, quantity) => {
@@ -646,6 +652,7 @@ const CartItems = () => {
           </div>
           <label className="form-label" style={{marginBottom: '0px'}}>Customer</label>                  
           {renderedBusinessPartner}
+          <div style={{ color: 'red', marginBottom: '10px' }}>{empty}</div>
           <div className="dropdown">
               <button 
                   className="btn bg-gradient-primary dropdown-toggle" 

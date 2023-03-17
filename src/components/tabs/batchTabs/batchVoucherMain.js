@@ -33,13 +33,13 @@ export default function BatchVoucherDetails(){
                 </h6>
               </div>
             </div>
+            <div className="card-body px-0 mx-3 pb-2">
+              <div className="table-responsive p-0">
+                {/*<BatchDetails/>*/}
+                <VoucherList/>
+              </div>
+            </div>
           </div>
-        <div className="card-body px-0 pb-2">
-          <div className="table-responsive p-0">
-            {/*<BatchDetails/>*/}
-            <VoucherList/>
-          </div>
-        </div>
       </div>
     </div>
   </div>

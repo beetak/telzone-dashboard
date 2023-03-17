@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { batchActions, getLoadingStatus, getSearchMessage, getSoldStatus, getStatusSearch, getUsedStatus, getVerified, voucherVerification } from '../../../store/batch-slice';
+import { batchActions, getLoadingStatus, getSearchMessage, getShow, getSoldStatus, getStatusSearch, getUsedStatus, getVerified, voucherVerification } from '../../../store/batch-slice';
 import { BeatLoader } from 'react-spinners';
 import VoucherVerification from '../VoucherVerification/VoucherVerification';
 
@@ -11,6 +11,7 @@ const VoucherDetails = ({ voucherCount, usedCount, soldCount, bundleType }) => {
   const soldState = useSelector(getSoldStatus)
   const usedState = useSelector(getUsedStatus)
   const verified = useSelector(getVerified)
+  const showMore = useSelector(getShow)
 
   console.log("verified: ", verified.message)
 
@@ -80,7 +81,7 @@ const VoucherDetails = ({ voucherCount, usedCount, soldCount, bundleType }) => {
 
   return (
     <div className='row pb-2'>
-      <div className="col-md-6 mt-4">
+      <div className="col-md-6">
         <div className="card h-100 mb-4">
           <div className="card-header pb-0 px-3">
             <div className="row">
@@ -139,9 +140,7 @@ const VoucherDetails = ({ voucherCount, usedCount, soldCount, bundleType }) => {
           </div>
         </div>
       </div>
-      <div className="col-md-6 mt-4 pb-2">
-        <VoucherVerification/>
-      </div>
+      <VoucherVerification/>
     </div>
   );
 }

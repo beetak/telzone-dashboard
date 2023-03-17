@@ -74,10 +74,10 @@ const FurtherDetails = () => {
 
   return (
     <>
-    <div class="col-lg-6 py-4"> 
+    <div class="col-lg-6"> 
       <div className="row">
         <div className="col-12">
-          <div className="card h-100 my-4">
+          <div className="card h-100">
             <div className="card-header pb-0 px-3">
               <div className="row">
                 <div className="col-md-6">
@@ -96,6 +96,34 @@ const FurtherDetails = () => {
                     </div>
                     <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
                       {"bundleType"}
+                    </div>
+                  </li>
+                  <li className="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                    <div className="d-flex align-items-center">
+                      <div className="d-flex flex-column">
+                        <h6 className="mb-1 text-dark text-sm">Voucher Status</h6>
+                      </div>
+                    </div>
+                    <div className="d-flex align-items-center text-info text-gradient text-sm font-weight-bold">
+                    {
+                      message==='found'?
+                      !verified.data.sold && !verified.data.used ? (
+                        <div className="d-flex align-items-center text-info text-gradient text-sm font-weight-bold">
+                          Available
+                        </div>) : 
+                        (
+                        verified.data.sold && !verified.data.used ?
+                          <div className="d-flex align-items-center text-info text-gradient text-sm font-weight-bold">
+                            Sold and Not Used
+                          </div> : 
+                          (
+                          verified.data.sold && verified.data.used ?
+                            <span class="badge badge-sm bg-gradient-secondary w-50 p-2">Sold & used</span> : 
+                            ''
+                          )
+                        ):
+                        ''
+                      }
                     </div>
                   </li>
                   <li className="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">

@@ -14,20 +14,25 @@ const CategoryPost = () => {
     const dispatch = useDispatch()
 
     const handleSubmit = async (e) => {
-      e.preventDefault();
-      dispatch(postCategory({ 
-        bundleCategory: {
-          dateCreated: "2022-11-25T08:06:39.395Z",
-          description,
-          duration,
-          name,
-        },
-        userID: 1
-       })
-      );
-      setDescription('')
-      setDuration('Bundle Life Span')
-      setName('')
+        e.preventDefault();
+        if(name==='' || description==='' || duration===''){
+            setEmpty("Please fill in all the fields")
+        }
+        else{
+            dispatch(postCategory({ 
+                bundleCategory: {
+                dateCreated: "2022-11-25T08:06:39.395Z",
+                description,
+                duration,
+                name,
+                },
+                userID: 1
+            })
+            );
+            setDescription('')
+            setDuration('Bundle Life Span')
+            setName('')
+        }
     };
     
   return (

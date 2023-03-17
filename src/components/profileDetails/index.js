@@ -11,21 +11,27 @@ const id = localStorage.getItem('userId')
 
 export default function ProfileDetails(){
 
+    const [empty, setEmpty] = useState('')
     const [password, setPassword] = useState('')
     const dispatch = useDispatch()
 
     const handleSubmit = async (e) => {
       e.preventDefault();
-      dispatch(updateUser({ 
-        active: true,
-        emailAddress,
-        firstname,
-        id,
-        surname,
-        password
-       })
-      );
-      setPassword('')
+      if(password===''){
+        setEmpty("Please provide the new password")
+      }
+      else{
+        dispatch(updateUser({ 
+          active: true,
+          emailAddress,
+          firstname,
+          id,
+          surname,
+          password
+        })
+        );
+        setPassword('')
+      }
     };
       let user
 
@@ -101,6 +107,7 @@ export default function ProfileDetails(){
                 <li className="list-group-item border-0 ps-0 pb-0">
                   <strong className="text-dark text-sm">Password Reset:</strong> &nbsp;
                   <form >
+                    <div style={{ color: 'red', marginBottom: '10px' }}>{empty}</div>
                     <label className="form-label" style={{padding: 0}}>Enter New Password</label>
                     <div className="input-group input-group-dynamic">
                         <input type="text" name="password" onChange={(e)=>setPassword(e.target.value)} value={password} className="form-control" style={{padding: 0}}/>
@@ -110,7 +117,6 @@ export default function ProfileDetails(){
                 </li>
               </ul>
             </div>
-            
           </div>
         </div>
         {user}

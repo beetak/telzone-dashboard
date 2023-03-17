@@ -21,16 +21,21 @@ const AdvertPost = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        dispatch(postAsyncAdvert({ 
-            advertsDTO: {
-                description,
-                image,
-                title
-              }
-            })
-        );
-        setTitle('')
-        setDescription('')
+        if(title==='' || description==='' || image===''){
+          setEmpty("Please fill in all the fields")
+        }
+        else{
+          dispatch(postAsyncAdvert({ 
+              advertsDTO: {
+                  description,
+                  image,
+                  title
+                }
+              })
+          );
+          setTitle('')
+          setDescription('')
+        }
     };
     
   return (

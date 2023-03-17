@@ -58,37 +58,19 @@ const VoucherList = () => {
     </tr>
   }
 
-  // let renderedVouchers = ''
-  // if(count>0){
-  //   renderedVouchers = (
-  //     Object.values(vouchers.data).map((voucher, index)=>(
-  //       <tr key={index}>
-  //         <VoucherCard data={voucher} index={index}/>
-  //       </tr>
-  //     ))
-  //   )
-  // }
-  // else{
-  //   renderedVouchers = <tr>
-  //     <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No Vouchers Exist In This Batch</h5></td>
-  //   </tr>
-  // }
-
   let errorMsg =  
     <tr>
       <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>
     </tr>
 
   return (
-    <div className="card-body px-0 pb-2">
-      <div className="table-responsive p-0">
+    <div className="card-body">
       {
         loading==='pending'?
         loadingAnimation: 
         loading ==='rejected'?
           errorMsg: renderedVouchers
       }
-      </div>
     </div>
   );
 }

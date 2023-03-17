@@ -12,6 +12,7 @@ import { getToggleStatus } from "../../store/toggle-slice";
 import { fetchAsyncCurrency } from "../../store/currency-slice";
 import VoucherVerification from "../../components/Vouchers/VoucherVerification/VoucherVerification";
 import FurtherDetails from "../../components/Vouchers/FurtherDetails/FurtherDetails";
+import { getShow } from "../../store/batch-slice";
 
 export default function VoucherVerificationPage () {
     // return(
@@ -24,7 +25,9 @@ export default function VoucherVerificationPage () {
     //             </div>
     //         </main>
     //     </div>
-    // )
+    // 
+
+    const showMore = useSelector(getShow)
 
     const dispatch = useDispatch()
     const active = true
@@ -46,7 +49,10 @@ export default function VoucherVerificationPage () {
                     <div className="container-fluid">
                         <div className="row">
                             <VoucherVerification/>
-                            {/*<FurtherDetails/>*/}
+                            {
+                                showMore?
+                                    <FurtherDetails/>:''
+                            }
                         </div>
                     </div>
                 </div>

@@ -44,27 +44,32 @@ const BundlePost = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(postBundle({
-      bundle: {
-        description,
-        groupPolicyId,
-        id: 1,
-        image,
-        name,
-        price
-      },
-      bundleCategoryID,
-      currencyID,
-      userID: 1
-    })
-    );
-    setName('')
-    setDescription('')
-    setPrice('')
-    setCategoryState('Product Type')
-    setCurrencyState('Currency')
-    setGroupPolicyState('Policy Type')
-    setImage('')
+    if(name==='' || description==='' || image==='' || price==='' || bundleCategoryID==='' || currencyID===''){
+      setEmpty("Please fill in all the fields")
+    }
+    else{
+      dispatch(postBundle({
+        bundle: {
+          description,
+          groupPolicyId,
+          id: 1,
+          image,
+          name,
+          price
+        },
+        bundleCategoryID,
+        currencyID,
+        userID: 1
+      })
+      );
+      setName('')
+      setDescription('')
+      setPrice('')
+      setCategoryState('Product Type')
+      setCurrencyState('Currency')
+      setGroupPolicyState('Policy Type')
+      setImage('')
+    }
   };
 
   const getPolicy = (id, name) => {
