@@ -15,22 +15,36 @@ export default function ProfileDetails(){
     const [password, setPassword] = useState('')
     const dispatch = useDispatch()
 
+    function containsUppercase(str) {
+      return /[A-Z]/.test(str);
+    }
+
+    function passwordLength(str) {
+      return  /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]\w{7,14}$/.test(str);
+    }
+
     const handleSubmit = async (e) => {
       e.preventDefault();
       if(password===''){
         setEmpty("Please provide the new password")
       }
       else{
-        dispatch(updateUser({ 
-          active: true,
-          emailAddress,
-          firstname,
-          id,
-          surname,
-          password
-        })
-        );
-        setPassword('')
+        if(!containsUppercase(password) || !passwordLength(password)){
+          setEmpty("Weak Password")
+        }
+        else{
+          dispatch(updateUser({ 
+            active: true,
+            emailAddress,
+            firstname,
+            id,
+            surname,
+            password
+          })
+          );
+          setPassword('')
+          setEmpty('')
+        }
       }
     };
       let user
@@ -110,7 +124,7 @@ export default function ProfileDetails(){
                     <div style={{ color: 'red', marginBottom: '10px' }}>{empty}</div>
                     <label className="form-label" style={{padding: 0}}>Enter New Password</label>
                     <div className="input-group input-group-dynamic">
-                        <input type="text" name="password" onChange={(e)=>setPassword(e.target.value)} value={password} className="form-control" style={{padding: 0}}/>
+                        <input type="text" name="password" onChange={(e)=>setPassword(e.target.value)} value={password} className="form-control" style={{padding: 0}} placeholder='Enter at least 8 characters'/>
                     </div>
                   <button onClick={handleSubmit} className="btn btn-primary mt-1">Reset</button>
                   </form>

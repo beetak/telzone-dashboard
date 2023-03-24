@@ -4,7 +4,8 @@ const toggleSlice = createSlice({
     name: 'toggle',
     initialState: {
         toggleState: true,
-        local: false
+        local: false,
+        startTime: ''
     },
     reducers: {
         changeState(state, action){
@@ -12,6 +13,9 @@ const toggleSlice = createSlice({
         },
         changePaymentMethod(state, action){
             state.local = action.payload.payment
+        },
+        setTimeSpan(state, action){
+            state.startTime = action.payload
         }
     }
 })
@@ -19,4 +23,5 @@ const toggleSlice = createSlice({
 export const toggleActions = toggleSlice.actions
 export const getToggleStatus = (state) => state.toggle.toggleState
 export const getPaymentMethod = (state) => state.toggle.local
+export const getStartTime = (state) => state.toggle.startTime
 export default toggleSlice

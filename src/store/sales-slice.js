@@ -13,6 +13,12 @@ export const fetchAsyncSalesByPartnerId = createAsyncThunk('sale/fetchAsyncSales
     return [...response.data.data]
 })
 
+export const fetchAsyncSalesByCurrencyId = createAsyncThunk('sale/fetchAsyncSalesByCurrencyId', async ({startDate, date, curId}) => {
+    const response = await Api
+    .get(`/order/currency/${startDate}/${date}/${curId}`)
+    return [...response.data.data]
+})
+
 export const fetchAsyncSalesByAgent = createAsyncThunk('sale/fetchAsyncSalesByAgent', async ({curId, userID, date}) => {
     const response = await Api
     .get(`/order/currency${curId}/adminPortalUser${userID}/date${date}`)
@@ -36,6 +42,7 @@ const saleSlice = createSlice({
     initialState: {
         itemsList: [],
         sales: [],
+        totalSales: [],
         partnerSales: [],
         agentSales: [],
         voucherList: [],
@@ -115,6 +122,23 @@ const saleSlice = createSlice({
             console.log("rejected")
             state.loadingStatus = 'rejected'
         },
+        [fetchAsyncSalesByCurrencyId.pending]: (state)=>{
+            console.log("pending")
+            state.loadingStatus = 'pending'
+        },
+        [fetchAsyncSalesByCurrencyId.fulfilled]: (state, action)=>{
+            console.log("fulfilled")
+            // return {...state, sales: payload}
+            const loadedSales = action.payload.map(sale=>{
+                return sale
+            })
+            state.totalSales = loadedSales
+            state.loadingStatus = 'fulfilled'
+        },
+        [fetchAsyncSalesByCurrencyId.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.loadingStatus = 'rejected'
+        },
         [fetchAsyncSales.pending]: (state)=>{
             console.log("pending")
             state.loadingStatus = 'pending'
@@ -157,6 +181,7 @@ const saleSlice = createSlice({
 
 export const saleActions = saleSlice.actions
 export const getAllSales = (state) => state.sale.sales
+export const getTotalSales = (state) => state.sale.totalSales
 export const getPartnerSales = (state) => state.sale.partnerSales
 export const getAgentSales = (state) => state.sale.agentSales
 export const getLoadingStatus = (state) => state.sale.loadingStatus

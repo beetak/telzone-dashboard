@@ -7,8 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAsyncBusiness} from "../../../store/business-slice";
 import { fetchAsyncClients } from "../../../store/clients-slice";
 import { getToggleStatus } from "../../../store/toggle-slice";
-import { fetchAsyncSales } from "../../../store/sales-slice";
+import { fetchAsyncSales, fetchAsyncSalesByCurrencyId } from "../../../store/sales-slice";
 import { fetchAsyncBusinessRole } from "../../../store/business-role-slice";
+import { fetchAsyncDailyPayments, fetchAsyncPayments } from "../../../store/customerPayments-slice";
+import { fetchAsyncCurrency, getGlobalCurreny } from "../../../store/currency-slice";
 
 const url = "http://localhost:8082/smart-wifi/user/"; // URL variable stores JSON url || API taken from 10 Degrees WordPress Agency
 
@@ -24,6 +26,9 @@ export default function BusinessReports(){
       dispatch(fetchAsyncClients())
       dispatch(fetchAsyncSales())
       dispatch(fetchAsyncBusinessRole())
+      dispatch(fetchAsyncPayments())
+      dispatch(fetchAsyncDailyPayments())
+      dispatch(fetchAsyncCurrency(true))
     }, [dispatch, active]);
 
     let tabinfo

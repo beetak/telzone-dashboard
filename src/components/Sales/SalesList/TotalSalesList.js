@@ -5,6 +5,7 @@ import BeatLoader from 'react-spinners/BeatLoader'
 import { getAllBusinessPartners } from '../../../store/business-slice';
 import TotalSalesCard from '../SalesCard/TotalSalesCard';
 import { useReactToPrint } from 'react-to-print';
+import TotalPurchaseReport from '../../SalesReport/TotalPurchaseReport';
 
 const userRole = localStorage.getItem('role')
 
@@ -62,7 +63,8 @@ const TotalSalesList = () => {
 
   return (
     <div>    
-      <p className="mb-0 text-sm-end me-5"><span className="text-success text-sm font-weight-bolder" style={{cursor: 'pointer'}} onClick={()=>handlePrint()}>Download pdf </span></p>  
+      <TotalPurchaseReport/>
+      {/*<p className="mb-0 text-sm-end me-5"><span className="text-success text-sm font-weight-bolder" style={{cursor: 'pointer'}} onClick={()=>handlePrint()}>Download pdf </span></p>  
       <table ref={componentRef} className="table align-items-center mb-0">
         <thead>
           <tr>
@@ -83,7 +85,7 @@ const TotalSalesList = () => {
               errorMsg:  renderedSales
           }
         </tbody>
-      </table>
+        </table>*/}
     </div>
   );
 }

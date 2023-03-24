@@ -16,6 +16,7 @@ import statsSlice from "./statistics-slice";
 import toggleSlice from "./toggle-slice";
 import saleSlice from "./sales-slice";
 import businessRoleSlice from "./business-role-slice";
+import customerPaymentsSlice from "./customerPayments-slice";
 
 const store = configureStore({
     reducer: {
@@ -35,7 +36,8 @@ const store = configureStore({
         statistics: statsSlice.reducer,
         toggle: toggleSlice.reducer,
         sale: saleSlice.reducer,
-        businessRole: businessRoleSlice.reducer
+        businessRole: businessRoleSlice.reducer,
+        customerPayments: customerPaymentsSlice.reducer
     }
 })
 export default store

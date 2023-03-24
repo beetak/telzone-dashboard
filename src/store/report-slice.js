@@ -34,15 +34,10 @@ export const fetchAsyncOrganisationReports = createAsyncThunk('report/fetchAsync
     }
 })
 
-export const fetchAsyncNetworkReports = createAsyncThunk('report/fetchAsyncNetworkReports', async () => {   
-    try{
-        const response = await MerakiApi
-        .get(`/organizations/1182283/networks`)
-        return [...response.data]
-    }
-    catch(err){
-        console.log(err)
-    }
+export const fetchAsyncNetworkReports = createAsyncThunk('report/fetchAsyncNetworkReports', async () => {
+    const response = await MerakiApi
+    .get(`/organizations/1182283/networks`)
+    return [...response.data]
 })
 
 export const fetchAsyncUsageReports = createAsyncThunk('report/fetchAsyncUsageReports', async (mac) => {
@@ -62,7 +57,8 @@ const initialState = {
     networkReports: [],
     organisationReports: [],
     usageReports: [],
-    loadingStatus: 'idle'
+    loadingStatus: 'idle',
+    networkLaoding: 'idle'
 }
 const reportSlice = createSlice({
     name: 'report',
@@ -112,11 +108,13 @@ const reportSlice = createSlice({
         [fetchAsyncClientReports.rejected]: (state, {payload})=>{
             console.log("rejected")
         },
-        [fetchAsyncNetworkReports.pending]: ()=>{
+        [fetchAsyncNetworkReports.pending]: (state)=>{
             console.log("pending")
+            state.networkLoading = 'rejected'
         },
         [fetchAsyncNetworkReports.fulfilled]: (state, action)=>{
             console.log("fulfilled")
+            state.networkLoading = 'fulfilled'
             const loadedReports = action.payload.map(report=>{
                 return report
             })
@@ -124,6 +122,7 @@ const reportSlice = createSlice({
         },
         [fetchAsyncNetworkReports.rejected]: (state, {payload})=>{
             console.log("rejected")
+            state.networkLoading = 'rejected'
         },
         [fetchAsyncOrganisationReports.pending]: ()=>{
             console.log("pending")
@@ -147,4 +146,5 @@ export const getAllNetworks = (state) => state.report.networkReports
 export const getAllOrganisations = (state) => state.report.organisationReports
 export const getClientUsage = (state) => state.report.usageReports
 export const getLoadingStatus = (state) => state.report.loadingStatus
+export const getLoadingNetwork = (state) => state.report.networkLaoding
 export default reportSlice

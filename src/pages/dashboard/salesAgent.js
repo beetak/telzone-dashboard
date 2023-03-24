@@ -5,7 +5,7 @@ import TopNavigation from '../../components/NavBar/topNav';
 import DailyReport from '../../components/SalesReport/DailyReport';
 import { fetchAsyncBundles } from '../../store/bundle-slice';
 import { fetchAsyncBusiness } from '../../store/business-slice';
-import { fetchAsyncCurrency, getGlobalCurreny } from '../../store/currency-slice';
+import { fetchAsyncCurrency, getGlobalCurrency } from '../../store/currency-slice';
 import { fetchAsyncSales, fetchAsyncSalesByAgent } from '../../store/sales-slice';
 const userID = localStorage.getItem('userId')
 export default function SalesAgent() {
@@ -18,7 +18,7 @@ export default function SalesAgent() {
 
   const dispatch = useDispatch()
 
-  const curId = useSelector(getGlobalCurreny)
+  const curId = useSelector(getGlobalCurrency)
 
   useEffect(() => {
     dispatch(fetchAsyncSalesByAgent({curId, userID, date}))

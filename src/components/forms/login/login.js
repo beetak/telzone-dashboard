@@ -1,8 +1,8 @@
 import { Component } from "react";
 import axios from 'axios';
 
-// const url = 'http://localhost:8082/smart-wifi/admin-portal-user/login/';
-  // const url = "http://172.27.34.94:8083/smart-wifi/admin-portal-user/login/"
+// const url = 'http://localhost:8083/smart-wifi/admin-portal-user/login/';
+  // const url = "http://172.27.242.113:8083/smart-wifi/admin-portal-user/login/"
 // const url = 'http://10.0.4.251:8083/smart-wifi/admin-portal-user/login/';
 const url = 'http://telzonewifi.telone.co.zw:8083/smart-wifi/admin-portal-user/login/';
 const logo = 'assets/img/logo.png'

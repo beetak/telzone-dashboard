@@ -24,12 +24,16 @@ function App() {
 
   const dispatch = useDispatch()
 
-
-
   useEffect(()=>{
-    dispatch(fetchAsyncNetworkReports())
     dispatch(fetchAsyncOrganisationReports())
   },[dispatch])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      dispatch(fetchAsyncNetworkReports())
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
     
 
   // useEffect(() => {

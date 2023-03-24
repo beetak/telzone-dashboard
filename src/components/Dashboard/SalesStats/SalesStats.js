@@ -1,15 +1,20 @@
 import { useSelector } from "react-redux";
 import { getAllClients } from "../../../store/clients-slice";
-import { getClientsNumber, getDownStreamStats, getTotalStreamStats, getUpStreamStats } from "../../../store/statistics-slice";
+import './blink.css'
+import { useEffect } from "react";
+import { getAllNetworks, getLoadingNetwork } from "../../../store/report-slice";
 
 export default function SalesStats(){
 
-    const upStreamStats = useSelector(getUpStreamStats)
-    const downStreamStats = useSelector(getDownStreamStats)
-    const totalStreamStats = useSelector(getTotalStreamStats)
     const clients = useSelector(getAllClients)
 
     var count = Object.keys(clients).length 
+
+    const networks = useSelector(getAllNetworks)
+    const loading = useSelector(getLoadingNetwork)
+
+    useEffect(()=>{
+    },[loading])
 
     return (
         <>
@@ -33,6 +38,28 @@ export default function SalesStats(){
                     </div>
                 </div>
             </div>
+            <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+                <div className="card">
+                    <div className="card-header p-3 pt-2">
+                        <div className="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute">
+                            <i className="material-icons opacity-10">sync_alt</i>
+                        </div>
+                        <div className="pt-5">
+                            <p className="text-sm mb-0 mt-3 text-capitalize">Meraki connection status: {`\t`}
+                                <span className='blink_text' style={{color:'#4CAF50'}}><strong>Connected</strong></span>
+                            </p>
+                            <p className="text-sm mb-0 mt-1 text-capitalize">DB connection status: {`\t`}
+                                {
+                                    loading==='idle' || loading==='rejected' || loading==='pending' ? <span className='blink_text' style={{color:'red'}}><strong>Disconnected</strong></span>:
+                                    <span className='blink_text' style={{color:'#4CAF50'}}><strong>Connected</strong></span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div className="card-footer p-2">
+                    </div>
+                </div>
+            </div>
         </div>
         </>
     )
@@ -41,4 +68,9 @@ export default function SalesStats(){
 const err = {
     paddingTop: "8px",
     color: "red"
+}
+  
+const LogoCentre = {
+    width: 150,
+    margin: '0 10px'
 }
