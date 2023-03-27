@@ -13,9 +13,9 @@ export const fetchAsyncSalesByPartnerId = createAsyncThunk('sale/fetchAsyncSales
     return [...response.data.data]
 })
 
-export const fetchAsyncSalesByCurrencyId = createAsyncThunk('sale/fetchAsyncSalesByCurrencyId', async ({startDate, date, curId}) => {
+export const fetchAsyncSalesByCurrencyId = createAsyncThunk('sale/fetchAsyncSalesByCurrencyId', async ({startDate, endDate, curId}) => {
     const response = await Api
-    .get(`/order/currency/${startDate}/${date}/${curId}`)
+    .get(`/order/currency/${startDate}/${endDate}/${curId}`)
     return [...response.data.data]
 })
 

@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { currencyActions, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
 import { useReactToPrint } from "react-to-print";
+import { toggleActions } from '../../store/toggle-slice';
 
 const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
@@ -23,6 +24,7 @@ export default function DailyReport() {
     const[currencyID, setCurrencyID] = useState('')
     const[currencyState, setCurrencyState] = useState('Currency')
     const[currencyActioned, setCurrencyActioned]= useState('')
+    const[date, setDate]= useState('')
 
     const currencyData = useSelector(getAllCurrencies)
     const dispatch = useDispatch()
@@ -33,7 +35,7 @@ export default function DailyReport() {
         setCurrencyState(symbol)
         sessionStorage.setItem("currency_id", id);
         dispatch(
-            currencyActions.setGlobaCurrency(id)
+            currencyActions.setGlobalCurrency(id)
         )
     }
 
@@ -128,8 +130,8 @@ export default function DailyReport() {
 
         agentSales.map((items, i)=>{
             if(items.bundles.name===bundleName&&items.businessPartner.name===partner){
-                count += items.orders.quantity
-                totalAmount += items.orders.amount
+                count += items.order.quantity
+                totalAmount += items.order.amount
             }
             voucherType=items.currency.symbol==='USD'?'Cash':'Electronic'
         })
@@ -151,10 +153,17 @@ export default function DailyReport() {
     const salesTotalCalc = () =>{
         let salesTotal = 0
         agentSales.map((item, i)=>{
-            salesTotal += item.orders.amount
+            salesTotal += item.order.amount
         })
         return(
             (Math.round(salesTotal*100)/100).toFixed(2)
+        )
+    }
+
+    const calcDate = (startDay) => {
+        setDate(startDay)
+        dispatch(
+            toggleActions.setDateFrom(startDay)
         )
     }
 
@@ -203,7 +212,7 @@ export default function DailyReport() {
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Region:</span></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Town:</span></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Shop:</span></h6>
-                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Date:</span></h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Date:</span> <input type="date" style={{border: 0}} name="date" onChange={(e) => calcDate(e.target.value)} value={date}/></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Currency:</span> {currencyState}</h6>
                             </div> 
                         </div>

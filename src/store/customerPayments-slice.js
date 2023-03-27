@@ -9,9 +9,9 @@ export const fetchAsyncPayments = createAsyncThunk('user/fetchAsyncPayments', as
     return [...response.data.data]
 })
 
-export const fetchAsyncPeriodicalPayments = createAsyncThunk('user/fetchAsyncPeriodicalPayments', async ({startDate, date, curSymbol}) => {
+export const fetchAsyncPeriodicalPayments = createAsyncThunk('user/fetchAsyncPeriodicalPayments', async ({startDate, endDate, curSymbol}) => {
     const response = await Api
-    .get(`/customerPayment/${startDate}/${date}/${curSymbol}`)
+    .get(`/customerPayment/${startDate}/${endDate}/${curSymbol}`)
     return [...response.data.data]
 })
 

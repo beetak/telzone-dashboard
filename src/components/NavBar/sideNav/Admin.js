@@ -6,14 +6,7 @@ const surname = localStorage.getItem('surname')
 const userRole = localStorage.getItem('role')
 
 export default class Admin extends Component{
-  handleUserRole =()=>{
-    alert("Access Forbidden")
-    return window.location = "/"
-  }
-  componentDidMount(){
-    // userRole !== 'Admin' ? this.handleUserRole() : console.log("welcome")
-   
-  }
+ 
     render(){
         return(
             <>

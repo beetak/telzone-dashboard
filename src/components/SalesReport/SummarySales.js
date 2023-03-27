@@ -9,6 +9,7 @@ import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
 import { useReactToPrint } from "react-to-print";
 import { getAllCustomerPayments, getPeriodicalPayments } from '../../store/customerPayments-slice';
 import { toggleActions } from '../../store/toggle-slice';
+// import datetime from 'datetime'
 
 const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
@@ -18,16 +19,24 @@ export default function SummarySales() {
 
     const today = new Date()
     const date = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+    const dateString = date.toString();
 
     const totalSales = useSelector(getTotalSales)
     const periodicalSales = useSelector(getPeriodicalPayments)
     
-    const [filter, setFilter] = useState('Filter by');
+    const[filter, setFilter] = useState('Filter by');
     const[currencyID, setCurrencyID] = useState('')
     const[currencyState, setCurrencyState] = useState('Currency')
     const[currencyActioned, setCurrencyActioned]= useState('')
     const[timeSpan, setTimeSpan] = useState('')
     const[duration, setDuration] = useState('Filter By')
+    const[birthday, setBirthday] = useState('')
+
+
+    const [startDay, setStartDay] = useState(date)
+    const [endDay, setEndDay] = useState('')
+
+    console.log("my bday: ",birthday)
 
     const currencyData = useSelector(getAllCurrencies)
     const dispatch = useDispatch()
@@ -55,34 +64,34 @@ export default function SummarySales() {
       ))
     ):(<div><h1>Error</h1></div>)
 
-    function subtractMonths(date, months) {
-        date.setMonth(date.getMonth() - months);
-        return date;
-    }
+    // function subtractMonths(date, months) {
+    //     date.setMonth(date.getMonth() - months);
+    //     return date;
+    // }
 
-    function subtractWeek(date, days) {
-        date.setDate(date.getDate() - days);
-        return date;
-    }
+    // function subtractWeek(date, days) {
+    //     date.setDate(date.getDate() - days);
+    //     return date;
+    // }
       
-    // August 13, 2022
-    const newDate = new Date();
-    const dateTime = new Date();
+    // // August 13, 2022
+    // const newDate = new Date();
+    // const dateTime = new Date();
     
-    const stringDate = subtractMonths(newDate, 1);
-    const myDate = subtractWeek(dateTime, 7);
+    // const stringDate = subtractMonths(newDate, 1);
+    // const myDate = subtractWeek(dateTime, 7);
 
-    const startDate = `${stringDate.getFullYear()}-${stringDate.getMonth()+1}-${stringDate.getDate()}`;
-    const weekDate = `${myDate.getFullYear()}-${myDate.getMonth()+1}-${myDate.getDate()}`;
+    // const startDate = `${stringDate.getFullYear()}-${stringDate.getMonth()+1}-${stringDate.getDate()}`;
+    // const weekDate = `${myDate.getFullYear()}-${myDate.getMonth()+1}-${myDate.getDate()}`;
     
-    // May 13, 2022
-    console.log('start date',startDate); // 2022-05-13T00:00:00.000Z
-    console.log('start date2',weekDate); // 2022-05-13T00:00:00.000Z
+    // // May 13, 2022
+    // console.log('start date',startDate); // 2022-05-13T00:00:00.000Z
+    // console.log('start date2',weekDate); // 2022-05-13T00:00:00.000Z
 
     let durationDrop = 
     
     <>
-        <div className="dropdown">
+        <div className="dropdown" style={{marginLeft: 10}}>
             <button 
                 className="btn bg-gradient-primary dropdown-toggle" 
                 type="button" 
@@ -92,13 +101,23 @@ export default function SummarySales() {
                 >
                 {duration}
             </button>
-            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton" style={{paddingLeft:20}}>
                 <li  
                     onClick={
                         () => {
-                            dispatch(
-                                toggleActions.setTimeSpan(weekDate)
-                            )
+                            // dispatch(
+                            //     toggleActions.setTimeSpan(weekDate)
+                            // )
+                            setDuration('Daily')
+                        }
+                    }>Daily
+                </li>
+                <li  
+                    onClick={
+                        () => {
+                            // dispatch(
+                            //     toggleActions.setTimeSpan(weekDate)
+                            // )
                             setDuration('Weekly')
                         }
                     }>Weekly
@@ -106,9 +125,9 @@ export default function SummarySales() {
                 <li  
                     onClick={
                         () => {
-                            dispatch(
-                                toggleActions.setTimeSpan(startDate)
-                            )
+                            // dispatch(
+                            //     toggleActions.setTimeSpan(startDate)
+                            // )
                             setDuration('Monthly')
                         }
                     }>Monthly
@@ -117,6 +136,12 @@ export default function SummarySales() {
         </div>
         <br/>
     </>
+
+    let datePicker = 
+        duration === 'Daily'? <input type='date'/> : 
+        duration === 'Weekly'? <input type='date'/> : 
+        duration === 'Monthly'? <input type='date'/> : ''
+
     const data = periodicalSales
     const salesData = totalSales
 
@@ -232,6 +257,51 @@ export default function SummarySales() {
         )
     }
 
+    const calcDate = (startDay) => {
+        setBirthday(startDay)
+        if(duration === 'Daily'){
+            setEndDay(startDay)
+            dispatch(
+                toggleActions.setTimeSpan({startDate: startDay, endDate: startDay})
+            )
+        }
+        else if(duration === 'Weekly'){
+            function subtractWeek(date, days) {
+                date.setDate(date.getDate() + days);
+                return date;
+            }
+            const dateTime = new Date(startDay);
+            const myDate = subtractWeek(dateTime, 7);
+            const weekDate = `${myDate.getFullYear()}-${myDate.getMonth()+1}-${myDate.getDate()}`;
+            setEndDay(weekDate)
+            console.log('start date2',weekDate); // 2022-05-13T00:00:00.000Z
+            dispatch(
+                toggleActions.setTimeSpan({startDate: startDay, endDate: weekDate})
+            ) 
+
+        }
+        else if(duration  === 'Monthly'){
+            function subtractMonths(date, months) {
+                date.setMonth(date.getMonth() + months);
+                return date;
+            }  
+            const newDate = new Date(startDay);  
+            const stringDate = subtractMonths(newDate, 1);   
+            const monthDate = `${stringDate.getFullYear()}-${stringDate.getMonth()+1}-${stringDate.getDate()}`; 
+            setEndDay(monthDate) 
+            console.log('start date',monthDate); // 2022-05-13T00:00:00.000Z  
+            dispatch(
+                toggleActions.setTimeSpan({startDate: startDay, endDate: monthDate})
+            ) 
+        }
+        else {
+            setEndDay(startDay)
+            dispatch(
+                toggleActions.setTimeSpan({startDate: startDay, endDate: startDay})
+            )
+        }
+    }
+
   return (
     <>
         <div className='row'>
@@ -254,7 +324,6 @@ export default function SummarySales() {
                                 {renderedCurrency}
                                 </ul>
                             </div>
-                            <div> </div>
                             {durationDrop}
                         </div>
                         <div className="col-6 text-end">
@@ -270,11 +339,13 @@ export default function SummarySales() {
                             </div>                      
                             <div class="col-6 text-end">
                                 <h6 className="mb-0">SUMMARY NATIONAL SALES REPORT</h6>
+                                <h6 className="mb-0">Natioinal Total</h6>
                             </div>
                         </div>
                         <div className="row">
                             <div className="col-6 align-items-center">
-                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Date:</span> {date}</h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>From Date:</span> <input type="date" style={{border: 0}} name="birthday" onChange={(e) => calcDate(e.target.value)} value={birthday} max={dateString}/></h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>To Date:</span> {endDay<date?endDay:date}</h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Currency:</span> {currencyState}</h6>
                             </div> 
                         </div>

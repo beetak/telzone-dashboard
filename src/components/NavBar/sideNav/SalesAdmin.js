@@ -8,13 +8,6 @@ const userRole = localStorage.getItem('role')
 
 export default class SalesAdmin extends Component{
 
-    handleUserRole =()=>{
-      alert("Access Forbidden")
-      return window.location = "/"
-    }
-    componentDidMount(){
-      // userRole !== 'Sales Admin' ? this.handleUserRole() : console.log("welcome")
-    }
     render(){
         return(
             <>

@@ -5,51 +5,36 @@ const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
 const userRole = localStorage.getItem('role')
 
-export default class SuperAdmin extends Component{
+
+export default class ShopManager extends Component{
 
     render(){
         return(
             <>
             <ul className="navbar-nav">
+      
       <li className="nav-item">
-      {/* <Link className="nav-link text-white active bg-gradient-primary" to="/"> */}
-        <Link className="nav-link text-white" to="/dashboard">
+        <Link className="nav-link text-white " to="/partners">
           <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i className="material-icons opacity-10">dashboard</i>
+            <i className="material-icons opacity-10">add_business</i>
           </div>
-          <span className="nav-link-text ms-1">Dashboard</span>
+          <span className="nav-link-text ms-1">Business Partners</span>
         </Link>
       </li>
       <li className="nav-item">
-        <Link to="/business-reports" className="nav-link text-white ">
-          <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i className="material-icons opacity-10">people</i>
-          </div>
-          <span className="nav-link-text ms-1">Business Reports</span>
-        </Link>
-      </li>
-      <li className="nav-item">
-        <Link className="nav-link text-white " to="/networks">
-          <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i className="material-icons opacity-10">payment</i>
-          </div>
-          <span className="nav-link-text ms-1">Network Management</span>
-        </Link>
-      </li>
-      <li className="nav-item">
-        <Link className="nav-link text-white " to="/recharge">
+        <Link className="nav-link text-white " to="/verify">
           <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i className="material-icons opacity-10">receipt_long</i>
           </div>
-          <span className="nav-link-text ms-1">Recharge</span>
+          <span className="nav-link-text ms-1">Voucher Verification</span>
         </Link>
       </li>
       <li className="nav-item">
-        <Link className="nav-link text-white " to="/adverts">
+        <Link className="nav-link text-white " to="/sales-reports">
           <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i className="material-icons opacity-10">campaign</i>
+            <i className="material-icons opacity-10">receipt_long</i>
           </div>
-          <span className="nav-link-text ms-1">Adverts</span>
+          <span className="nav-link-text ms-1">Reports</span>
         </Link>
       </li>
       <li className="nav-item mt-3">

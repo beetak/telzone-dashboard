@@ -22,7 +22,7 @@ export default function BusinessPartnerDetails (){
 
       let data
         
-        userRole === 'Admin' ? 
+        userRole === 'Admin' || userRole === 'Sales Manager' ? 
           data = (
             <div class="col-lg-4 py-4">                
               <div className="row">

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getGlobalCurrency, getGlobalSymbol } from "../../../../store/currency-slice";
 import { fetchAsyncDailyPayments, fetchAsyncPeriodicalPayments } from "../../../../store/customerPayments-slice";
 import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByPartnerId } from "../../../../store/sales-slice";
-import { getStartTime } from "../../../../store/toggle-slice";
+import { getEndTime, getStartTime } from "../../../../store/toggle-slice";
 import DailySalesList from "../../../Sales/SalesList/DailySalesList";
 import PartnerSalesList from "../../../Sales/SalesList/PartnerSalesList";
 import SalesList from "../../../Sales/SalesList/PartnerSalesList";
@@ -25,13 +25,14 @@ export default function SalesDetails (){
   const curId = useSelector(getGlobalCurrency)
   const curSymbol = useSelector(getGlobalSymbol)
   const startDate = useSelector(getStartTime)
+  const endDate = useSelector(getEndTime)
 
   useEffect(() => {
     dispatch(fetchAsyncSalesByPartnerId(id))
-    dispatch(fetchAsyncSalesByCurrencyId({startDate, date, curId}))
-    dispatch(fetchAsyncPeriodicalPayments({startDate, date, curSymbol}))
+    dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId}))
+    dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol}))
     // dispatch(fetchAsyncDailyPayments({date, curSymbol}))
-  }, [dispatch, id, curId, curSymbol, startDate]);
+  }, [dispatch, id, endDate, curId, curSymbol, startDate]);
 
   const [show, setShow] =useState('')
   let tab = ''

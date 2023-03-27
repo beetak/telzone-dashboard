@@ -76,7 +76,9 @@ export default class LoginForm extends Component {
       userRole==='' ? (
         window.location='/'
       ):(
-        userRole==='Sales Admin'? (window.location = '/sales'):(window.location = '/dashboard')
+        userRole==='Sales Admin'? (window.location = '/sales'):(
+          userRole==='Shop Manager'? (window.location = '/sales'):(window.location = '/dashboard')
+        )
       )
     }
 
