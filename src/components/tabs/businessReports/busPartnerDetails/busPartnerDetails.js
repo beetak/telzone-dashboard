@@ -22,7 +22,7 @@ export default function BusinessPartnerDetails (){
 
       let data
         
-        userRole === 'Admin' || userRole === 'Sales Manager' ? 
+        userRole === 'Admin' || userRole === 'Supervisor' ? 
           data = (
             <div class="col-lg-4 py-4">                
               <div className="row">
@@ -50,7 +50,7 @@ export default function BusinessPartnerDetails (){
 
 <div className="container-fluid">
   <div className="row">
-    <div class={userRole==='Super Admin'? 'col-lg-12 py-4':  'col-lg-8 py-4'}>                
+    <div class={userRole==='Super Admin'? 'col-lg-12 py-4': 'col-lg-8 py-4'}>                
       <div className="row">
         <div className="col-12">
           <div className="card my-4">

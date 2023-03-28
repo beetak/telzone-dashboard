@@ -31,12 +31,15 @@ export default function SummarySales() {
     const[timeSpan, setTimeSpan] = useState('')
     const[duration, setDuration] = useState('Filter By')
     const[birthday, setBirthday] = useState('')
+    const[secondDate, setSecondDate] = useState('')
+    const[startDate, setStartDate] = useState('')
+    const[endDate, setEndDate] = useState('')
+    const[empty, setEmpty] = useState('')
+    const[validate, setValidate] = useState('')
 
 
     const [startDay, setStartDay] = useState(date)
     const [endDay, setEndDay] = useState('')
-
-    console.log("my bday: ",birthday)
 
     const currencyData = useSelector(getAllCurrencies)
     const dispatch = useDispatch()
@@ -63,30 +66,6 @@ export default function SummarySales() {
         </tr>
       ))
     ):(<div><h1>Error</h1></div>)
-
-    // function subtractMonths(date, months) {
-    //     date.setMonth(date.getMonth() - months);
-    //     return date;
-    // }
-
-    // function subtractWeek(date, days) {
-    //     date.setDate(date.getDate() - days);
-    //     return date;
-    // }
-      
-    // // August 13, 2022
-    // const newDate = new Date();
-    // const dateTime = new Date();
-    
-    // const stringDate = subtractMonths(newDate, 1);
-    // const myDate = subtractWeek(dateTime, 7);
-
-    // const startDate = `${stringDate.getFullYear()}-${stringDate.getMonth()+1}-${stringDate.getDate()}`;
-    // const weekDate = `${myDate.getFullYear()}-${myDate.getMonth()+1}-${myDate.getDate()}`;
-    
-    // // May 13, 2022
-    // console.log('start date',startDate); // 2022-05-13T00:00:00.000Z
-    // console.log('start date2',weekDate); // 2022-05-13T00:00:00.000Z
 
     let durationDrop = 
     
@@ -136,11 +115,6 @@ export default function SummarySales() {
         </div>
         <br/>
     </>
-
-    let datePicker = 
-        duration === 'Daily'? <input type='date'/> : 
-        duration === 'Weekly'? <input type='date'/> : 
-        duration === 'Monthly'? <input type='date'/> : ''
 
     const data = periodicalSales
     const salesData = totalSales
@@ -242,7 +216,6 @@ export default function SummarySales() {
     const salesTotalCalc = () =>{
         let successTotal = 0
         let total = 0
-        let successQty = 0
         periodicalSales.map((item, i)=>{
             if(item.status === 'Successful'){
                 successTotal += item.amount
@@ -302,6 +275,26 @@ export default function SummarySales() {
         }
     }
 
+    const submitRequest = async (endDate) => {
+        setEndDate(endDate)
+        if(currencyID===''){
+          setEmpty("Please select the currency")
+        }
+        else if(startDate==='' || endDate===''){
+            setValidate("Please select the start date and reselect end date")
+        }
+        else{
+            if(startDate>endDate){
+                setValidate("Invalid Time Span")
+            }
+            else{
+                dispatch(
+                    toggleActions.setTimeSpan({startDate, endDate})
+                )
+            }
+        }
+    }
+
   return (
     <>
         <div className='row'>
@@ -324,7 +317,7 @@ export default function SummarySales() {
                                 {renderedCurrency}
                                 </ul>
                             </div>
-                            {durationDrop}
+                            <div><sup style={{color: 'red', paddingLeft: 10}}>{empty}</sup></div>
                         </div>
                         <div className="col-6 text-end">
                             <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" onClick={()=>handlePrint()}><i class="material-icons text-lg position-relative me-1">picture_as_pdf</i> DOWNLOAD PDF</button>
@@ -339,13 +332,13 @@ export default function SummarySales() {
                             </div>                      
                             <div class="col-6 text-end">
                                 <h6 className="mb-0">SUMMARY NATIONAL SALES REPORT</h6>
-                                <h6 className="mb-0">Natioinal Total</h6>
+                                <h6 className="mb-0">National Total</h6>
                             </div>
                         </div>
                         <div className="row">
                             <div className="col-6 align-items-center">
-                                <h6 className="mb-0 ms-2"><span style={{width:100}}>From Date:</span> <input type="date" style={{border: 0}} name="birthday" onChange={(e) => calcDate(e.target.value)} value={birthday} max={dateString}/></h6>
-                                <h6 className="mb-0 ms-2"><span style={{width:100}}>To Date:</span> {endDay<date?endDay:date}</h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>From Date:</span><input type="date" style={{border: 0}} name="startDate" onChange={(e) => setStartDate(e.target.value)} value={startDate} max={dateString}/></h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>To Date:</span><input type="date" style={{border: 0}} name="endDate" onChange={(e) => submitRequest(e.target.value)} value={endDate} max={dateString}/><sup style={{color: 'red', paddingLeft: 10}}>{validate}</sup></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Currency:</span> {currencyState}</h6>
                             </div> 
                         </div>
@@ -364,7 +357,7 @@ export default function SummarySales() {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>Splash Page Sales</tr>
+                                <tr>Online Sales</tr>
                                 {
                                     output.map((item)=>(
                                         <tr key={item.bundleId}>
@@ -377,7 +370,7 @@ export default function SummarySales() {
                                         </tr>
                                     ))
                                 }
-                                <tr>Agents' Sales</tr>
+                                <tr>Agent Sales</tr>
                                 {
                                     output2.map((item)=>(
                                         <tr key={item.bundles}>
@@ -400,8 +393,8 @@ export default function SummarySales() {
                                 </tr>
                             </tbody>
                         </table>
-                        
                     </div>
+                    <div className="col-12" style={{textAlign: 'center'}}><h6>Disclaimer: To sum up both online and physical shop sales.</h6></div>
                 </div>
             </div>
         </div>

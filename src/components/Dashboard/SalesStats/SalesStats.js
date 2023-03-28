@@ -38,7 +38,7 @@ export default function SalesStats(){
                     </div>
                 </div>
             </div>
-            <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            {/*<div className="col-xl-3 col-sm-6 mb-xl-0 mb-4">
                 <div className="card">
                     <div className="card-header p-3 pt-2">
                         <div className="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute">
@@ -59,7 +59,7 @@ export default function SalesStats(){
                     <div className="card-footer p-2">
                     </div>
                 </div>
-            </div>
+            </div>*/}
         </div>
         </>
     )
