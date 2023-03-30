@@ -32,7 +32,7 @@ const CustomerCard = (props) => {
         <p className="text-xs font-weight-bold mb-0">{data.surname}</p>
       </td>
       <td>
-        <p className="text-xs font-weight-bold mb-0">{data.phone_number}</p>
+        <p className="text-xs font-weight-bold mb-0">{data.phoneNumber}</p>
       </td>
       <td>
         <p className="text-xs font-weight-bold mb-0">{data.email}</p>
