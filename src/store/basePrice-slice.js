@@ -96,7 +96,7 @@ const priceSlice = createSlice({
         }
     }
 })
-export const {addPrice} = priceSlice.actions
+export const priceActions = priceSlice.actions
 export const getBasePrice = (state) => state.price.prices
 export const getLoadingStatus = (state) => state.price.loadingStatus
 export default priceSlice

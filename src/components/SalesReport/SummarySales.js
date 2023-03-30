@@ -208,7 +208,7 @@ export default function SummarySales() {
     const componentRef = useRef()
     const handlePrint = useReactToPrint({
       content: ()=> componentRef.current,
-      documentTitle: 'TelOne SmartWiFi Receipt',
+      documentTitle: 'TelOne SmartWiFi National Sales Summary Report',
       // onAfterPrint: ()=> alert('Printing Completed')
     })
     
@@ -291,6 +291,8 @@ export default function SummarySales() {
                 dispatch(
                     toggleActions.setTimeSpan({startDate, endDate})
                 )
+                setEmpty("")
+                setValidate('')
             }
         }
     }
@@ -326,7 +328,7 @@ export default function SummarySales() {
                 </div>
                 <div className="card h-100" ref={componentRef} style={{width: '100%', height: window.innerHeight, padding: '80px'}}>
                     <div className="card-header pb-0 p-3">
-                        <div className="row" style={{lineHeight: 2}}>  
+                        <div className="row" style={{lineHeight: 2}}>
                             <div class="col-6 text-left mb-5">
                                 <img src={img} style={{width: '200px'}}/>
                             </div>                      

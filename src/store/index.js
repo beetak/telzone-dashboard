@@ -17,6 +17,8 @@ import toggleSlice from "./toggle-slice";
 import saleSlice from "./sales-slice";
 import businessRoleSlice from "./business-role-slice";
 import customerPaymentsSlice from "./customerPayments-slice";
+import entitySlice from "./entities-slice";
+import portalSlice from "./portal-slice";
 
 const store = configureStore({
     reducer: {
@@ -37,7 +39,9 @@ const store = configureStore({
         toggle: toggleSlice.reducer,
         sale: saleSlice.reducer,
         businessRole: businessRoleSlice.reducer,
-        customerPayments: customerPaymentsSlice.reducer
+        customerPayments: customerPaymentsSlice.reducer,
+        entity: entitySlice.reducer,
+        portal: portalSlice.reducer
     }
 })
 export default store

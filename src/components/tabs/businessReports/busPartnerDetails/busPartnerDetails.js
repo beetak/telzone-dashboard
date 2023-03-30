@@ -1,5 +1,9 @@
+import { useEffect } from "react";
 import { Component } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { fetchAsyncBusinessRole } from "../../../../store/business-role-slice";
+import { fetchAsyncBusiness } from "../../../../store/business-slice";
+import { fetchAsyncRegion } from "../../../../store/entities-slice";
 import { getToggleStatus, toggleActions } from "../../../../store/toggle-slice";
 import BusinessPartnerList from "../../../BusinessPartner/BusinessPartnerList/BusinessPartnerList";
 import BusinessPartnerPost from "../../../BusinessPartner/BusinessPartnerPost/BusinessPartnerPost";
@@ -10,6 +14,13 @@ export default function BusinessPartnerDetails (){
 
     const toggleStatus  = useSelector(getToggleStatus)
     const dispatch = useDispatch()
+    const active = useSelector(getToggleStatus)
+
+    useEffect(() => {
+      dispatch(fetchAsyncBusiness(active))
+      dispatch(fetchAsyncBusinessRole())
+      dispatch(fetchAsyncRegion())
+    }, [dispatch, active]);
 
     const changeStatus = () => {
       console.log(toggleStatus)

@@ -2,7 +2,9 @@ import React, {useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllBusinessRoles } from '../../../store/business-role-slice';
 import { postAsyncBusiness } from '../../../store/business-slice';
+import { getAllRegions } from '../../../store/entities-slice';
 import BusinessRoleDropdown from '../../BusinessRole/BusinessRoleDropdown/BusinessRoleDropdown';
+import TelOneRegionDropdown from '../../TelOneRegions/TelOneRegionDropdown/TelOneRegionDropdown';
 
 const BusinessPartnerPost = () => {
 
@@ -16,27 +18,36 @@ const BusinessPartnerPost = () => {
   const [vat, setVat] = useState('')
   const [role, setRole] = useState('Dealership Type')
   const [roleID, setRoleID] = useState('')
+  const [region, setRegion] = useState('Select Region')
+  const [regionId, setRegionId] = useState('')
 
 
   const dispatch = useDispatch()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(postAsyncBusiness({ 
-      businessPartner: {
-        active,
-        businessAddress,
-        email,
-        name,
-        phoneNumber
-      },
-      businessPartnerRolesID:roleID
-      })
-    );
-    setBusinessAddress('')
-    setEmail('')
-    setPhoneNumber('')
-    setName('')
+    if(businessAddress === '' || email === '' || name === '' || phoneNumber === '' || roleID === '' || regionId === ''){
+      setEmpty("Please complete all fields")
+    }
+    else{
+      dispatch(postAsyncBusiness({ 
+        businessPartner: {
+          active,
+          businessAddress,
+          email,
+          name,
+          phoneNumber
+        },
+        businessPartnerRolesID:roleID,
+        regionId
+        })
+      );
+      setBusinessAddress('')
+      setEmail('')
+      setPhoneNumber('')
+      setName('')
+      setEmpty('')
+    }
   };
 
   const roleData = useSelector(getAllBusinessRoles)
@@ -55,6 +66,22 @@ const BusinessPartnerPost = () => {
     roleData.map((role, index)=>(
       <tr key={index}>
         <BusinessRoleDropdown data={role} setBusinessRole={getRole}/>
+      </tr>
+    ))
+  ):(<div><h1>Error</h1></div>)
+
+  const regionData = useSelector(getAllRegions)
+
+  const getRegion =(id, name)=>{
+    setRegionId(id)
+    setRegion(name)
+  }
+
+  let renderedRegion = ''
+  renderedRegion = regionData ? (
+    regionData.map((region, index)=>(
+      <tr key={index}>
+        <TelOneRegionDropdown data={region} setRegion={getRegion}/>
       </tr>
     ))
   ):(<div><h1>Error</h1></div>)
@@ -96,6 +123,21 @@ const BusinessPartnerPost = () => {
                     </button>
                     <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                       {renderedRoles}
+                    </ul>
+                </div>
+                {/* Currency dropdown */}
+                <div className="dropdown">
+                    <button 
+                        className="btn bg-gradient-primary dropdown-toggle" 
+                        type="button" 
+                        id="dropdownMenuButton" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                        >
+                        {region}
+                    </button>
+                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      {renderedRegion}
                     </ul>
                 </div>
                 <button onClick={handleSubmit} className="btn btn-primary">Submit</button>

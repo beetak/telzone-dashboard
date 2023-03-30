@@ -9,6 +9,12 @@ export const fetchAsyncUser = createAsyncThunk('user/fetchAsyncUser', async () =
     return [...response.data.data]
 })
 
+export const fetchAsyncShopAgents = createAsyncThunk('user/fetchAsyncShopAgents', async ({roleId, shopId}) => {
+    const response = await Api
+    .get(`/admin-portal-user/roleId${roleId}/shopId${shopId}`)
+    return [...response.data.data]
+})
+
 export const postAsyncUser = createAsyncThunk('user/postAsyncUser', async (initialData) => {
     return await Api
         .post('/admin-portal-user/', 
@@ -58,8 +64,10 @@ export const updateUser = createAsyncThunk('user/updateUser',
 
 const initialState = {
     users: [],
+    shopAgents: [],
     loginStatus: 'false',
-    loadingStatus: 'idle'
+    loadingStatus: 'idle',
+    globalUser: ''
 }
 const userSlice = createSlice({
     name: 'user',
@@ -67,6 +75,9 @@ const userSlice = createSlice({
     reducers: {
         addUser: (state, {payload})=>{
             state.partners = payload
+        },
+        setGlobalUser: (state, action) => {
+            state.globalUser = action.payload
         }
     },
     extraReducers: {
@@ -83,6 +94,22 @@ const userSlice = createSlice({
             state.loadingStatus = 'fulfilled'
         },
         [fetchAsyncUser.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.loadingStatus = 'rejected'
+        },
+        [fetchAsyncShopAgents.pending]: (state)=>{
+            console.log("pending")
+            state.loadingStatus = 'pending'
+        },
+        [fetchAsyncShopAgents.fulfilled]: (state, action)=>{
+            console.log("sucess")
+            const loadedPartners = action.payload.map(user=>{
+                return user
+            })
+            state.shopAgents = loadedPartners
+            state.loadingStatus = 'fulfilled'
+        },
+        [fetchAsyncShopAgents.rejected]: (state, {payload})=>{
             console.log("rejected")
             state.loadingStatus = 'rejected'
         },
@@ -115,6 +142,7 @@ const userSlice = createSlice({
             localStorage.setItem('surname', action.payload.data.surname)
             // localStorage.setItem('userId', response.data.data.id)
             localStorage.setItem('role', action.payload.data.role.role)
+            localStorage.setItem('shopId', action.payload.data.shop.id)
             console.log(action.payload)
             // state.users.push(action.payload)
         },
@@ -145,8 +173,10 @@ const userSlice = createSlice({
         }
     }
 })
-export const {addUser} = userSlice.actions
+export const userActions = userSlice.actions
 export const getAllUsers = (state) => state.user.users
+export const getShopAgents = (state) => state.user.shopAgents
 export const getLoginStatus = (state) => state.user.loginStatus
 export const getLoadingStatus = (state) => state.user.loadingStatus
+export const getGlobalUser = (state) => state.user.globalUser
 export default userSlice

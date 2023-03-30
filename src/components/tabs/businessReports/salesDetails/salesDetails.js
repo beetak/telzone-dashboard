@@ -71,9 +71,9 @@ export default function SalesDetails (){
                     }
                   }>
                   <i className="as fa-rotate-left text-light text-sm pb-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile" />
-                  Summary Sales
+                  Summary National Sales
                 </button>
-                <button  className="btn btn-sm mb-1 mt-0 me-1 bg-gradient-dark"
+                <button  className="btn btn-sm mb-1 mt-0 me-1 bg-gradient-dark" disabled
                   onClick={
                     ()=>{
                       setShow('customer_summary')
@@ -82,7 +82,7 @@ export default function SalesDetails (){
                   <i className="as fa-rotate-left text-light text-sm pb-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile" />
                   Customer Summary
                 </button>
-                <button  className="btn btn-sm mb-1 mt-0 me-1 bg-gradient-dark"
+                <button  className="btn btn-sm mb-1 mt-0 me-1 bg-gradient-dark" disabled
                   onClick={
                     ()=>{
                       setShow('shop_summary')

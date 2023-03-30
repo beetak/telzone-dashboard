@@ -1,6 +1,6 @@
 import React from 'react';
 
-const RoleCard = (props) => {
+export default function RoleCard (props) {
   const {data} = props 
   return (
     <>
@@ -14,12 +14,9 @@ const RoleCard = (props) => {
       <td>
         <div className="d-flex px-2">
           <div className="my-auto">
-            <h6 className="mb-0 text-sm">{data.name}</h6>
+            <h6 className="mb-0 text-sm">{data.role}</h6>
           </div>
         </div>
-      </td>
-      <td>
-        <p clasName="text-xs font-weight-bold mb-0 w-10">{data.description}</p>
       </td>
       <td className="align-middle text-center">
         {/*<a className="btn btn-link text-danger text-gradient px-3 mb-0" href="javascript:;"><i className="material-icons text-sm me-2">delete</i>Delete</a>*/}
@@ -47,5 +44,3 @@ const RoleCard = (props) => {
     </>
   );
 }
-
-export default RoleCard;

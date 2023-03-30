@@ -19,6 +19,7 @@ import SalesAgent from "./pages/dashboard/salesAgent";
 import VoucherVerificationPage from "./pages/sales/voucherVerification";
 import SPBusinessPartners from "./pages/shopManager/businessPartners/SPBusinessPartners";
 import SPSalesReports from "./pages/shopManager/salesReports/SPSalesReports";
+import BusEntities from "./pages/busEntities";
 
 const userRole = localStorage.getItem('role')
 
@@ -26,16 +27,16 @@ function App() {
 
   const dispatch = useDispatch()
 
-  useEffect(()=>{
-    dispatch(fetchAsyncOrganisationReports())
-  },[dispatch])
+  // useEffect(()=>{
+  //   dispatch(fetchAsyncOrganisationReports())
+  // },[dispatch])
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      dispatch(fetchAsyncNetworkReports())
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     dispatch(fetchAsyncNetworkReports())
+  //   }, 5000);
+  //   return () => clearInterval(interval);
+  // }, []);
     
 
   // useEffect(() => {
@@ -70,6 +71,7 @@ function App() {
           <Route path={'/networks'} element={<NetworkMan/>} />
           <Route path={'/recharge'} element={<RechargeManagement/>} />
           <Route path={'/business-reports'} element={<BusReports/>} />
+          <Route path={'/business-entities'} element={<BusEntities/>} />
           <Route path={'/sales-reports'} element={<SPSalesReports/>} /> 
           <Route path={'/partners'} element={<SPBusinessPartners/>} /> 
         </Routes>

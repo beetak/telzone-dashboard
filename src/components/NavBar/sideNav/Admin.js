@@ -36,7 +36,6 @@ export default class Admin extends Component{
           <span className="nav-link-text ms-1">Vouchers</span>
         </Link>
       </li>
-      
       <li className="nav-item">
         <Link className="nav-link text-white " to="/business-reports">
           <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -45,6 +44,22 @@ export default class Admin extends Component{
           <span className="nav-link-text ms-1">Business Reports</span>
         </Link>
       </li>
+      <li className="nav-item">
+        <Link className="nav-link text-white " to="/business-entities">
+          <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i className="material-icons opacity-10">groups</i>
+          </div>
+          <span className="nav-link-text ms-1">Business Entities</span>
+        </Link>
+      </li>
+      {/*<li className="nav-item">
+        <Link className="nav-link text-white " to="/portal-statistics">
+          <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i className="material-icons opacity-10">groups</i>
+          </div>
+          <span className="nav-link-text ms-1">Portal Statistics</span>
+        </Link>
+        </li>*/}
       <li className="nav-item">
         <Link className="nav-link text-white " to="/adverts">
           <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">

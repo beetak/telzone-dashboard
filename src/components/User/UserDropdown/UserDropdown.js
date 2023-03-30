@@ -1,20 +1,22 @@
 import React from 'react';
 import Dropdown from 'react-bootstrap/Dropdown'
+import { useDispatch } from 'react-redux';
 
-const UserDropdown = (props) => {
+export default function UserDropdown(props){
+    const dispatch = useDispatch()
     const {data} = props 
-  return (
-    <>
-        <Dropdown.Item 
-            onClick={
-                () => {
-                    props.setUser(data.id, data.name)
+    return (
+        <>
+            <Dropdown.Item 
+                onClick={
+                    () => {
+                        props.setUser(data.id, data.name)
+                        
+                    }
                 }
-            }
-            >{data.name}
-        </Dropdown.Item>
-    </>
-  );
+                >{data.name}
+            </Dropdown.Item>
+        </>
+    );
 }
 
-export default UserDropdown;

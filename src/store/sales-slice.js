@@ -25,6 +25,12 @@ export const fetchAsyncSalesByAgent = createAsyncThunk('sale/fetchAsyncSalesByAg
     return [...response.data.data]
 })
 
+export const fetchAsyncAgentSalesByShop = createAsyncThunk('sale/fetchAsyncAgentSalesByShop', async ({curId, userID, startDate, endDate}) => {
+    const response = await Api
+    .get(`/order/currency${curId}/adminPortalUser${userID}/startDate${startDate}/endDate${endDate}`)
+    return [...response.data.data]
+})
+
 export const postSale = createAsyncThunk(
     'sale/postAsyncSale',
     async (initialData) => {
@@ -45,6 +51,8 @@ const saleSlice = createSlice({
         totalSales: [],
         partnerSales: [],
         agentSales: [],
+        shopAgent: [],
+        shopAgentSales: [],
         voucherList: [],
         totalQuantity: 0,
         showCart: false,
@@ -156,6 +164,23 @@ const saleSlice = createSlice({
             console.log("rejected")
             state.loadingStatus = 'rejected'
         },
+        [fetchAsyncAgentSalesByShop.pending]: (state)=>{
+            console.log("pending")
+            state.loadingStatus = 'pending'
+        },
+        [fetchAsyncAgentSalesByShop.fulfilled]: (state, action)=>{
+            console.log("fulfilled")
+            // return {...state, sales: payload}
+            const loadedSales = action.payload.map(sale=>{
+                return sale
+            })
+            state.shopAgentSales = loadedSales
+            state.loadingStatus = 'fulfilled'
+        },
+        [fetchAsyncAgentSalesByShop.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.loadingStatus = 'rejected'
+        },
         [postSale.pending]: ()=>{
             console.log("pending")
         },
@@ -184,5 +209,6 @@ export const getAllSales = (state) => state.sale.sales
 export const getTotalSales = (state) => state.sale.totalSales
 export const getPartnerSales = (state) => state.sale.partnerSales
 export const getAgentSales = (state) => state.sale.agentSales
+export const getShopAgentSales = (state) => state.sale.shopAgentSales
 export const getLoadingStatus = (state) => state.sale.loadingStatus
 export default saleSlice

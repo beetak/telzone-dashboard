@@ -6,6 +6,7 @@ import UserList from "../../User/UserList/UserList";
 import { useDispatch } from "react-redux";
 import { fetchAsyncUser } from "../../../store/user-slice";
 import { fetchAsyncRole } from "../../../store/role-slice";
+import { fetchAsyncRegion, fetchAsyncShop, fetchAsyncTown } from "../../../store/entities-slice";
 
  // URL variable stores JSON url || API taken from 10 Degrees WordPress Agency
 
@@ -16,6 +17,9 @@ export default function UserManagement(){
   useEffect(() => {
     dispatch(fetchAsyncUser())
     dispatch(fetchAsyncRole())
+    dispatch(fetchAsyncTown())
+    dispatch(fetchAsyncShop())
+    dispatch(fetchAsyncRegion())
   }, [dispatch]);
     
   return(

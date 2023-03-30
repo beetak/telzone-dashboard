@@ -2,14 +2,17 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import SideNavigation from '../../../components/NavBar/sideNav';
 import TopNavigation from '../../../components/NavBar/topNav';
-import SummarySales from '../../../components/SalesReport/SummarySales';
+import SupervisorReportDetails from '../../../components/tabs/supervisorTabs/main';
 import { fetchAsyncCurrency, getGlobalCurrency, getGlobalSymbol } from '../../../store/currency-slice';
 import { fetchAsyncPeriodicalPayments } from '../../../store/customerPayments-slice';
-import { fetchAsyncSalesByCurrencyId } from '../../../store/sales-slice';
+import { fetchAsyncAgentSalesByShop, fetchAsyncSalesByCurrencyId } from '../../../store/sales-slice';
 import { getEndTime, getStartTime } from '../../../store/toggle-slice';
+import { fetchAsyncShopAgents, getGlobalUser } from '../../../store/user-slice';
 
 export default function SPSalesReports() {
     const dispatch = useDispatch()
+
+    const userID = useSelector(getGlobalUser)
 
     const startDate = useSelector(getStartTime)
     const endDate = useSelector(getEndTime)
@@ -20,7 +23,9 @@ export default function SPSalesReports() {
         dispatch(fetchAsyncCurrency(true))
         dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId}))
         dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol}))
-    }, [dispatch, startDate, endDate, curId]);
+        dispatch(fetchAsyncShopAgents({roleId:1, shopId:1}))
+        dispatch(fetchAsyncAgentSalesByShop({curId, userID, startDate, endDate}))
+    }, [dispatch, startDate, endDate, curId, userID]);
 
     return (
         <div>
@@ -28,7 +33,7 @@ export default function SPSalesReports() {
             <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
                 {<TopNavigation title={"Sales Reports"}/>}
                 <div className="container-fluid py-4">
-                    <SummarySales/>
+                    <SupervisorReportDetails/>
                 </div>
             </main>
         </div>
