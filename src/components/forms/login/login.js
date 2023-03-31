@@ -55,6 +55,7 @@ export default class LoginForm extends Component {
             localStorage.setItem('surname', response.data.data.surname)
             localStorage.setItem('userId', response.data.data.id)
             localStorage.setItem('role', response.data.data.role.role)
+            localStorage.setItem('shopId', response.data.data.shop.id)
             // window.location = '/dashboard'
             this.routeTo()
          }

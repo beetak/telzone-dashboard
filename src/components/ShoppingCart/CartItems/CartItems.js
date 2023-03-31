@@ -52,6 +52,7 @@ const img = "assets/img/telonelogo.png"
 const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
 const userID = localStorage.getItem('userId')
+const shopId = localStorage.getItem('shopId')
 
 let voucherIdArray = []
 
@@ -264,7 +265,8 @@ const CartItems = () => {
             dateCreated: today,
             payingAccountNumber: "TelOne",
             quantity: totalQty
-          }
+          },
+          shopId
         }
       ))
       var todayDate = new Date().toLocaleDateString('en-US', {year: 'numeric', month: '2-digit', day: '2-digit'}); // 08/19/2020 (month and day with two digits)
