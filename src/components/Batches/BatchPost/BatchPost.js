@@ -5,9 +5,12 @@ import { getAllBundles } from '../../../store/bundle-slice';
 import voucher_codes from 'voucher-code-generator'
 
 const userID = localStorage.getItem('userId')
+const shopId = localStorage.getItem('shopId')
 
 var CryptoJS = require("crypto-js");
 const BatchPost = () => {
+
+  const dateCreated = new Date()
 
   const[voucherList, setVoucherList] = useState([])
   const[currentState, setCurrentState] = useState('Product')
@@ -51,10 +54,11 @@ const BatchPost = () => {
   const handleSubmit = async () => {
     dispatch(postBatch({ 
       batch: {
-        batchName ,
+        dateCreated,
         id: 1
       },
-      userID
+      userID,
+      bundleId: bundleID
     }))
   }
 

@@ -1,9 +1,13 @@
 import {useState, useEffect} from 'react';
-import { Button, ButtonGroup, Dropdown, FormControl, InputGroup, Modal } from 'react-bootstrap';
+import { Button, ButtonGroup, Col, Container, Dropdown, Form, FormControl, InputGroup, Modal, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllRoles } from '../../../store/role-slice';
 import { updateUser } from '../../../store/user-slice';
 import RoleDropdown from '../../Role/RoleDropdown/RoleDropdown';
+import { getAllRegions, getAllShops, getAllTowns } from '../../../store/entities-slice';
+import TelOneTownDropdown from '../../TelOneTowns/TelOneTownDropdown/TelOneTownDropdown';
+import TelOneRegionDropdown from '../../TelOneRegions/TelOneRegionDropdown/TelOneRegionDropdown';
+import TelOneShopDropdown from '../../TelOneShops/TelOneShopDropdown/TelOneShopDropdown';
 
 const UserCard = (props) => {
   const [emailAddress, setEmailAddress] = useState('')
@@ -16,8 +20,13 @@ const UserCard = (props) => {
   const [roleId, setRoleId] = useState('')
   const [activeState, setActiveState] = useState('')
   const [isOpen, setIsOpen] = useState(false)
-  const [current, setCurrent] = useState('')
   const [userId, setUserId] = useState('')
+  const [shopId, setShopId] = useState('')
+  const [regionId, setRegionId] = useState('')
+  const [region, setRegion] = useState('Select Region')
+  const [shopName, setShopName] = useState('Select Shop')
+  const [townId, setTownId] = useState('')
+  const [town, setTown] = useState('Select Town')
 
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
@@ -59,6 +68,51 @@ const UserCard = (props) => {
       </tr>
     ))
   ):(<div><h1>Error</h1></div>)
+
+   //town data
+   const townData = useSelector(getAllTowns)
+   const getTown =(id, name)=>{
+     setTownId(id)
+     setTown(name)
+   }
+   let renderedTown = ''
+   renderedTown = townData ? (
+     townData.map((role, index)=>(
+       <tr key={index}>
+         <TelOneTownDropdown data={role} setTown={getTown}/>
+       </tr>
+     ))
+   ):(<div><h1>Error</h1></div>)
+
+   //region data
+   const regionData = useSelector(getAllRegions)
+   const getRegion =(id, name)=>{
+     setRegionId(id)
+     setRegion(name)
+   }
+   let renderedRegions = ''
+   renderedRegions = regionData ? (
+     regionData.map((region, index)=>(
+       <tr key={index}>
+         <TelOneRegionDropdown data={region} setRegion={getRegion}/>
+       </tr>
+     ))
+   ):(<div><h1>Error</h1></div>)
+
+   //shop data
+   const shopData = useSelector(getAllShops)
+   const getShop =(id, name)=>{
+     setShopId(id)
+     setShopName(name)
+   }
+   let renderedShops = ''
+   renderedShops = shopData ? (
+     shopData.map((shop, index)=>(
+       <tr key={index}>
+         <TelOneShopDropdown data={shop} setShop={getShop}/>
+       </tr>
+     ))
+   ):(<div><h1>Error</h1></div>)
   
   return (
     <>
@@ -70,7 +124,7 @@ const UserCard = (props) => {
         <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{data.emailAddress}</p>
       </td>
       <td>
-        <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{data.role.role}</p>
+        <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{data.roleId.role === "Sales Admin"? "Sales Agent":data.roleId.role}</p>
       </td>
 
       <td class="text-sm">
@@ -80,18 +134,18 @@ const UserCard = (props) => {
       </td>
       <td className="align-middle">
         <a className="btn btn-link text-dark px-3 mb-0" onClick={() => {
-
             setEmailAddress(data.emailAddress)
             setFirstname(data.firstname)
             setId(data.id)
             setSurname(data.surname)
-            setRole(data.role.role)
+            setRole(data.roleId.role)
+            setRegion(data.regionId.name)
+            setTown(data.townId.name)
+            setShopName(data.shopId.name)
             setPassword(data.password)
             setActive(data.active)
             setActiveState(data.active?'Deactivate':'Activate')
-
-          openModal() //opens the modal
-
+            openModal() //opens the modal
           }}><i className="material-icons text-sm me-2">edit</i>Edit
         </a>
       </td>
@@ -148,20 +202,62 @@ const UserCard = (props) => {
             aria-describedby="basic-addon2"
             name = "password"
             onChange = {(e)=>setPassword(e.target.value)}
+            placeholder="***********"
           />
         </InputGroup>
 
-
-        {/* role Dropdown */}
-        
-        <Dropdown as={ButtonGroup}>
-          <Button variant="info">{role}</Button>
-          <Dropdown.Toggle split variant="info" id="dropdown-split-basic" />
-          <Dropdown.Menu>
-            {renderedRoles}
-          </Dropdown.Menu>
-        </Dropdown>
-        <br/>
+          <Row>
+            <Col>
+              {/* role Dropdown */}
+              <Form.Label>User Role</Form.Label><br/>
+              <Dropdown as={ButtonGroup}>
+                <Button variant="info">{role}</Button>
+                <Dropdown.Toggle split variant="info" id="dropdown-split-basic" />
+                <Dropdown.Menu>
+                  {renderedRoles}
+                </Dropdown.Menu>
+              </Dropdown>
+              <br/>
+            </Col>
+            <Col>
+              {/* regions Dropdown */}
+              <Form.Label>Region</Form.Label><br/>
+              <Dropdown as={ButtonGroup}>
+                <Button variant="info">{region}</Button>
+                <Dropdown.Toggle split variant="info" id="dropdown-split-basic" />
+                <Dropdown.Menu>
+                  {renderedRegions}
+                </Dropdown.Menu>
+              </Dropdown>
+              <br/>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              {/* town Dropdown */} 
+              <Form.Label>Town</Form.Label><br/>
+              <Dropdown as={ButtonGroup}>
+                <Button variant="info">{town}</Button>
+                <Dropdown.Toggle split variant="info" id="dropdown-split-basic" />
+                <Dropdown.Menu>
+                  {renderedTown}
+                </Dropdown.Menu>
+              </Dropdown>
+              <br/>
+            </Col>
+            <Col>
+              {/* shop Dropdown */}
+              <Form.Label>Shops</Form.Label><br/>
+              <Dropdown as={ButtonGroup}>
+                <Button variant="info">{shopName}</Button>
+                <Dropdown.Toggle split variant="info" id="dropdown-split-basic" />
+                <Dropdown.Menu>
+                  {renderedShops}
+                </Dropdown.Menu>
+              </Dropdown>
+              <br/>
+            </Col>
+          </Row>
 
 
         {/* Active State Dropdown */}
