@@ -53,7 +53,7 @@ export default function TelOneTownList(){
       <table className="table align-items-center mb-0">
         <thead>
           <tr>
-            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style={{width: "5%"}}>Town Name</th>
+            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style={{width: "40%"}}>Town Name</th>
             <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Region</th>
             {/*
               userRole==='Super Admin' || 'Admin' ? (

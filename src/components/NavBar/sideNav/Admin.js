@@ -47,7 +47,7 @@ export default class Admin extends Component{
       <li className="nav-item">
         <Link className="nav-link text-white " to="/business-entities">
           <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i className="material-icons opacity-10">groups</i>
+            <i className="material-icons opacity-10">dataset</i>
           </div>
           <span className="nav-link-text ms-1">Business Entities</span>
         </Link>

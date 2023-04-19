@@ -13,6 +13,7 @@ import { fetchAsyncDailyPayments, fetchAsyncPayments } from "../../../store/cust
 import { fetchAsyncCurrency, getGlobalCurreny } from "../../../store/currency-slice";
 import { fetchAsyncShopAgents } from "../../../store/user-slice";
 import { fetchAsyncRegion } from "../../../store/entities-slice";
+import { fetchAsyncBundles } from "../../../store/bundle-slice";
 
 const url = "http://localhost:8082/smart-wifi/user/"; // URL variable stores JSON url || API taken from 10 Degrees WordPress Agency
 
@@ -32,6 +33,7 @@ export default function BusinessReports(){
       dispatch(fetchAsyncDailyPayments())
       dispatch(fetchAsyncCurrency(true))
       dispatch(fetchAsyncRegion())
+      dispatch(fetchAsyncBundles(true))
     }, [dispatch, active]);
 
     let tabinfo
