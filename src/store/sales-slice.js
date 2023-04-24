@@ -56,7 +56,8 @@ const saleSlice = createSlice({
         voucherList: [],
         totalQuantity: 0,
         showCart: false,
-        loadingStatus: 'idle'
+        loadingStatus: 'idle',
+        loadingByCurIdStatus: 'idle'
     },
     reducers: {
         addToCart(state, action){
@@ -128,11 +129,11 @@ const saleSlice = createSlice({
         },
         [fetchAsyncSalesByPartnerId.rejected]: (state, {payload})=>{
             console.log("rejected")
-            state.loadingStatus = 'rejected'
+            state.loadingByCurIdStatus = 'rejected'
         },
         [fetchAsyncSalesByCurrencyId.pending]: (state)=>{
             console.log("pending")
-            state.loadingStatus = 'pending'
+            state.loadingByCurIdStatus = 'pending'
         },
         [fetchAsyncSalesByCurrencyId.fulfilled]: (state, action)=>{
             console.log("fulfilled")
@@ -141,7 +142,7 @@ const saleSlice = createSlice({
                 return sale
             })
             state.totalSales = loadedSales
-            state.loadingStatus = 'fulfilled'
+            state.loadingByCurIdStatus = 'fulfilled'
         },
         [fetchAsyncSalesByCurrencyId.rejected]: (state, {payload})=>{
             console.log("rejected")
@@ -211,4 +212,5 @@ export const getPartnerSales = (state) => state.sale.partnerSales
 export const getAgentSales = (state) => state.sale.agentSales
 export const getShopAgentSales = (state) => state.sale.shopAgentSales
 export const getLoadingStatus = (state) => state.sale.loadingStatus
+export const getLoadingByCurIdStatus = (state) => state.sale.loadingByCurIdStatus
 export default saleSlice

@@ -261,7 +261,7 @@ const CartItems = () => {
           businessPartnerId,
           currencyId,
           order: {
-            amount: subTotal,
+            amount: total,
             dateCreated: today,
             discount: disc,
             payingAccountNumber: "TelOne",

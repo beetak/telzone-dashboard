@@ -2,7 +2,7 @@ import React, {useState, useRef} from 'react';
 import Dropdown from 'react-bootstrap/Dropdown'
 import { Button } from "react-bootstrap";
 import { ButtonGroup, Form } from "react-bootstrap";
-import { getAgentSales, getAllSales, getTotalSales } from '../../store/sales-slice';
+import { getAgentSales, getAllSales, getLoadingByCurIdStatus, getTotalSales } from '../../store/sales-slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { currencyActions, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
@@ -63,6 +63,7 @@ export default function SummaryTaxes() {
     const totalSales = useSelector(getTotalSales)
     const periodicalSales = useSelector(getPeriodicalPayments)
     const bundles = useSelector(getAllBundles)
+    const loadingByCurId = useSelector(getLoadingByCurIdStatus)
 
     const [startDay, setStartDay] = useState(date)
     const [endDay, setEndDay] = useState('')
@@ -115,12 +116,11 @@ export default function SummaryTaxes() {
     .map(([bundles, count]) => ({ bundles, count }))
     .sort((a, b) => b.count - a.count);
 
-    console.log("the out put2: ",output2);
-
     const calculateByPartner = (bundleName) =>{
         let count = 0
         let price = ''
         let totalAmount = 0
+        let totalDiscount = 0
         let totalTax = 0
 
         periodicalSales.map((items, i)=>{
@@ -138,9 +138,11 @@ export default function SummaryTaxes() {
             count !== 0 ? 
             <>
                 {/*<div style={{width: '25%', textAlign: 'center'}}>{price}</div>*/}
-                <div style={{width: '50%', textAlign: 'center'}}>{count}</div>
-                <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>${(Math.round(totalAmount*100)/100).toFixed(2)}</div>
-                <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>${(Math.round(totalAmount*100*0.15)/100).toFixed(2)}</div>
+                <div style={{width: '10%', textAlign: 'center'}}>{count}</div>
+                <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>$ {(Math.round(totalAmount*10000/115)/100).toFixed(2)}</div>
+                <div style={{width: '15%', textAlign: 'right', paddingRight: 70}}>$ {(Math.round(totalDiscount*100)/100).toFixed(2)}</div>
+                <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>$ {(Math.round(totalAmount*100)/100).toFixed(2)}</div>
+                <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>$ {(Math.round(totalAmount*10000/115*0.15)/100).toFixed(2)}</div>
             </>:''
         )
     }
@@ -148,6 +150,8 @@ export default function SummaryTaxes() {
     const calculateByBundle = (bundleName) =>{
         let count = 0
         let totalAmount = 0
+        let totalVAT = 0
+        let totalDiscount = 0
         let price = ''
 
         bundles.map((item, i)=>{
@@ -160,15 +164,19 @@ export default function SummaryTaxes() {
             if(items.bundles.name===bundleName){
                 count +=items.order.quantity
                 totalAmount += items.order.amount
+                totalVAT += items.order.vat
+                totalDiscount += items.order.discount
             }
         })
         return (
             count !== 0 ? 
             <>
                 {/*<div style={{width: '25%', textAlign: 'center'}}>{price}</div>*/}
-                <div style={{width: '50%', textAlign: 'center'}}>{count}</div>
-                <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>${(Math.round(totalAmount*100)/100).toFixed(2)}</div>
-                <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>${(Math.round(totalAmount*100*0.15)/100).toFixed(2)}</div>
+                <div style={{width: '10%', textAlign: 'center'}}>{count}</div>
+                <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>$ {(Math.round((totalAmount-totalVAT-totalDiscount)*100)/100).toFixed(2)}</div>
+                <div style={{width: '15%', textAlign: 'right', paddingRight: 70}}>$ {(Math.round((totalDiscount)*100)/100).toFixed(2)}</div>
+                <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>$ {(Math.round((totalAmount)*100)/100).toFixed(2)}</div>
+                <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>$ {(Math.round(totalVAT*100)/100).toFixed(2)}</div>
             </>:''
         )
     }
@@ -202,7 +210,7 @@ export default function SummaryTaxes() {
     const componentRef = useRef()
     const handlePrint = useReactToPrint({
       content: ()=> componentRef.current,
-      documentTitle: 'TelOne SmartWiFi National Sales Summary Report',
+      documentTitle: 'TelOne SmartWiFi: National Tax Summary Report',
       // onAfterPrint: ()=> alert('Printing Completed')
     })
     
@@ -217,10 +225,10 @@ export default function SummaryTaxes() {
         })
 
         salesData.map((item, i)=>{
-            total += item.order.amount      
+            total += item.order.vat      
         })
         return(
-            (Math.round((successTotal+total)*100*0.15)/100).toFixed(2)
+            (Math.round(((successTotal*100/115*0.15)+total)*100)/100).toFixed(2)
         )
     }
 
@@ -347,7 +355,9 @@ export default function SummaryTaxes() {
                                     <th className="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         <div className="row">
                                             {/*<div style={{width: '25%', textAlign: 'center'}}>Unit Price</div>*/}
-                                            <div style={{width: '50%', textAlign: 'center'}}>Quantity</div>
+                                            <div style={{width: '10%', textAlign: 'center'}}>Quantity</div>
+                                            <div style={{width: '25%', textAlign: 'right', paddingRight: 50}}>Collections excTax</div>
+                                            <div style={{width: '15%', textAlign: 'right', paddingRight: 50}}>Total Discount</div>
                                             <div style={{width: '25%', textAlign: 'right', paddingRight: 50}}>Total Collections</div>
                                             <div style={{width: '25%', textAlign: 'right', paddingRight: 50}}>Total Tax</div>
                                         </div>
@@ -385,7 +395,7 @@ export default function SummaryTaxes() {
                                     <td>Total</td>
                                     <td>
                                         <div className="row">
-                                            <div style={{textAlign: 'right', padding: 70}}>{salesTotalCalc()}</div>
+                                            <div style={{textAlign: 'right', padding: 70}}>$ {salesTotalCalc()}</div>
                                         </div>
                                     </td>
                                 </tr>
