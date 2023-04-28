@@ -89,6 +89,26 @@ export const updateBatch = createAsyncThunk('batch/updateBatch',
     return {data, id, batchId}
 })
 
+export const reactivateVoucher = createAsyncThunk('batch/reactivateVoucher', 
+    async (
+        {
+            dateUsed,
+            voucherId,
+            macAddress,
+            used,
+        }) => {
+    
+    const response = await Api
+    .put(`/voucher/${voucherId}`, {
+            dateUsed,
+            voucherCode: voucherId,
+            macAddress,
+            used,
+    } ,  {headers})
+    const data = response.data
+    return {data}
+})
+
 export const updateAsyncVoucher = createAsyncThunk('batch/updateAsyncVoucher', 
     async (
         {
@@ -166,7 +186,8 @@ const batchSlice = createSlice({
         statusSearch: 'idle',
         message: 'idle',
         verificationResponse: '',
-        showMore: false
+        showMore: false,
+        reactivateStatus: 'idle'
     },
     reducers: {
         clearVouchers(state, action){
@@ -383,7 +404,20 @@ const batchSlice = createSlice({
                     }: voucher
                 )
             }
-        }
+        },
+        [reactivateVoucher.pending]: (state)=>{
+            console.log("voucher update pending")
+            state.reactivateStatus = 'pending'
+        },
+        [reactivateVoucher.fulfilled]: (state, action) =>{
+            console.log("Update Successful")
+            console.log(action.payload)
+            state.reactivateStatus = 'success'
+        },
+        [reactivateVoucher.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.reactivateStatus = 'failed'
+        },
     }
 })
 
@@ -408,6 +442,7 @@ export const getUsedStatus = (state) => state.batch.usedStatus
 export const getStatusSearch = (state) => state.batch.statusSearch
 export const getSearchMessage = (state) => state.batch.message
 export const getVerified = (state) => state.batch.verificationResponse
+export const getReactivate = (state) => state.batch.reactivateStatus
 export const getShow = (state) => state.batch.showMore
 export const {clearVouchers} = batchSlice.actions
 export default batchSlice

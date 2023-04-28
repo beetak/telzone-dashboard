@@ -4,7 +4,7 @@ import { fetchAsyncBasePrice, getBasePrice } from "../../../store/basePrice-slic
 import { cartActions, getBtnState } from "../../../store/cart-slice";
 import { getPaymentMethod } from "../../../store/toggle-slice";
 
-const CartItem = ({ name, quantity, total, price, id, product, rate, vat }) => {
+const CartItem = ({ name, quantity, total, discount, price, id, product, rate, vat }) => {
 
   const [rateStatus, setRateStatus]  = useState('')
   const [rateId, setRateId] = useState('')
@@ -56,7 +56,7 @@ const CartItem = ({ name, quantity, total, price, id, product, rate, vat }) => {
   return (
     <>
       <td>{name}</td>
-      <td style={{textAlign: 'center'}}>${(Math.round(price * 10000 * rate / (vat+100)) / 100).toFixed(2)}</td>
+      <td style={{textAlign: 'center'}}>${(Math.round((price - (price*discount/100)) * 10000 * rate / (vat+100)) / 100).toFixed(2)}</td>
       <td>
         <button onClick={decrementCartItems} style={CartActionsStyles}>
           -
@@ -76,7 +76,7 @@ const CartItem = ({ name, quantity, total, price, id, product, rate, vat }) => {
           +
         </button>
       </td>
-      <td style={{textAlign: 'right'}}> ${(Math.round(total * 10000 * rate / (vat+100)) / 100).toFixed(2)}</td>
+      <td style={{textAlign: 'right'}}> ${(Math.round((total - (total*discount/100)) * 10000 * rate / (vat+100)) / 100).toFixed(2)}</td>
     </>
                 
   );

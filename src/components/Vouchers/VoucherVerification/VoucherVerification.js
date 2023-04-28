@@ -118,7 +118,7 @@ const VoucherVerification = () => {
                         message === 'not-found' ?
                           renderedError : ''
                 }
-                <button disabled onClick={handleSubmit} className="btn btn-info my-4">Verify</button>
+                <button onClick={handleSubmit} className="btn btn-info my-4">Verify</button>
               </form>
             </div>
           </div>

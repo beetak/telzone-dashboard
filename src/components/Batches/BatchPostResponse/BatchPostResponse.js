@@ -4,6 +4,7 @@ import { getBatchStatus, getCreatedBatch, getPostingStatus, getVoucherStatus, ge
 import { getAllBundles } from '../../../store/bundle-slice';
 import voucher_codes from 'voucher-code-generator'
 import BeatLoader from 'react-spinners/BeatLoader'
+import VoucherReactivate from '../../Vouchers/VoucherReactivate/VoucherReactivate';
 
 const BatchPostResponse = () => {
 
@@ -123,6 +124,9 @@ const BatchPostResponse = () => {
             <div className="">
               <p className="mb-0 text-sm" style={Style1}>Use the form to create batches of vouchers</p>
             </div>
+        </div>
+        <div className="table-responsive p-0">
+          <VoucherReactivate/>
         </div>
       </div>
     </>

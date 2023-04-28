@@ -38,7 +38,7 @@ export default function SupervisorReportDetails(){
                         </a>
                     </div>
                 </div>
-                {/*<div className="col-3">
+                <div className="col-3">
                     <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
                         <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
                             onClick={()=>setTabState('agentReports')}
@@ -48,7 +48,7 @@ export default function SupervisorReportDetails(){
                             </div>
                         </a>
                     </div>
-        </div>*/}
+                </div>
             </div>
         <div className="card-body px-0 pb-2">
           <div className="table-responsive p-0">

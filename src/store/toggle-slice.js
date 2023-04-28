@@ -6,7 +6,8 @@ const toggleSlice = createSlice({
         toggleState: true,
         local: false,
         startTime: '',
-        endTime: ''
+        endTime: '',
+        agentId: ''
     },
     reducers: {
         changeState(state, action){
@@ -21,6 +22,9 @@ const toggleSlice = createSlice({
         },
         setDateFrom(state, action){
             state.startTime = action.payload
+        },
+        setAgent(state, action){
+            state.agentId = action.payload.adminPortalUserId
         }
     }
 })
@@ -30,4 +34,5 @@ export const getToggleStatus = (state) => state.toggle.toggleState
 export const getPaymentMethod = (state) => state.toggle.local
 export const getStartTime = (state) => state.toggle.startTime
 export const getEndTime = (state) => state.toggle.endTime
+export const getAgentId = (state) => state.toggle.agentId
 export default toggleSlice

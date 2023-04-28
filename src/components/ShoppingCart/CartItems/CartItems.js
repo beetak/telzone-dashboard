@@ -126,6 +126,7 @@ const CartItems = () => {
   let valueAddedTax = 0;
   let disc = 0;
   let totalQty = 0;
+  let totalValue = 0;
   const itemsList = useSelector((state) => state.cart.itemsList);
   const orderId = useSelector(getLastId)
   const orderStatus = useSelector(getOrderStatus)
@@ -210,11 +211,13 @@ const CartItems = () => {
   // const cartItem = useSelector(getAllSales)
 
   itemsList.forEach((item) => {
-    subTotal += item.totalPrice*(100/(100+vatPercentage));
+
+    totalValue += item.totalPrice
+    disc = (Math.round(totalValue * discountPercentage * rate) / 100).toFixed(2)
+    subTotal = (Math.round(totalValue-disc/rate))*(100/(100+vatPercentage));
     totalQty += item.quantity
-    disc = (Math.round(subTotal * discountPercentage * rate) / 100).toFixed(2)
-    valueAddedTax = (Math.round((subTotal * rate - disc) * vatPercentage) / 100).toFixed(2)
-    total = (Math.round((subTotal*rate - disc) * 100 + valueAddedTax * 100) / 100).toFixed(2)
+    valueAddedTax = (Math.round(subTotal * rate * vatPercentage) / 100).toFixed(2)
+    total = (Math.round((subTotal*rate) * 100 + valueAddedTax * 100) / 100).toFixed(2)
   });
 
   let renderedItems = itemsList.map((item, index)=>(
@@ -227,7 +230,8 @@ const CartItems = () => {
         name={item.name}
         product={item.product}
         rate={rate}
-        vat={vatPercentage}/>
+        vat={vatPercentage}
+        discount={discountPercentage}/>
     </tr>
   ))
 

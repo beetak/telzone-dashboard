@@ -67,55 +67,6 @@ export default function SummarySales() {
       ))
     ):(<div><h1>Error</h1></div>)
 
-    let durationDrop = 
-    
-    <>
-        <div className="dropdown" style={{marginLeft: 10}}>
-            <button 
-                className="btn bg-gradient-primary dropdown-toggle" 
-                type="button" 
-                id="dropdownMenuButton" 
-                data-bs-toggle="dropdown" 
-                aria-expanded="false"
-                >
-                {duration}
-            </button>
-            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton" style={{paddingLeft:20}}>
-                <li  
-                    onClick={
-                        () => {
-                            // dispatch(
-                            //     toggleActions.setTimeSpan(weekDate)
-                            // )
-                            setDuration('Daily')
-                        }
-                    }>Daily
-                </li>
-                <li  
-                    onClick={
-                        () => {
-                            // dispatch(
-                            //     toggleActions.setTimeSpan(weekDate)
-                            // )
-                            setDuration('Weekly')
-                        }
-                    }>Weekly
-                </li>
-                <li  
-                    onClick={
-                        () => {
-                            // dispatch(
-                            //     toggleActions.setTimeSpan(startDate)
-                            // )
-                            setDuration('Monthly')
-                        }
-                    }>Monthly
-                </li>
-            </ul>
-        </div>
-        <br/>
-    </>
-
     const data = periodicalSales
     const salesData = totalSales
 

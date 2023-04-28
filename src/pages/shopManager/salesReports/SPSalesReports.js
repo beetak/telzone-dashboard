@@ -6,8 +6,10 @@ import SupervisorReportDetails from '../../../components/tabs/supervisorTabs/mai
 import { fetchAsyncCurrency, getGlobalCurrency, getGlobalSymbol } from '../../../store/currency-slice';
 import { fetchAsyncPeriodicalPayments } from '../../../store/customerPayments-slice';
 import { fetchAsyncAgentSalesByShop, fetchAsyncSalesByCurrencyId } from '../../../store/sales-slice';
-import { getEndTime, getStartTime } from '../../../store/toggle-slice';
+import { getAgentId, getEndTime, getStartTime } from '../../../store/toggle-slice';
 import { fetchAsyncShopAgents, getGlobalUser } from '../../../store/user-slice';
+
+const shopId = localStorage.getItem('shopId')
 
 export default function SPSalesReports() {
     const dispatch = useDispatch()
@@ -18,13 +20,14 @@ export default function SPSalesReports() {
     const endDate = useSelector(getEndTime)
     const curId = useSelector(getGlobalCurrency)
     const curSymbol = useSelector(getGlobalSymbol)
+    const agentId = useSelector(getAgentId)
     
     useEffect(() => {
         dispatch(fetchAsyncCurrency(true))
         dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId}))
         dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol}))
-        dispatch(fetchAsyncShopAgents({roleId:1, shopId:1}))
-        dispatch(fetchAsyncAgentSalesByShop({curId, userID, startDate, endDate}))
+        dispatch(fetchAsyncShopAgents({roleId:3, shopId}))
+        dispatch(fetchAsyncAgentSalesByShop({curId, userID:agentId, startDate, endDate}))
     }, [dispatch, startDate, endDate, curId, userID]);
 
     return (

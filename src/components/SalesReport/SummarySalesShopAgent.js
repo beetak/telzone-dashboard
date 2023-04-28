@@ -7,6 +7,7 @@ import { useReactToPrint } from "react-to-print";
 import { toggleActions } from '../../store/toggle-slice';
 import { getShopAgents, userActions } from '../../store/user-slice';
 import AgentDropdown from '../User/AgentDropdown/AgentDropdown';
+import { Dropdown } from 'react-bootstrap';
 // import datetime from 'datetime'
 
 const img = "assets/img/telonelogo.png"
@@ -59,7 +60,7 @@ export default function SummarySalesShopAgent() {
 
     const getUser =(id, name)=>{
         setAdminPortalUserId(id)
-        setAgentName(name)
+        setAgentState(name)
         dispatch(
             userActions.setGlobalUser(id)
         )
@@ -67,11 +68,26 @@ export default function SummarySalesShopAgent() {
 
     let renderedAgent = ''
     renderedAgent = agentData ? (
-      agentData.map((user, index)=>(
-        <tr key={index}>
-          <AgentDropdown data={user} setUser={getUser}/>
-        </tr>
-      ))
+        <>
+            <tr>
+                <Dropdown.Item 
+                    onClick={
+                        () => {
+                            setAdminPortalUserId(0)
+                            setAgentState('All Shop Sales')
+                        }
+                    }
+                    >All Sales
+                </Dropdown.Item>
+            </tr>   
+            {
+                agentData.map((user, index)=>(
+                    <tr key={index}>
+                        <AgentDropdown data={user} setUser={getUser}/>
+                    </tr>
+                ))
+            }
+        </>
     ):(<div><h1>Error</h1></div>)
 
     const salesData = totalSales
@@ -155,10 +171,24 @@ export default function SummarySalesShopAgent() {
                 setValidate("Invalid Time Span")
             }
             else{
-                dispatch(
-                    toggleActions.setTimeSpan({startDate, endDate})
-                )
-                setEmpty("")
+                if(adminPortalUserId===0){
+                    dispatch(
+                        toggleActions.setTimeSpan({startDate, endDate})
+                    )
+                    dispatch(
+                        toggleActions.setAgent({adminPortalUserId:4})
+                    )
+                    setEmpty("")
+                }
+                else{
+                    dispatch(
+                        toggleActions.setTimeSpan({startDate, endDate})
+                    )
+                    dispatch(
+                        toggleActions.setAgent({adminPortalUserId})
+                    )
+                    setEmpty("")
+                }
             }
         }
     }
