@@ -68,7 +68,7 @@ export default function SummarySalesShopAgent() {
 
     let renderedAgent = ''
     renderedAgent = agentData ? (
-        <>
+        <>{/*
             <tr>
                 <Dropdown.Item 
                     onClick={
@@ -79,7 +79,7 @@ export default function SummarySalesShopAgent() {
                     }
                     >All Sales
                 </Dropdown.Item>
-            </tr>   
+                </tr>  */} 
             {
                 agentData.map((user, index)=>(
                     <tr key={index}>
