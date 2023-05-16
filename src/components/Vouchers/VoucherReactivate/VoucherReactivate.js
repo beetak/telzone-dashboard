@@ -48,7 +48,8 @@ const VoucherReactivate = () => {
     <>
       <div className="row">
         <div className="col-12">
-          <div className="p-4">
+          <h6 className='pt-2 text-info'>Voucher Activation</h6>
+          <div className="" style={{paddingRight:40, paddingLeft:40}}>
               <div className='text-align-center'>
                 {
                   loading === 'idle'? '': 
@@ -59,15 +60,23 @@ const VoucherReactivate = () => {
               </div>
               <form >
                 <div style={{color: 'red', marginBottom: '10px'}}>{empty}</div>
-                  <label className="form-label">Voucher Code</label>
-                  <div className="input-group input-group-dynamic mb-2">
-                      <input type="text" name="voucherId" value={voucherId} onChange={(e)=>setVoucherId(e.target.value)} className="form-control" />
+                <div className='row'>
+                  <div className='col-5'>
+                    <label className="form-label mb-0 ">Voucher Code</label>
+                    <div className="input-group input-group-dynamic mb-2">
+                        <input type="text" name="voucherId" value={voucherId} onChange={(e)=>setVoucherId(e.target.value)} className="form-control mb-0" />
+                    </div>
                   </div>
-                  <label className="form-label">Mac Address</label>
-                  <div className="input-group input-group-dynamic mb-4">
-                      <input type="text" name="macAddress" value={macAddress} onChange={(e)=>setMacAddress(e.target.value)} className="form-control" />
+                  <div className='col-5'>
+                    <label className="form-label mb-0">Mac Address</label>
+                    <div className="input-group input-group-dynamic mb-4">
+                        <input type="text" name="macAddress" value={macAddress} onChange={(e)=>setMacAddress(e.target.value)} className="form-control mb-0" />
+                    </div>
                   </div>
-                  <button onClick={handleSubmit} className="btn btn-primary my-4">Submit</button>
+                  <div className='col-2'>
+                    <button onClick={handleSubmit} className="btn btn-info my-4">Activate</button>
+                  </div>
+                </div>
               </form>
             </div>
           </div>

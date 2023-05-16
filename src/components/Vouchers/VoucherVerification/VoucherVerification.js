@@ -157,7 +157,7 @@ const VoucherVerification = () => {
                     Available
                   </div>) : 
                   (
-                  verified.data.sold && !verified.data.used ?
+                  verified.data.sold && !verified.data.used?
                     <div className="d-flex align-items-center text-info text-gradient text-sm font-weight-bold">
                       Sold and Not Used
                     </div> : 

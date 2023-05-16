@@ -123,6 +123,7 @@ const CartItems = () => {
 
   let total = 0;
   let subTotal = 0;
+  let total1 = 0;
   let valueAddedTax = 0;
   let disc = 0;
   let totalQty = 0;
@@ -214,9 +215,11 @@ const CartItems = () => {
 
     totalValue += item.totalPrice
     disc = (Math.round(totalValue * discountPercentage * rate) / 100).toFixed(2)
-    subTotal = (Math.round(totalValue-disc/rate))*(100/(100+vatPercentage));
+    subTotal = (totalValue-disc/rate)*(100/(100+vatPercentage));
+    total1 = (Math.round(totalValue-disc/rate))
     totalQty += item.quantity
     valueAddedTax = (Math.round(subTotal * rate * vatPercentage) / 100).toFixed(2)
+    // valueAddedTax = (Math.round(subTotal * rate * vatPercentage) / 100).toFixed(2)
     total = (Math.round((subTotal*rate) * 100 + valueAddedTax * 100) / 100).toFixed(2)
   });
 
@@ -591,14 +594,14 @@ const CartItems = () => {
               <tr>
                 <td></td>
                 <td></td>
-                <td style={{fontSize: '14px',fontWeight:'bold', textAlign:'right'}} className='border-top-lg border-bottom-lg'>Discount {businessPartnerDiscount}%</td>
+                <td style={{fontSize: '14px',fontWeight:'bold', textAlign:'right'}} className='border-top-lg border-bottom-lg'>Discount : {discountPercentage}%</td>
                 <td style={{fontSize: '14px', textAlign:'right'}} className='border-top-xl border-bottom-xl'>${disc}</td>
               </tr>:''
             }
             <tr>
               <td></td>
               <td></td>
-              <td style={{fontSize: '14px',fontWeight:'bold', textAlign:'right'}} className='border-top-lg border-bottom-lg'>VAT {businessPartnerVat}%</td>
+              <td style={{fontSize: '14px',fontWeight:'bold', textAlign:'right'}} className='border-top-lg border-bottom-lg'>VAT : {vatPercentage}%</td>
               <td style={{fontSize: '14px', textAlign:'right'}} className='border-top-xl border-bottom-xl'>${valueAddedTax}</td>
             </tr>
             <tr>

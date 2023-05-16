@@ -6,8 +6,9 @@ import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByPartnerId } from "../../.
 import { getEndTime, getStartTime } from "../../../../store/toggle-slice";
 import SummarySales from "../../../SalesReport/SummarySales";
 import SummarySalesShop from "../../../SalesReport/SummarySalesShop";
-import SummarySalesCustomer from "../../../SalesReport/SummarySalesShopCustomer";
+import SummarySalesCustomer from "../../../SalesReport/SummarySalesCustomer";
 import SummaryTaxes from "../../../SalesReport/SummaryTaxes";
+import SummarySalesCommission from "../../../SalesReport/SummarySalesCommision";
 
 export default function SalesDetails (){
 
@@ -42,11 +43,12 @@ export default function SalesDetails (){
   }
   
   else if(show  === 'tax_summary'){
-    // tab = <PartnerSalesList/>
     tab = <SummaryTaxes/>
   }
+  else if(show  === 'commission_summary'){
+    tab = <SummarySalesCommission/>
+  }
   else if(show  === 'shop_summary'){
-    // tab = <PartnerSalesList/>
     tab = <SummarySalesShop/>
   }
   else{
@@ -83,7 +85,7 @@ export default function SalesDetails (){
                   <i className="as fa-rotate-left text-light text-sm pb-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile" />
                   National Tax Report
                 </button>
-                <button  className="btn btn-sm mb-1 mt-0 me-1 bg-gradient-dark" disabled
+                <button  className="btn btn-sm mb-1 mt-0 me-1 bg-gradient-dark"
                   onClick={
                     ()=>{
                       setShow('customer_summary')
@@ -92,14 +94,14 @@ export default function SalesDetails (){
                   <i className="as fa-rotate-left text-light text-sm pb-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile" />
                   Customer Summary
                 </button>
-                <button  className="btn btn-sm mb-1 mt-0 me-1 bg-gradient-dark" disabled
+                <button  className="btn btn-sm mb-1 mt-0 me-1 bg-gradient-dark"
                   onClick={
                     ()=>{
-                      setShow('shop_summary')
+                      setShow('commission_summary')
                     }
                   }>
                   <i className="as fa-rotate-left text-light text-sm pb-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile" />
-                  Shop Summary
+                  Commissions Summary
                 </button>
               </div>
             </div>
