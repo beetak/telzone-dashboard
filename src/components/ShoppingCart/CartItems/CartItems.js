@@ -2,9 +2,7 @@ import {useState, useRef, useEffect} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllBusinessPartners } from "../../../store/business-slice";
 import { 
-  cartActions, 
-  getAccount, 
-  getAmount, 
+  cartActions,  
   getBtnState, 
   getBundleId, 
   getCustomerAddress, 
@@ -13,45 +11,31 @@ import {
   getCustomerName, 
   getCustomerNumber, 
   getDicountPercentage, 
-  getLastId, 
-  getLoadingStatus, 
-  getOrderStatus, 
   getRetrievalStatus, 
-  getSaleVoucher, 
   getSoldVoucherIds, 
   getSoldVouchers, 
   getStateUpdate, 
-  getVATPercentage, 
-  getVoucherUpdateStatus, 
+  getVATPercentage,  
   postSale, 
-  postVoucherSaleByBundleId, 
-  updateVoucherOnSale, 
-  updateVoucherStatus
+  postVoucherSaleByBundleId
 } from "../../../store/cart-slice";
-import Dropdown from 'react-bootstrap/Dropdown'
-import { Button } from "react-bootstrap";
-import InputGroup from 'react-bootstrap/InputGroup'
-import { FormControl } from "react-bootstrap";
-import { ButtonGroup, Form } from "react-bootstrap";
 import BusinessPartnerDropdown from "../../BusinessPartner/BusinessPartnerDropdown/BusinessPartnerDropdown";
 import CartItem from "../CartItem/CartItem";
 import jsPDF from 'jspdf'
 import "jspdf-autotable";
 import { useReactToPrint } from "react-to-print";
 import InvoiceItem from "../InvoiceItem/InvoiceItem";
-import { getPaymentMethod, getToggleStatus, toggleActions } from "../../../store/toggle-slice";
-import { Br, Cut, Line, Printer, Text, Row, render } from 'react-thermal-printer';
-import axios from  'axios'
 import { fetchAsyncBasePrice, getBasePrice } from "../../../store/basePrice-slice";
 import { BeatLoader } from "react-spinners";
 import CurrencyDropdown from "../../Currency/CurrencyDropdown/CurrencyDropdown";
 import { getAllCurrencies } from "../../../store/currency-slice";
 
-const userId = localStorage.getItem('userId')
 const img = "assets/img/telonelogo.png"
 const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
 const userID = localStorage.getItem('userId')
+const regionId = localStorage.getItem('regionId')
+const townId = localStorage.getItem('townId')
 const shopId = localStorage.getItem('shopId')
 
 let voucherIdArray = []
@@ -68,33 +52,33 @@ const CartItems = () => {
 
   const dispatch  = useDispatch()
   const prices  = useSelector(getBasePrice)
-  const paymentValue = useSelector(getPaymentMethod)
   
   const bpname = useSelector(getCustomerName)
   const bpemail = useSelector(getCustomerEmail)
   const customerPhone = useSelector(getCustomerNumber)
   const customerAddress = useSelector(getCustomerAddress)
-  const [isOpen, setIsOpen] = useState(false)
   const [printState, setPrintState] = useState(false)
   const [empty, setEmpty] = useState('')
+  const [loadingStatus, setLoadingStatus] = useState(false)
+  const [loadingSuccess, setLoadingSuccess] = useState(false)
+  const [orderId, setOrderId] = useState('')
 
   const [businessPartnerName, setBusinessPartnerName] = useState(`Client's Name`)
-  const [adminPortalUserId, setAdminPortalUserId] = useState(3)
   const [businessPartnerId, setBusinessPartnerId] = useState('')
   const [businessPartnerEmail, setBusinessPartnerEmail] = useState('')
+  const [businessPartnerPhone, setBusinessPartnerPhone] = useState('')
+  const [businessPartnerAddress, setBusinessPartnerAddress] = useState('')
   const [businessPartnerDiscount, setBusinessPartnerDiscount] = useState('')
   const [businessPartnerVat, setBusinessPartnerVat] = useState('')
   const [currentDate, setCurrentDate] = useState('')
   const [rateStatus, setRateStatus] = useState('')
   const [rate, setRate] = useState(1)
   const [rateId, setRateId] = useState('')
-  const [payment, setPayment] = useState('Payment Method')
   const[currencyId, setCurrencyID] = useState('')
   const[currencyState, setCurrencyState] = useState('Currency')
   const[currencyActioned, setCurrencyActioned]= useState('')
   const[currencySymbol, setCurrencySymbol]= useState('')
 
-  const voucherId = useSelector(getSaleVoucher)
   const btnState = useSelector(getBtnState)
   const discountPercentage = useSelector(getDicountPercentage)
   const vatPercentage = useSelector(getVATPercentage)
@@ -117,49 +101,25 @@ const CartItems = () => {
       }
   }, [dispatch, currencySymbol, postBundleId]);
 
-  const openModal = () => setIsOpen(true);
-
-  const closeModal = () => setIsOpen(false);
-
-  let total = 0;
-  let subTotal = 0;
-  let total1 = 0;
-  let valueAddedTax = 0;
-  let disc = 0;
   let totalQty = 0;
-  let totalValue = 0;
-  const itemsList = useSelector((state) => state.cart.itemsList);
-  const orderId = useSelector(getLastId)
-  const orderStatus = useSelector(getOrderStatus)
-  const soldVouchers = useSelector(getSoldVouchers)
-  const updateState = useSelector(getVoucherUpdateStatus)
-  const loading = useSelector(getRetrievalStatus)
+  let unitPrice = 0
+  let totalPrice = 0
+  let unitDiscount = 0
+  let totalDiscount = 0
+  let unitVat = 0
+  let totalVat = 0
+  let netTotal = 0
 
-  const getBusinessPartner =(id, name, discount, vat)=>{
+  const itemsList = useSelector((state) => state.cart.itemsList);
+
+  const getBusinessPartner =(id, name, email, phoneNumber, physicalAddress, discount, vat)=>{
     setBusinessPartnerId(id)
     setBusinessPartnerName(name)
+    setBusinessPartnerEmail(email)
+    setBusinessPartnerPhone(phoneNumber)
+    setBusinessPartnerAddress(physicalAddress)
     setBusinessPartnerDiscount(discount)
     setBusinessPartnerVat(vat)
-  } 
-
-  const handleUpdateOnSale = () => {
-    dispatch(updateVoucherOnSale(
-      {
-        voucherId
-      }
-    ))
-    if(updateState === 'success'){
-      printVouchers()
-    }
-    closeModal()
-  }
-
-  const updateVoucherState = (callback) => {
-    console.log("",soldVouchersId)
-    dispatch(updateVoucherStatus(
-      soldVouchersId
-    ))
-    callback()
   }
   
   const businessPartners = useSelector(getAllBusinessPartners)
@@ -202,7 +162,6 @@ const CartItems = () => {
           <>
             <li key={index}>
               <BusinessPartnerDropdown data={partner} setBusinessPartner={getBusinessPartner}/>
-              {/*<BusinessPartnerDropdown data={partner} setBusinessPartner={getBusinessPartner} setClientLevel={getClientLevel}/>*/}
             </li>
           </>
         ))}
@@ -212,15 +171,17 @@ const CartItems = () => {
   // const cartItem = useSelector(getAllSales)
 
   itemsList.forEach((item) => {
-
-    totalValue += item.totalPrice
-    disc = (Math.round(totalValue * discountPercentage * rate) / 100).toFixed(2)
-    subTotal = (totalValue-disc/rate)*(100/(100+vatPercentage));
-    total1 = (Math.round(totalValue-disc/rate))
     totalQty += item.quantity
-    valueAddedTax = (Math.round(subTotal * rate * vatPercentage) / 100).toFixed(2)
-    // valueAddedTax = (Math.round(subTotal * rate * vatPercentage) / 100).toFixed(2)
-    total = (Math.round((subTotal*rate) * 100 + valueAddedTax * 100) / 100).toFixed(2)
+
+    unitPrice = (Math.round((item.price - (item.price*discountPercentage/100)) * 10000 * rate / (vatPercentage+100)) / 100).toFixed(2)
+    totalPrice = (Math.round(unitPrice*item.quantity*100)/100).toFixed(2)
+    unitDiscount = item.price*discountPercentage/100 * rate
+    totalDiscount = (Math.round(unitDiscount*item.quantity*100)/100).toFixed(2)
+    unitVat = (Math.round((unitPrice*1.15 - unitPrice)*100)/100).toFixed(2)
+    totalVat = (Math.round(unitVat*item.quantity*100)/100).toFixed(2)
+    netTotal = (Math.round((parseFloat(totalVat) + parseFloat(totalPrice))*100)/100).toFixed(2)
+
+
   });
 
   let renderedItems = itemsList.map((item, index)=>(
@@ -238,76 +199,89 @@ const CartItems = () => {
     </tr>
   ))
 
-  let invoiceItems = itemsList.map((item, index)=>(
-    <tr key={index}>
-      <InvoiceItem 
-        quantity={item.quantity}
-        id={item.id}
-        price={item.price}
-        total={item.totalPrice}
-        name={item.name}
-        product={item.product}/>
-    </tr>
-  ))
+  const makeSale = () => {
+    if (currencyId === '') {
+      setEmpty("Please select currency");
+    } else {
+      setLoadingStatus(true)
 
-  const processSale = ()=>{
-    itemsList.forEach((item) => {
-      saleByBundle(item.product, item.quantity)
-    });
-  }
-
-  const makeSale = (callback) => {
-    if(currencyId===''){
-      setEmpty("Please select currency")
-    }
-    else{
-      dispatch(postSale(
-        {
-          adminPortalUserId: userID,
-          bundleId: postBundleId,
-          businessPartnerId,
-          currencyId,
-          order: {
-            amount: total,
-            dateCreated: today,
-            discount: disc,
-            payingAccountNumber: "TelOne",
-            quantity: totalQty,
-            vat: valueAddedTax
-          },
-          shopId
+      dispatch(postSale({
+        adminPortalUserId: userID,
+        bundleId: postBundleId,
+        businessPartnerId,
+        currencyId,
+        order: {
+          amount: totalPrice,
+          dateCreated: today,
+          discount: totalDiscount,
+          payingAccountNumber: "TelOne",
+          quantity: totalQty,
+          vat: totalVat
+        },
+        regionId,
+        shopId,
+        townId
+      })).then(response => {
+        console.log("post sale response ", response);
+        if (response.payload && response.payload.code === "SUCCESS") {
+          // Request was successful
+          var todayDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+          setCurrentDate(todayDate);
+          console.log(todayDate);
+          // setPrintState(true);
+  
+          // Execute postVoucherSaleByBundleId
+          saleByBundle(postBundleId, totalQty, response.payload.data.order.id);
+        } else {
+          // Request was not successful
+          console.log('postSale failed');
         }
-      ))
-      var todayDate = new Date().toLocaleDateString('en-US', {year: 'numeric', month: '2-digit', day: '2-digit'}); // 08/19/2020 (month and day with two digits)
-      setCurrentDate(todayDate)
-      console.log(todayDate);
-      setPrintState(true)
-      callback()
+      }).catch(error => {
+        // Handle any errors that occurred during postSale dispatch
+        console.error('Error during postSale:', error);
+      })
     }
-  }
+  };
 
-  const saleByBundle = (bundleId, quantity) => {
+  const saleByBundle = (bundleId, quantity, orderID) => {
     dispatch(postVoucherSaleByBundleId(
       {
         bundleId,
         quantity
       }
-    ))
+    )).then(response => {
+      console.log("voucher response ", response);
+      if (response.payload && response.payload.success === true) {
+        setLoadingSuccess(true);
+        // Request was successful
+        if(quantity===1){
+          printSingleVoucher(response.payload.data.data, orderID)
+        }
+        else{
+          printVouchers(response.payload.data.data, orderID)
+        }
+      } else {
+        // Request was not successful
+        console.log('postVoucher failed');
+      }
+    }).catch(error => {
+      // Handle any errors that occurred during postSale dispatch
+      console.error('Error during postSale:', error);
+    }).finally(() => {
+      // Clear the loading state after 5 seconds
+      setTimeout(() => {
+        setLoadingStatus(false);
+        setLoadingSuccess(false);
+      }, 5000);
+    });
   }
 
-  const getVoucherId = () =>{
-    soldVouchers.map((items, index)=>
-      voucherIdArray.push(items.id)
-    )
-    console.log("voucher ids: ",voucherIdArray)
-  }
-
-  const printSingleVoucher = () => {
+  const printSingleVoucher = (voucherDetails, orderID) => {
 
     let count = 1
-    console.log("generated vouchers: ",soldVouchers)
+    console.log("generated vouchers: ",voucherDetails)
     // const data = Object.values(soldVouchers).map(elt=> [count++, elt.bundleName, elt.voucherCode]);
-    const data = Object.values(soldVouchers).map(elt=> [count++, elt.bundleName, elt.voucherCode]);
+    const data = Object.values(voucherDetails).map(elt=> [count++, elt.price, elt.price]);
     const title = "My Awesome Report";
     const headers = [["","Name", "Voucher Code"]];
 
@@ -324,8 +298,10 @@ const CartItems = () => {
     const date = `${current.getDate()}/${current.getMonth()+1}/${current.getFullYear()}`;
     var today = new Date(),
     curTime = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+    const dateString = new Date(current);
+    const formattedDate = dateString.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
     // var doc = new jsPDF('potrait', 'px', 'a6', 'false')
-    var doc = new jsPDF('potrait', 'px', [240,160], 'false')
+    var doc = new jsPDF('potrait', 'px', [280,160], 'false')
     doc.addImage(img, 'PNG', 15, 0, 70, 25)
     doc.setFont('Times New Roman', 'bold')
     doc.setFontSize(12)
@@ -341,31 +317,40 @@ const CartItems = () => {
     doc.setFont('Times New Roman', 'medium')
     doc.setFontSize(10)
     doc.setTextColor(0,0,0);
-    doc.text(15, 120, 'Client Name:  '+bpname+ '\nClient Email:  ' +bpemail+ '\nInvoice Number:  ' +orderId+ '\nDate:  ' + date + ' ' + curTime + "\n")
-    // doc.text(15, 120, 'Client Name:  ' + businessPartnerId===0? 'N/A': bpname + '\nClient Email:  ' + businessPartnerId===0? 'N/A': bpemail + '\nInvoice Number:  ' +orderId+ '\nDate:  ' + date + ' ' + curTime + "\n")
+    doc.text(15, 120, 'Client Name:  '+businessPartnerName+ '\nClient Email:  ' +businessPartnerEmail)
     doc.setFont('Times New Roman', 'bold')
     doc.setFontSize(12)
     doc.setTextColor(0,0,0);
-    doc.text(15, 160, 'Cashier Details')
+    doc.text(15, 145, 'Receipt Details')
     doc.setFont('Times New Roman', 'medium')
     doc.setFontSize(10)
     doc.setTextColor(0,0,0);
-    doc.text(15, 175, 'Cashier Name: ' +firstname+ " "+surname+ '\nShop: TelOne Shop ' + "\n")
+    doc.text(15, 160, 'Receipt Number: ' + orderID )
+    doc.text(15, 168, 'Date:\nUnit Price:\nVAT 15%:\nTotal Price:' )
+    doc.text(60, 168, formattedDate + ' ' + curTime + '\n$'+ totalPrice + '\n$' + totalVat + '\n$' + netTotal )
+    doc.setFont('Times New Roman', 'bold')
+    doc.setFontSize(12)
+    doc.setTextColor(0,0,0);
+    doc.text(15, 210, 'Cashier Details')
+    doc.setFont('Times New Roman', 'medium')
+    doc.setFontSize(10)
+    doc.setTextColor(0,0,0);
+    doc.text(15, 225, 'Cashier Name: ' +firstname+ " "+surname+ '\nShop: TelOne Shop ' + "\n")
 
     doc.setTextColor(0,0,0);
     doc.setFontSize(10)
     // doc.autoTable(content);
 
-    soldVouchers.map((item, i)=>{
+    voucherDetails.map((item, i)=>{
       doc.text(
         15,
-        200 + i * 18,
-        'Bundle: ' + item.bundleName + '\nPIN: ' + item.voucherCode
+        250 + i * 18,
+        'Bundle: ' + item.bundle.name + '\nPIN: ' + item.voucherCode
       )
     });
 
     doc.save('invoice.pdf')
-    window.location = '/sales'
+    // window.location = '/sales'
   }
   const getCurrency =(id, name, symbol)=>{
     setCurrencyID(id)
@@ -385,55 +370,86 @@ const CartItems = () => {
       ))
     ):(<div><h1>Error</h1></div>)
 
-  let paymentDrop = 
-  <>
-  
-      <Dropdown as={ButtonGroup}>
-            <Button variant="info">{payment}</Button>
-            <Dropdown.Toggle split variant="info" id="dropdown-split-basic" />
-            <Dropdown.Menu>
-              <Dropdown.Item 
-                onClick={
-                  ()=>{
-                    changePayment(true)
-                    setPayment('USD')
-                  }
-                }
-              >USD
-              </Dropdown.Item>
-              <Dropdown.Item 
-                onClick={
-                  ()=>{
-                    changePayment(false)
-                    setPayment('RTGS')
-                  }
-                }
-              >RTGS
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-          <br/></>
-
-  const printVouchers = () => {
-
+    const deleteCartItem = () => {
+      dispatch(cartActions.deleteFromCart());
+    };
+    
+  const printVouchers = (myVouchers, orderID) => {
+    console.log("items lis ",itemsList)
     let count = 1
-    const data = Object.values(soldVouchers).map(elt=> [count++, elt.bundleName, elt.voucherCode]);
+    const data = Object.values(myVouchers).map(elt=> [count++, elt.bundle.name, elt.voucherCode]);
+    const totals = Object.values(myVouchers).map(elt=> [count++, elt.bundle.name, elt.voucherCode]);
+    const invoiceData = Object.values(itemsList).map(elt=>
+      [  
+        elt.name,
+        elt.quantity, 
+        unitPrice, 
+        totalPrice
+      ]);
 
     const title = "My Awesome Report";
     const headers = [["","Name", "Voucher Code"]];
+    const invoiceHeaders = [["Item", "Quantity", "Unit Price", "Total Price"]];  
+
+    let invoiceContent = {
+      startY: 190, // Adjust the spacing as needed
+      head: invoiceHeaders,
+      margin: { left: 45, right: 35},
+      body: invoiceData,
+      columnStyles: {
+        0: { columnWidth: 180 }, // Width for the first column (empty column)
+        1: { columnWidth: 50 }, // Width for the "Name" column
+        2: { columnWidth: 70, align: 'right' }, // Width for the "Voucher Code" column
+        3: { columnWidth: 70, align: 'right' }, // Width for the "Voucher Code" column
+      },
+    };
+
+    const contentHeight = invoiceContent.head.length * 10 + invoiceContent.body.length * 15;
 
     let content = {
-      startY: 190,
+      startY: invoiceContent.startY + contentHeight + 10, // Adjust the spacing as needed
+      margin: { left: 275, right: 35},
+      body: [
+        ['Sub Total', totalPrice],
+        ['Discount', totalDiscount],
+        ['VAT', totalVat],
+        ['Total', netTotal],
+      ],
+      
+      columnStyles: {
+        0: { columnWidth: 70 }, // Width for the first column (empty column)
+        1: { columnWidth: 70 }, // Width for the "Name" column
+      },
+    }; 
+
+    let voucherContent = {
+      startY: 40, // Adjust the spacing as needed
       head: headers,
       margin: { left: 45, right: 35},
       body: data
-    };    
+    };
 
     const current = new Date();
-    const date = `${current.getDate()}/${current.getMonth()+1}/${current.getFullYear()}`;
     var today = new Date(),
     curTime = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+
+    const dateString = new Date(current);
+    const formattedDate = dateString.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const fiveDaysAgo = new Date(formattedDate);
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+    const formattedFiveDaysAgo = fiveDaysAgo.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
     var doc = new jsPDF('potrait', 'px', 'a4', 'false')
+    
+    const pageHeight = doc.internal.pageSize.height;
+    const footerY = pageHeight - 40; // Adjust the spacing as needed
+    const pageWidth = doc.internal.pageSize.width;
+    const text = "Cashier: " + firstname + ' ' + surname
+    const textWidth = doc.getTextWidth(text);
+    const centerX = (pageWidth - textWidth) / 2;
+
     doc.addImage(img, 'PNG', 45, 40, 70, 25)
     doc.setFont('Times New Roman', 'bold')
     doc.setFontSize(12)
@@ -444,63 +460,63 @@ const CartItems = () => {
     doc.text(410, 95, '107 Kwame Nkrumah Avenue, Harare, Zimbabwe\nP.O Box CY 331, Causeway, Harare, Zimbabwe\n24 Hour Call Center - +263 0242 700950',{align: 'right'})
     doc.setFont('Times New Roman', 'bold')
     doc.setFontSize(12)
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('Times New Roman', 'bold');
+    doc.setFontSize(12);
+    doc.text(410, 130, 'Invoice Details', { align: 'right' });
+    doc.setFont('Times New Roman', 'regular');
+    doc.setFontSize(10);
+    doc.setTextColor(112, 112, 112);
+    doc.text(360, 140, 'Invoice Date:\nTime:\nInvoice Number:\nBP Number:\nVAT Number:', { align: 'right' });
+    doc.text(410, 140, formattedDate + '\n' + curTime + '\n' + orderID + '\n200001412' + '\n10001509', { align: 'right' });
+    doc.setFont('Times New Roman', 'bold');
+    doc.setFontSize(12);
+    
     doc.setTextColor(0,0,0);
     doc.text(45, 130, 'Client Details')
     doc.setFont('Times New Roman', 'medium')
     doc.setFontSize(10)
     doc.setTextColor(112,112,112);
-    doc.text(45, 140, 'Client Name:  ' +bpname+ '\nClient Email:  ' +bpemail+ '\nInvoice Number:  ' +orderId+ '\nDate:  ' + date + ' ' + curTime + "\n")
+    doc.text(45, 140, 'Client Name:\nClient Email:\nCell Phone:\nAddress:')
+    doc.text(95, 140, businessPartnerName+ '\n' +businessPartnerEmail+ '\n' +businessPartnerPhone+ '\n' + businessPartnerAddress)
 
     doc.setTextColor(0,0,0);
     doc.setFontSize(11)
+    
+    doc.autoTable(invoiceContent);
     doc.autoTable(content);
+    doc.text(text, centerX, footerY);
+    // Add a blank page before invoiceContent
+    doc.addPage();
+    // Render invoiceContent on the second page
+    doc.autoTable(voucherContent);
     
     doc.save('invoice.pdf')
-    window.location = '/sales'
+    // window.location = '/sales'
   }
 
   const componentRef = useRef()
   const handlePrint = useReactToPrint({
     content: ()=> componentRef.current,
-    documentTitle: 'TelOne SmartWiFi Receipt',
-    // onAfterPrint: ()=> alert('Printing Completed')
+    documentTitle: 'TelOne SmartWiFi Receipt'
   })
 
-
-  const closePrintScreen = () =>{
-    setPrintState(false)
-  }
-
-  const toggleStatus  = useSelector(getToggleStatus)
-  
-
-  const changeStatus = () => {
-    console.log(toggleStatus)
-    dispatch(
-        toggleActions.changeState({
-          status: !toggleStatus
-        })
-    )
-  }
-
-  const changePayment = (paymentStatus) => {
-    dispatch(
-        toggleActions.changePaymentMethod({
-          payment: paymentStatus
-        })
-    )
-  }
-
-  let loadingAnimation = 
+  let loadingSalesAnimation = 
     <div className='text-center' style={anime}>
-        <h5 style={{color: '#055bb5'}}>Preparing Invoice</h5>
+        <h5 style={{color: '#055bb5'}}> {
+          loadingStatus && !loadingSuccess? 
+            "Preparing Invoice":
+            loadingStatus && loadingSuccess? 
+              "Successful":""
+          }</h5>
         <BeatLoader
-        color={'#055bb5'}
-        loading={loading}
-        cssOverride={override}
-        size={15}
-        aria-label="Loading Spinner"
-        data-testid="loader"
+          color={'#055bb5'}
+          loading={loadingStatus}
+          cssOverride={override}
+          size={15}
+          aria-label="Loading Spinner"
+          data-testid="loader"
         />
     </div>
 
@@ -509,123 +525,10 @@ const CartItems = () => {
       <h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5>
     </div>
 
-  const successTimer = () =>{
-    setTimeout(() => {
-      <div className='text-center'>
-        <h5 style={{color: '#E91E63'}}>Success</h5>
-      </div>
-    }, 9000);
-  }
-
-  let showData = printState? (
-    <div className="">
-      <div className="text-center">
-        {toggleStatus?
-          <button 
-            onClick={()=>updateVoucherState(function(){if(stateUpdate){printSingleVoucher()}})}  
-            className="btn btn-danger mx-1"
-          >Close</button>:
-          <>
-            <button 
-              // onClick={()=>updateVoucherState(function(){if(stateUpdate){printVouchers()}})}
-              onClick={function(event){getVoucherId();handlePrint()}}
-              className="btn btn-info mx-1"
-            >Print</button>
-            <button 
-              // onClick={()=>updateVoucherState(function(){if(stateUpdate){closePrintScreen()}})} 
-              // onClick={()=>updateVoucherState(function(){if(stateUpdate){printSingleVoucher()}})} 
-              onClick={()=>updateVoucherState(function(event){if(stateUpdate){closePrintScreen()}})}
-              className="btn btn-danger mx-1"
-            >Close</button>
-          </>
-        }
-      </div>
-      <div className="" ref={componentRef} style={{width: '100%', height: window.innerHeight, padding: '80px'}}>
-        <img src={img} style={{width: '100px'}}/>
-        <div className="">
-          <div className="text-right"  style={{textAlign: "right"}}>
-            <h6>Headquarters: <span>Runhare House</span></h6>
-            <p style={{fontSize: '12px', fontWeight: 'bold'}}>107 Kwame Nkrumah Avenue, Harare, Zimbabwe 
-              <br/> P.O Box CY 331, Causeway, Harare, Zimbabwe 
-              <br/> 24 Hour Call Center - +263 0242 700950
-            </p>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-6">
-            <h6>Customer Details</h6>
-            <div style={{listStyle: 'none'}}>
-              <div style={lineStyle}><span style={{fontWeight: 'bold'}}>Name:</span> {bpname}</div>
-              <div style={lineStyle}><span style={{fontWeight: 'bold'}}>Email:</span> {bpemail}</div>
-              <div style={lineStyle}><span style={{fontWeight: 'bold'}}>Cellphone:</span> {customerPhone}</div>
-              <div style={lineStyle}><span style={{fontWeight: 'bold'}}>Address:</span> {customerAddress}</div>
-            </div>
-          </div>
-          <div className={"col-6"} style={{textAlign: "right"}}>
-            <h6>Invoice Details</h6>
-            <div>
-              <div style={lineStyle}><span style={{fontWeight: 'bold'}}>Invoice Date:</span> {currentDate}</div>
-              <div style={lineStyle}><span style={{fontWeight: 'bold'}}>Invoice Number:</span> {orderId}</div>
-              <div style={lineStyle}><span style={{fontWeight: 'bold'}}>BP Number:</span> 200001412</div>
-              <div style={lineStyle}><span style={{fontWeight: 'bold'}}>VAT Number:</span> 10001509</div>
-            </div>
-          </div>
-        </div>
-        <h6 className="mt-3 mb-0">Payment</h6>
-        <table className="w-100">
-          <thead>
-            <tr className='border-top-lg border-bottom-lg'>
-              <th style={{fontSize: '14px', width: '100px'}}>Qty</th>
-              <th style={{fontSize: '14px'}}>Product</th>
-              <th style={{fontSize: '14px', textAlign:'right'}}>Unit Price</th>
-              <th style={{fontSize: '14px', textAlign:'right'}}>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {invoiceItems} 
-            <tr>
-              <td></td>
-              <td></td>
-              <td style={{fontSize: '14px',fontWeight:'bold', textAlign:'right'}} className='border-top-lg border-bottom-lg'>Sub Total</td>
-              <td style={{fontSize: '14px', textAlign:'right'}} className='border-top-xl border-bottom-xl'>${(Math.round(subTotal * 100) / 100).toFixed(2)}</td>
-            </tr> 
-            {
-              clientLevel===2?
-              <tr>
-                <td></td>
-                <td></td>
-                <td style={{fontSize: '14px',fontWeight:'bold', textAlign:'right'}} className='border-top-lg border-bottom-lg'>Discount : {discountPercentage}%</td>
-                <td style={{fontSize: '14px', textAlign:'right'}} className='border-top-xl border-bottom-xl'>${disc}</td>
-              </tr>:''
-            }
-            <tr>
-              <td></td>
-              <td></td>
-              <td style={{fontSize: '14px',fontWeight:'bold', textAlign:'right'}} className='border-top-lg border-bottom-lg'>VAT : {vatPercentage}%</td>
-              <td style={{fontSize: '14px', textAlign:'right'}} className='border-top-xl border-bottom-xl'>${valueAddedTax}</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td style={{fontSize: '14px',fontWeight:'bold', textAlign:'right'}} className='border-top-lg border-bottom-lg'>Total</td>
-              <td style={{fontSize: '14px', textAlign:'right'}} className='border-top-xl border-bottom-xl'>${(Math.round(total * 100 * rate) / 100).toFixed(2)}</td>
-            </tr>
-          </tbody>
-        </table>
-        <div className="text-center bottom-8 w-80" style={{position: 'absolute'}}>
-        <hr/>
-          <h6>Cashier Details</h6>
-          <div style={lineStyle}><span style={{fontWeight: 'bold'}}>Receipting Cashier:</span> {firstname} {surname}</div>
-          <div style={lineStyle}><span style={{fontWeight: 'bold'}}>TelOne Shop</span></div>
-        </div>
-      </div>
-    </div>
-  ):(
-    <>
+  let showData = <>
       <div className="table-responsive p-0">
         <div className="p-4">
           <div className="input-group input-group-dynamic mb-4">
-
             <table class="table table-borderless">
               <thead>
                 <tr>
@@ -643,18 +546,18 @@ const CartItems = () => {
                     <td colSpan={2}></td>
                     <td>Sub Total
                     </td>
-                    <td style={{textAlign: 'right'}}> ${(Math.round(subTotal * 100 * rate) / 100).toFixed(2)}</td>
+                    <td style={{textAlign: 'right'}}> ${totalPrice}</td>
                   </tr>
                   <tr>
                     <td colSpan={2}></td>
                     <td>Discount {discountPercentage}%
                     </td>
-                    <td style={{textAlign: 'right'}}> ${disc}</td>
+                    <td style={{textAlign: 'right'}}> ${totalDiscount}</td>
                   </tr>
                   <tr>
                     <td colSpan={2}></td>
                     <td>VAT {vatPercentage}%</td>
-                    <td style={{textAlign: 'right'}}> ${valueAddedTax}</td>
+                    <td style={{textAlign: 'right'}}> ${totalVat}</td>
                   </tr>
                   </>:
                   <></>}
@@ -665,46 +568,39 @@ const CartItems = () => {
           {renderedBusinessPartner}
           <div style={{ color: 'red', marginBottom: '10px' }}>{empty}</div>
           <div className="dropdown">
-              <button 
-                  className="btn bg-gradient-primary dropdown-toggle" 
-                  type="button" 
-                  id="dropdownMenuButton" 
-                  data-bs-toggle="dropdown" 
-                  aria-expanded="false"
-                  >
-                  {currencyState}
-              </button>
-              <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                {renderedCurrency}
-              </ul>
-          </div>
-
-          {orderStatus==="idle"?
             <button 
-            // onClick={processSale} 
-            onClick={()=>makeSale(function(){processSale()})} 
-            className="btn btn-info"
-            disabled = {businessPartnerName===`Client's Name` || totalQty === 0 ?true:false}
-            >Generate Sale</button>
-            :orderStatus==="success"?
-              (stateUpdate === 'successful'?
-                <button onClick={printVouchers} type='button' className="btn btn-primary">Retrieve Vouchers</button>:<button onClick={updateVoucherState} disabled={true} type='button' className="btn btn-primary">Can Not Procceed</button>):(<button disabled={true} type='button' className="btn btn-primary">Try Again</button>)
-          }
-
-          {loading === 'idle'?
-            '':(loading==='pending'?
-                loadingAnimation:(
-                  loading === 'fulfilled'?
-                    successTimer:(
-                      loading ==='rejected'?errorMsg: ''
-                  )
-                )
-              )
-          }
+              className="btn bg-gradient-primary dropdown-toggle" 
+              type="button" 
+              id="dropdownMenuButton" 
+              data-bs-toggle="dropdown" 
+              aria-expanded="false"
+              >
+              {currencyState}
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {renderedCurrency}
+            </ul>
+          </div>
+          <div className="">
+            <button 
+              onClick={()=>makeSale()} 
+              className="btn btn-info"
+              disabled = {businessPartnerName===`Client's Name` || totalQty === 0 ?true:false}
+            >Print Vouchers
+            </button>
+            <button 
+              onClick={deleteCartItem} 
+              className="btn btn-danger mx-2"
+            >Cancel
+            </button>
+            {
+              loadingStatus?
+                loadingSalesAnimation:''
+            }
+          </div>
         </div>
-      </div>
+      </div> 
     </>
-  )
 
   return (
     <div class="col-lg-7 py-4"> 
@@ -713,15 +609,11 @@ const CartItems = () => {
           <div className="card my-4">
             <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
               <div className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" style={Style2}>
-                  <div className="col-3">
+                  <div className="col-8">
                     <h6 className="text-white text-capitalize ps-3">Generate Sale</h6>
                   </div>
-                  <div className="col-5 form-check form-switch d-flex align-items-center">
-                    <input className="form-check-input" type="checkbox" onClick={changeStatus}/>
-                    <label className="form-check-label mb-0 ms-2" style={{color: 'white'}}>{toggleStatus?"Single Voucher Receipt":"Multiple Voucher Receipt"}</label>
-                  </div>
                   <div className="col-4">
-                    <h6 className="text-white text-capitalize ps-3"><span style={{float: 'right'}}>Total Price: ${total}</span></h6>
+                    <h6 className="text-white text-capitalize ps-3"><span style={{float: 'right'}}>Total Price: ${netTotal}</span></h6>
                   </div>
                 </div>
             </div>

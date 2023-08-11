@@ -4,7 +4,8 @@ import CartBundleCard from "../CartBundleCard/CartBundleCard";
 import { useSelector } from "react-redux";
 import BeatLoader from 'react-spinners/BeatLoader'
 
-const CartBundleList = () => {
+const CartBundleList = ({pageType}) => {
+    console.log("page: ", pageType)
 
     const bundles = useSelector(getAllBundles)
 
@@ -12,7 +13,7 @@ const CartBundleList = () => {
     renderedBundles = bundles ? (
         bundles.map((bundle, index)=>(
         <tr key={index}>
-            <CartBundleCard data={bundle} index={index}/>
+            <CartBundleCard data={bundle} page={pageType} index={index}/>
         </tr>
         ))
     ):(<div><h1>Error</h1></div>)

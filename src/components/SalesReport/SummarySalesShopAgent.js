@@ -1,5 +1,5 @@
 import React, {useState, useRef} from 'react';
-import { getShopAgentSales } from '../../store/sales-slice';
+import { getShopAgentSales, getShopSales } from '../../store/sales-slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { currencyActions, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
@@ -19,6 +19,7 @@ export default function SummarySalesShopAgent() {
     const dateString = date.toString();
 
     const totalSales = useSelector(getShopAgentSales)
+    const shopSales = useSelector(getShopSales)
     
     const[currencyID, setCurrencyID] = useState('')
     const[currencyState, setCurrencyState] = useState('Currency')
@@ -68,7 +69,7 @@ export default function SummarySalesShopAgent() {
 
     let renderedAgent = ''
     renderedAgent = agentData ? (
-        <>{/*
+        <>
             <tr>
                 <Dropdown.Item 
                     onClick={
@@ -79,7 +80,7 @@ export default function SummarySalesShopAgent() {
                     }
                     >All Sales
                 </Dropdown.Item>
-                </tr>  */} 
+            </tr> 
             {
                 agentData.map((user, index)=>(
                     <tr key={index}>
@@ -90,7 +91,7 @@ export default function SummarySalesShopAgent() {
         </>
     ):(<div><h1>Error</h1></div>)
 
-    const salesData = totalSales
+    const salesData = adminPortalUserId===0 ? shopSales:totalSales
 
     const output2 = Object.entries(
         salesData.reduce((prev, { bundles }) => {
@@ -155,8 +156,7 @@ export default function SummarySalesShopAgent() {
         )
     }
 
-    const submitRequest = async (endDate) => {
-        setEndDate(endDate)
+    const submitRequest = async () => {
         if(currencyID===''){
           setEmpty("Please select the currency")
         }
@@ -232,6 +232,7 @@ export default function SummarySalesShopAgent() {
                                 </ul>
                             </div>
                             <div><sup style={{color: 'red', paddingLeft: 10}}>{emptyAgent}</sup></div>
+                            <button onClick={()=>submitRequest()} className="btn btn-primary">Search</button>
                         </div>
                         <div className="col-6 text-end">
                             <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" onClick={()=>handlePrint()}><i class="material-icons text-lg position-relative me-1">picture_as_pdf</i> DOWNLOAD PDF</button>
@@ -246,13 +247,13 @@ export default function SummarySalesShopAgent() {
                             </div>                      
                             <div class="col-6 text-end">
                                 <h6 className="mb-0">SUMMARY AGENT SALES REPORT</h6>
-                                <h6 className="mb-0">By: {agentName}</h6>
+                                <h6 className="mb-0">By: {agentState}</h6>
                             </div>
                         </div>
                         <div className="row">
                             <div className="col-6 align-items-center">
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>From Date:</span><input type="date" style={{border: 0}} name="startDate" onChange={(e) => setStartDate(e.target.value)} value={startDate} max={dateString}/></h6>
-                                <h6 className="mb-0 ms-2"><span style={{width:100}}>To Date:</span><input type="date" style={{border: 0}} name="endDate" onChange={(e) => submitRequest(e.target.value)} value={endDate} max={dateString}/><sup style={{color: 'red', paddingLeft: 10}}>{validate}</sup></h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>To Date:</span><input type="date" style={{border: 0}} name="endDate" onChange={(e) => setEndDate(e.target.value)} value={endDate} max={dateString}/><sup style={{color: 'red', paddingLeft: 10}}>{validate}</sup></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Currency:</span> {currencyState}</h6>
                             </div> 
                         </div>

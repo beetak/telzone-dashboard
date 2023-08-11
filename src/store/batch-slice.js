@@ -16,11 +16,13 @@ export const postBatch = createAsyncThunk(
     'cart/postAsyncBatch',
     async (initialData) => {
       console.log(initialData);
-      return await Api
-        .post('/batch/', 
-          initialData
-        )
-        .then((res) => res.data);
+      try {
+        const response = await Api.post('/batch/', initialData);
+        return { success: true, data: response.data };
+      } catch (error) {
+        console.error('postSale error:', error);
+        throw error;
+      }
     }
 );
 
@@ -173,6 +175,8 @@ const batchSlice = createSlice({
         batchPostStatus: 'idle', // | 'success'
         voucherPostStatus: '', // | 'success'
         createdBatch: '',
+        postLoading: false,
+        postSuccess: false,
         createdVoucher: '',
         viewVouchers: '',
         viewVoucherStatus: 'idle',
@@ -202,6 +206,12 @@ const batchSlice = createSlice({
         },
         setVerify(state, action){
             state.statusSearch = 'idle'
+        },
+        postStatus(state, action){
+            state.postLoading = action.payload
+        },
+        successStatus(state, action){
+            state.postSuccess = action.payload
         }
     },
     extraReducers: {
@@ -234,15 +244,32 @@ const batchSlice = createSlice({
             state.postStatus = 'pending'
             state.voucherPostStatus = 'idle'
         },
-        [postBatch.fulfilled]: (state, action)=>{
-            console.log("fulfilled")
-            state.batchPostStatus = 'success'
-            state.createdBatch = action.payload.data.batch.id
-            action.payload.id = action.payload.data.batch.id
-            state.batches = state.batches.concat(action.payload)
-            state.posting = 'success'
-            state.postStatus = 'fulfilled'
-            state.getVoucherStatus = 'idle'
+        // [postBatch.fulfilled]: (state, action)=>{
+        //     console.log("fulfilled")
+        //     state.batchPostStatus = 'success'
+        //     state.createdBatch = action.payload.data.batch.id
+        //     action.payload.id = action.payload.data.batch.id
+        //     state.batches = state.batches.concat(action.payload)
+        //     state.posting = 'success'
+        //     state.postStatus = 'fulfilled'
+        //     state.getVoucherStatus = 'idle'
+        // },
+        [postBatch.fulfilled]: (state, action) => {
+            if (action.payload.success) {
+              const { data } = action.payload;
+            //   data.customers = {
+            //     email: "string",
+            //     firstname: "string",
+            //     password: "string",
+            //     id: 0,
+            //     phone_number: "string",
+            //     surname: "string"
+            //   };
+              console.log("batch response ",data);
+            //   state.batches.push(data);
+            } else {
+              console.log('postBatch failed:', action.payload.error);
+            }
         },
         [postBatch.rejected]: (state, {payload})=>{
             state.batchPostStatus='failed'
@@ -436,7 +463,8 @@ export const getVCodes = (state) => state.batch.vcode
 export const getLoadingStatus = (state) => state.batch.loadingStatus
 export const getVBActive = (state) => state.batch.batchActive
 export const getVBSuspended = (state) => state.batch.batchSuspended
-export const getPostingStatus = (state) => state.batch.postStatus
+export const getPostLoading = (state) => state.batch.postLoading
+export const getPostSuccess = (state) => state.batch.postSuccess
 export const getSoldStatus = (state) => state.batch.soldStatus
 export const getUsedStatus = (state) => state.batch.usedStatus
 export const getStatusSearch = (state) => state.batch.statusSearch

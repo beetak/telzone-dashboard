@@ -207,6 +207,7 @@ export default function TotalPurchaseReport() {
                                 {renderedCurrency}
                                 </ul>
                             </div>
+                            <button onClick={()=>submitRequest()} className="btn btn-primary">Search</button>
                         </div>
                         <div className="col-6 text-end">
                             <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" onClick={()=>handlePrint()}><i class="material-icons text-lg position-relative me-1">picture_as_pdf</i> DOWNLOAD PDF</button>

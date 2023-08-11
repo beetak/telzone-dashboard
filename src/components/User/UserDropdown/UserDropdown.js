@@ -10,11 +10,12 @@ export default function UserDropdown(props){
             <Dropdown.Item 
                 onClick={
                     () => {
-                        props.setUser(data.id, data.name)
-                        
+                        // props.setUser(data.id, data.firstname)
+                        props.setSupervisor(data.id, data.firstname, data.surname) 
                     }
                 }
-                >{data.name}
+                >
+                {data.firstname} {data.surname}
             </Dropdown.Item>
         </>
     );

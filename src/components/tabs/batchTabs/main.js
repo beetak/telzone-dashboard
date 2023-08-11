@@ -33,6 +33,7 @@ export default function BundleDetails(){
                 tabinfo = <BatchCreateForm/>;
               } 
               else if(tabState === 'bundles') {
+                dispatch(fetchAsyncBatches())
                 tabinfo = <BatchesTab/>;
                   // tabinfo = <VouchersTable/>
               }

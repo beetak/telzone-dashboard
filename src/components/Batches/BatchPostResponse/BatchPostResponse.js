@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getBatchStatus, getCreatedBatch, getPostingStatus, getVoucherStatus, getVoucherType, postBatch } from '../../../store/batch-slice';
+import { getBatchStatus, getCreatedBatch, getPostLoading, getPostSuccess, getPostingStatus, getVoucherStatus, getVoucherType, postBatch } from '../../../store/batch-slice';
 import { getAllBundles } from '../../../store/bundle-slice';
 import voucher_codes from 'voucher-code-generator'
 import BeatLoader from 'react-spinners/BeatLoader'
@@ -10,32 +10,13 @@ const BatchPostResponse = () => {
 
   const batchStatus = useSelector(getBatchStatus)
 
-  const[length, setLength] =  ''
   const[count, setCount] = useState('')
-  const[voucherList, setVoucherList] = useState([])
   const[batches, setBatches] = useState([])
-  const[lastBatch, setLastBatch] = useState('')
-  const[voucherCode, setVoucherCode] = useState('')
-  const[loadingState, setLoadingState] = useState('')
-  const[batchItem, setBatchItem] = useState('')
-  const[groups, setGroups] = useState([])
-  const[currentState, setCurrentState] = useState('Product')
-  const[loadingBundle, setLoadingBundle] = useState('')
-  const[empty, setEmpty] = useState('')
-  const[batchId, setBatchId] = useState([])
-  const[category, setCategory] = useState([])
-  const[batchName, setBatchName] = useState("TelOnev1")
-  const[showBatchId, setShowBatchId] = useState('')
-  const[encryptedVoucher, setEncryptedVoucher] = useState('')
-  const[bundleName, setBundleName] = useState('')
-  const[bundleId, setBundleId] = useState('')
 
     const dispatch = useDispatch()
 
-    const response = useSelector(getVoucherStatus)
-    const batch = useSelector(getCreatedBatch)
-    const productType = useSelector(getVoucherType)
-    const postStatus = useSelector(getPostingStatus)
+    const postSuccess = useSelector(getPostSuccess)
+    const postLoading = useSelector(getPostLoading)
 
     let info
     let batchNumber
@@ -44,7 +25,7 @@ const BatchPostResponse = () => {
       <td colspan={6}>
         <BeatLoader
           color={'#055bb5'}
-          loading={postStatus}
+          loading={postLoading}
           cssOverride={override}
           size={15}
           aria-label="Loading Spinner"
@@ -52,42 +33,6 @@ const BatchPostResponse = () => {
         />
       </td>
     </tr>
-
-    let renderedResponse = 
-    postStatus==='idle'? '':
-    (postStatus==='pending'?
-    loadingAnimation:
-    (postStatus==='fulfilled' && response==='idle'?
-      <p className="mb-0 text-sm">Click Submit to complete voucher generation </p>:
-      (postStatus==='fulfulled' && response === 'pending'?
-      loadingAnimation:
-      (postStatus === 'fulfilled' && response === 'success'?
-      loadingAnimation: '')
-      )
-    ))
-
-    if(postStatus==='idle'){
-      info = ""
-      batchNumber = ""
-    }
-    if(postStatus ==='pending'){
-      info = <p className="mb-0 text-sm">{'Voucher Creation Pending...'}</p>
-      batchNumber = ""
-    }
-    if(postStatus ==='successful'){
-      info = loadingAnimation
-      batchNumber = <>
-        <br/>
-        <p className="mb-0 text-sm">Batch Number: {batch}</p>
-      </>
-    }
-    else if(postStatus ==='rejected'){
-      info = <p className="mb-0 text-sm">{productType} Voucher Creation Failed</p>
-      batchNumber = <>
-        <br/>
-        <p className="mb-0 text-sm">Batch Number: {batch}</p>
-      </>
-    }
 
   let renderedBatches = ''
   if(count>0){
@@ -104,6 +49,23 @@ const BatchPostResponse = () => {
     </tr>
   }
 
+  let loadingBatchAnimation = 
+    <div className='text-center' style={anime}>
+        <h5 style={{color: '#055bb5'}}>{
+          postLoading?"Generating Vouchers. Please wait a moment":postSuccess&&"Voucher Generation Completed"}</h5>
+        {
+          postLoading&&
+          <BeatLoader
+            color={'#055bb5'}
+            loading={postLoading}
+            cssOverride={override}
+            size={15}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+        }
+    </div>
+
 
   let errorMsg =  
     <tr>
@@ -117,6 +79,10 @@ const BatchPostResponse = () => {
             <h3 className="mb-0 ">TelOne</h3>
             <p className="text-sm ">Voucher Creation</p>
             <div className="">
+                {
+                  postLoading || postSuccess?
+                    loadingBatchAnimation:''
+                }
                 {info}
                 {batchNumber}
             </div>

@@ -16,7 +16,7 @@ export default function TelOneTownDropdown(props){
                 props.setTown(data.id, data.name)
             }
         }>
-        {data.name}
+        {data.name==='No Town'? 'All Towns': data.name}
     </a>
     </>
   );

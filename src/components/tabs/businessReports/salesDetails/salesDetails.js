@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getGlobalCurrency, getGlobalSymbol } from "../../../../store/currency-slice";
-import { fetchAsyncPeriodicalPayments } from "../../../../store/customerPayments-slice";
 import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByPartnerId } from "../../../../store/sales-slice";
 import { getEndTime, getStartTime } from "../../../../store/toggle-slice";
 import SummarySales from "../../../SalesReport/SummarySales";
@@ -27,7 +26,6 @@ export default function SalesDetails (){
   useEffect(() => {
     dispatch(fetchAsyncSalesByPartnerId(id))
     dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId}))
-    dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol}))
     // dispatch(fetchAsyncDailyPayments({date, curSymbol}))
   }, [dispatch, id, endDate, curId, curSymbol, startDate]);
 

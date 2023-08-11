@@ -56,12 +56,23 @@ export const postTown = createAsyncThunk(
         .then((res) => res.data);
     }
 );
+export const fetchAsyncTownByRegion = createAsyncThunk('entity/fetchAsyncTownByRegion', async (id) => {
+    const response = await Api
+    .get(`/town/regionId${id}`)
+    return [...response.data.data]
+});
 
 export const fetchAsyncShop = createAsyncThunk('entity/fetchAsyncShop', async () => {
     const response = await Api
     .get(`/shop/`)
     return [...response.data.data]
-})
+});
+
+export const fetchAsyncShopByTown = createAsyncThunk('entity/fetchAsyncShopByTown', async (id) => {
+    const response = await Api
+    .get(`/shop/townId${id}`)
+    return [...response.data.data]
+});
 
 export const postShop = createAsyncThunk(
     'entity/postAsyncRole',
@@ -81,9 +92,13 @@ const initialState = {
     towns: [],
     regions: [],
     loadingShop: 'idle',
+    loadingTownShop: 'idle',
+    loadingRegTown: 'idle',
     loadingTown: 'idle',
     loadingRegion: 'idle',
     loadingRole: 'idle',
+    townShops: [],
+    regionTowns: []
 }
 const entitySlice = createSlice({
     name: 'roles',
@@ -137,6 +152,22 @@ const entitySlice = createSlice({
             console.log("rejected")
             state.loadingShop = 'rejected'
         },
+        [fetchAsyncShopByTown.pending]: (state)=>{
+            console.log("pending")
+            state.loadingTownShop = 'pending'
+        },
+        [fetchAsyncShopByTown.fulfilled]: (state, action)=>{
+            console.log('shops: ', action.payload)
+            const loadedShops = action.payload.map(shop=>{
+                return shop
+            })
+            state.townShops = loadedShops
+            state.loadingTownShop = 'fulfilled'
+        },
+        [fetchAsyncShopByTown.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.loadingTownShop = 'rejected'
+        },
         [postShop.pending]: ()=>{
             console.log("pending")
         },
@@ -165,6 +196,21 @@ const entitySlice = createSlice({
         [fetchAsyncTown.rejected]: (state, {payload})=>{
             console.log("rejected")
             state.loadingTown = 'rejected'
+        },
+        [fetchAsyncTownByRegion.pending]: (state)=>{
+            console.log("pending")
+            state.loadingRegTown = 'pending'
+        },
+        [fetchAsyncTownByRegion.fulfilled]: (state, action)=>{
+            const loadedRegions = action.payload.map(town=>{
+                return town
+            })
+            state.regionTowns = loadedRegions
+            state.loadingRegTown = 'fulfilled'
+        },
+        [fetchAsyncTownByRegion.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.loadingRegTown = 'rejected'
         },
         [postTown.pending]: ()=>{
             console.log("pending")
@@ -217,7 +263,9 @@ const entitySlice = createSlice({
 export const entityActions = entitySlice.actions
 export const getAllRoles = (state) => state.entity.roles
 export const getAllRegions = (state) => state.entity.regions
+export const getRegionTowns = (state) => state.entity.regionTowns
 export const getAllTowns = (state) => state.entity.towns
+export const getTownShops = (state) => state.entity.townShops
 export const getAllShops = (state) => state.entity.shops
 export const getLoadingShop = (state) => state.entity.loadingShop
 export const getLoadingRegion = (state) => state.entity.loadingRegion

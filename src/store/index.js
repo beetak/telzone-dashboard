@@ -19,6 +19,7 @@ import businessRoleSlice from "./business-role-slice";
 import customerPaymentsSlice from "./customerPayments-slice";
 import entitySlice from "./entities-slice";
 import portalSlice from "./portal-slice";
+import focSlice from "./foc-slice";
 
 const store = configureStore({
     reducer: {
@@ -41,7 +42,8 @@ const store = configureStore({
         businessRole: businessRoleSlice.reducer,
         customerPayments: customerPaymentsSlice.reducer,
         entity: entitySlice.reducer,
-        portal: portalSlice.reducer
+        portal: portalSlice.reducer,
+        foc: focSlice.reducer
     }
 })
 export default store

@@ -20,6 +20,11 @@ import VoucherVerificationPage from "./pages/sales/voucherVerification";
 import SPBusinessPartners from "./pages/shopManager/businessPartners/SPBusinessPartners";
 import SPSalesReports from "./pages/shopManager/salesReports/SPSalesReports";
 import BusEntities from "./pages/busEntities";
+import SPVoucherManagement from "./pages/shopManager/vouchers/SPVoucherManagement";
+import HORSalesReport from "./pages/headManager/HORSalesReport";
+import ABMSalesReport from "./pages/areaBusManager/ABMSalesReport";
+import RegionalSalesReport from "./pages/regionalManager/RegionalSalesReport";
+import Customers from "./pages/customers";
 
 const userRole = localStorage.getItem('role')
 
@@ -64,16 +69,22 @@ function App() {
           <Route path={"/profile"} element={<Profile/>} />
           <Route path={"/dashboard"} element={<Dashboard/>} />
           <Route path={"/adverts"} element={<Adverts/>} />
-          <Route path={"/sales"} element={<Sales/>} />
+          <Route path={"/sales"} element={<Sales page='sales'/>} />
+          <Route path={"/foc-sales"} element={<Sales page='foc-sales'/>} />
           <Route path={"/salesdash"} element={<SalesAgent/>} />
           <Route path={"/signup"} element={<Signup/>} />
           <Route path={"/verify"} element={<VoucherVerificationPage/>} />
+          <Route path={"/vouchers"} element={<SPVoucherManagement/>} />
           <Route path={'/networks'} element={<NetworkMan/>} />
           <Route path={'/recharge'} element={<RechargeManagement/>} />
           <Route path={'/business-reports'} element={<BusReports/>} />
           <Route path={'/business-entities'} element={<BusEntities/>} />
           <Route path={'/sales-reports'} element={<SPSalesReports/>} /> 
-          <Route path={'/partners'} element={<SPBusinessPartners/>} /> 
+          <Route path={'/partners'} element={<SPBusinessPartners/>} />
+          <Route path={'/hor-reports'} element={<HORSalesReport/>} />
+          <Route path={'/abm-reports'} element={<ABMSalesReport/>} />
+          <Route path={'/regional-reports'} element={<RegionalSalesReport/>} /> 
+          <Route path={'/customers'} element={<Customers/>} /> 
         </Routes>
       </div>
       </BrowserRouter>

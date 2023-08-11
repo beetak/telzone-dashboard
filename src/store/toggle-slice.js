@@ -7,7 +7,9 @@ const toggleSlice = createSlice({
         local: false,
         startTime: '',
         endTime: '',
-        agentId: ''
+        agentId: '',
+        globalRegion: '',
+        globalTown: ''
     },
     reducers: {
         changeState(state, action){
@@ -25,6 +27,12 @@ const toggleSlice = createSlice({
         },
         setAgent(state, action){
             state.agentId = action.payload.adminPortalUserId
+        },
+        setGlobalRegion(state, action){
+            state.globalRegion = action.payload
+        },
+        setGlobalTown(state, action){
+            state.globalTown = action.payload
         }
     }
 })
@@ -35,4 +43,6 @@ export const getPaymentMethod = (state) => state.toggle.local
 export const getStartTime = (state) => state.toggle.startTime
 export const getEndTime = (state) => state.toggle.endTime
 export const getAgentId = (state) => state.toggle.agentId
+export const getGlobalRegion = (state) => state.toggle.globalRegion
+export const getGlobalTown = (state) => state.toggle.globalTown
 export default toggleSlice

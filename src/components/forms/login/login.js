@@ -2,7 +2,7 @@ import { Component } from "react";
 import axios from 'axios';
 
 // const url = 'http://localhost:8083/smart-wifi/admin-portal-user/login/';
-// const url = "http://172.27.247.150:8083/smart-wifi/admin-portal-user/login/"
+// const url = "http://172.27.6.243:8083/smart-wifi/admin-portal-user/login/"
 // const url = 'http://10.0.4.251:8083/smart-wifi/admin-portal-user/login/';
 const url = 'http://telzonewifi.telone.co.zw:8083/smart-wifi/admin-portal-user/login/';
 const logo = 'assets/img/logo.png'
@@ -55,6 +55,8 @@ export default class LoginForm extends Component {
             localStorage.setItem('surname', response.data.data.surname)
             localStorage.setItem('userId', response.data.data.id)
             localStorage.setItem('role', response.data.data.role.role)
+            localStorage.setItem('regionId', response.data.data.shop.townId.regionId.id)
+            localStorage.setItem('townId', response.data.data.shop.townId.id)
             localStorage.setItem('shopId', response.data.data.shop.id)
             // window.location = '/dashboard'
             this.routeTo()
@@ -78,7 +80,13 @@ export default class LoginForm extends Component {
         window.location='/'
       ):(
         userRole==='Sales Admin'? (window.location = '/sales'):(
-          userRole==='Supervisor'? (window.location = '/partners'):(window.location = '/dashboard')
+          userRole==='Supervisor'? (window.location = '/partners'):(
+            userRole==='Head Retail'? (window.location = '/abm-reports'):(
+              userRole==='Area Manager'? (window.location = '/abm-reports'):(
+                userRole==='Regional Manager'? (window.location = '/regional-reports'):(window.location = '/dashboard')
+              )
+            )
+          )
         )
       )
     }

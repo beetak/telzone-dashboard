@@ -48,33 +48,6 @@ export default function DailyReport() {
       ))
     ):(<div><h1>Error</h1></div>)
 
-    let durationDrop = 
-    
-    <>
-        <Dropdown as={ButtonGroup}>
-            <Button variant="info">{filter}</Button>
-            <Dropdown.Toggle split variant="info" id="dropdown-split-basic" />
-            <Dropdown.Menu>
-              <Dropdown.Item 
-                onClick={
-                  ()=>{
-                    setFilter('USD')
-                  }
-                }
-              >USD
-              </Dropdown.Item>
-              <Dropdown.Item 
-                onClick={
-                  ()=>{
-                    setFilter('USD')
-                  }
-                }
-              >ZWL
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        <br/>
-    </>
     const data = agentSales
     const output = Object.entries(
         data.reduce((prev, { bundles }) => {
@@ -189,6 +162,7 @@ export default function DailyReport() {
                                 {renderedCurrency}
                                 </ul>
                             </div>
+                            <button onClick={'()=>submitRequest()'} className="btn btn-primary">Search</button>
                         </div>
                         <div className="col-6 text-end">
                             <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" onClick={()=>handlePrint()}><i class="material-icons text-lg position-relative me-1">picture_as_pdf</i> DOWNLOAD PDF</button>

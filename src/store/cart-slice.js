@@ -29,10 +29,30 @@ export const postSale = createAsyncThunk('cart/postSale', async (initialData) =>
   }
 );
 
-export const postVoucherSaleByBundleId = createAsyncThunk('cart/postVoucherSaleByBundleId', async ({bundleId, quantity}) => {
-    return await Api
-        .post(`/sales/${bundleId}?quantity=${quantity}&sold=${false}&used=${false}`)
-        .then((res) => res.data.data);
+export const postVoucherSaleByBundleId = createAsyncThunk(
+    'cart/postVoucherSaleByBundleId',
+    async ({bundleId, quantity}) => {
+        try {
+            const response = await Api.post(`/sales/${bundleId}?quantity=${quantity}&sold=${false}&used=${false}`)
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error('postVoucher error:', error);
+            throw error;
+        }
+    }
+);
+
+export const postSalegggg = createAsyncThunk(
+    'sale/postAsyncSale',
+    async (initialData) => {
+      console.log(initialData);
+      try {
+        const response = await Api.post('/payments/', initialData);
+        return { success: true, data: response.data };
+      } catch (error) {
+        console.error('postSale error:', error);
+        throw error;
+      }
     }
 );
 
@@ -150,6 +170,9 @@ const cartSlice = createSlice({
               existingItem.totalPrice -= existingItem.price;
             }
         },
+        deleteFromCart(state, action) {
+            state.itemsList = []
+        },
         setShowCart(state){
             state.showCart=true
         },
@@ -216,12 +239,12 @@ const cartSlice = createSlice({
         [postVoucherSaleByBundleId.fulfilled]: (state, action)=>{
             const voucherData = action.payload
             state.retrieveStatus = 'fulfilled'
-            console.log("the voucher",action.payload)
+            // console.log("the voucher",action.payload)
 
-            voucherData.forEach(function(voucher, i){
-                state.soldVouchers.push({id: voucher.id, voucherCode: voucher.voucherCode, bundleName: voucher.bundle.name})
-                state.soldId.push(voucher.id)
-            })  
+            // voucherData.forEach(function(voucher, i){
+            //     state.soldVouchers.push({id: voucher.id, voucherCode: voucher.voucherCode, bundleName: voucher.bundle.name})
+            //     state.soldId.push(voucher.id)
+            // })  
             // state.stateUpdate = 'successful'          
         },
         [postVoucherSaleByBundleId.rejected]: (state, {payload})=>{

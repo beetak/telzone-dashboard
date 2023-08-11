@@ -1,20 +1,30 @@
 import React from 'react';
 import { useDispatch, useSelector} from 'react-redux';
 import { cartActions, getBtnState } from '../../../store/cart-slice';
+import { focActions } from '../../../store/foc-slice';
 
 const CartBundleCard = (props) => {
 
     const btnState = useSelector(getBtnState)
 
-    const {data} = props
+    const {data, page} = props
+    console.log("page ", page)
     let name = data.name
     let id = data.id
     let price = data.price
     
     const dispatch  = useDispatch()
     const addToCart = () => {
+      page==='sales' ?
       dispatch(
         cartActions.addToCart({
+          name,
+          id,
+          price
+        })
+      ):
+      dispatch(
+        focActions.addToFocCart({
           name,
           id,
           price

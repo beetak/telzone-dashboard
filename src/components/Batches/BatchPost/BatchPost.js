@@ -3,6 +3,7 @@ import { useDispatch, useSelector} from 'react-redux';
 import { batchActions, getBatchStatus, getCreatedBatch, getVCodes, postBatch, postVoucher } from '../../../store/batch-slice';
 import { getAllBundles } from '../../../store/bundle-slice';
 import voucher_codes from 'voucher-code-generator'
+import { BeatLoader } from 'react-spinners';
 
 const userID = localStorage.getItem('userId')
 const shopId = localStorage.getItem('shopId')
@@ -18,6 +19,9 @@ const BatchPost = () => {
   const[batchName, setBatchName] = useState("TelOnev1")
   const[bundleName, setBundleName] = useState('')
   const[bundleID, setBundleID] = useState('')
+  const [postVouchers, setPostVouchers] = useState("")
+  const [loadingStatus, setLoadingStatus] = useState(false)
+  const [loadingSuccess, setLoadingSuccess] = useState(false)
 
   const dispatch = useDispatch()
 
@@ -29,29 +33,10 @@ const BatchPost = () => {
   const batch = useSelector(getCreatedBatch)
   const storedVCodes = useSelector(getVCodes)
 
-  // const handleSubmit = async () => {
-  //   if(response==='idle'){
-  //     dispatch(postBatch({ 
-  //       batch: {
-  //         batchName ,
-  //         id: 1
-  //       }
-  //     }), ()=>console.log(response))
-  //   }
-  //   else if(response==='pending'){
-  //     alert("Generating Vouchers")
-  //   } 
-  //   else if(response==='success'){
-  //     return response
-  //   }
-  // }
-
-  const createVouchers = () => {
-    handleSubmit()
-    generateVoucher()
-  }
-
   const handleSubmit = async () => {
+    // setLoadingStatus(true);
+    dispatch(batchActions.postStatus(true)
+    )
     dispatch(postBatch({ 
       batch: {
         dateCreated,
@@ -59,14 +44,30 @@ const BatchPost = () => {
       },
       userID,
       bundleId: bundleID
-    }))
+    })).then((response)=>{
+      console.log("batch resp: ", response)
+      if(response.payload && response.payload.success){
+        generateVoucher(response.payload.data.data.batch.id)
+      }
+      else{
+        //code to undo batch
+        console.log("batch failed")
+        // Clear the loading state after 5 seconds
+        setTimeout(() => {
+          // setLoadingStatus(false);
+          // dispatch(batchActions.postStatus({state: false}))
+        }, 2000);
+      }
+    })
   }
 
-  const handlePost = async () =>{
-    console.log('stored vouchers: ', storedVCodes)
-    Object.values(storedVCodes).map((item, i)=>(
-      dispatch(postVoucher({
-        batchID: batch,
+  const handlePost = async (voucherCodes, batchID) =>{
+    dispatch(batchActions.successStatus(true))
+    voucherCodes.map((item, i)=>(
+      // setLoadingSuccess(true),
+      dispatch(
+        postVoucher({
+        batchID: batchID,
         bundleID,
         userID,
         orderId: 1,
@@ -77,30 +78,60 @@ const BatchPost = () => {
           "isBlocked": 0,
           "id":1,
           "serialNumber": 0,
+          "macAddress": "string",
           "used": false,
           "sold": false,
           "voucherCode": item
         }
       })
-    )) 
-  )
-  setCurrentState('Product')
+    )))
+    // setLoadingStatus(false);
+    // setLoadingSuccess(true);
+    dispatch(batchActions.postStatus(false))
+    dispatch(batchActions.successStatus(true))
+    setBundleID('')
+    setTimeout(() => {
+      // setLoadingSuccess(false);
+      dispatch(batchActions.successStatus(false))
+    }, 2000);
+    setCurrentState('Product')
+    setPostVouchers("50 Vouchers Have Been Saved. Refreshing Soon...")
+  // alert("Done")
+  // window.location = "/batch"
 }
  
 
-const generateVoucher = () => {
+const generateVoucher = (batchID) => {
   console.log('before batch creation: ', response)
     let vcode = voucher_codes.generate({
       length: 16,
-      count: 3000,
+      count: 50,
       charset: '0123456789',
       pattern: '################'
     })
     console.log("the vcode",vcode)
-    vcode.forEach((item)=>(
-      dispatch(batchActions.vcodeCreation(item))
-    ))
+    // vcode.forEach((item)=>(
+    //   dispatch(batchActions.vcodeCreation(item))
+    // ))
+    handlePost(vcode, batchID)
 }
+
+let loadingBatchAnimation = 
+<div className='text-center' style={anime}>
+    <h5 style={{color: '#055bb5'}}>{
+      loadingStatus?"Creating Vouchers. Please wait":loadingSuccess&&"Vouchers Successfully Created"}</h5>
+    {
+      loadingStatus&&
+      <BeatLoader
+        color={'#055bb5'}
+        loading={loadingStatus}
+        cssOverride={override}
+        size={15}
+        aria-label="Loading Spinner"
+        data-testid="loader"
+      />
+    }
+</div>
     
   const bundles = useSelector(getAllBundles)
   let renderedBundles = ''
@@ -140,12 +171,7 @@ const generateVoucher = () => {
                 </ul>
             </div>
             <div>
-              {response==="idle"?
-                <button onClick={createVouchers} disabled={bundleID?false:true} type='button' className="btn btn-primary">Generate Batch</button>
-              :
-                response==="success"?
-                <button onClick={handlePost} type='button' style={{right: '10', position: 'absolute'}} className="btn btn-primary">Submit</button>:<button disabled={true} type='button' className="btn btn-primary">Retry</button>
-              }
+              <button onClick={handleSubmit} disabled={bundleID?false:true} type='button' className="btn btn-primary">Generate Batch</button>
             </div>
         </form>
     </div>
@@ -157,4 +183,18 @@ export default BatchPost;
 const Style2={
     paddingTop: "1rem",
     paddinBottom: "0.5rem"
+}
+
+const override = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "blue",
+};
+
+const anime = {
+  textAlign: 'center', 
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  width: '100%', 
+  height: '10vh'
 }

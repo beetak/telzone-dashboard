@@ -12,7 +12,7 @@ import { fetchAsyncBusinessRole } from "../../../store/business-role-slice";
 import { fetchAsyncDailyPayments, fetchAsyncPayments } from "../../../store/customerPayments-slice";
 import { fetchAsyncCurrency, getGlobalCurreny } from "../../../store/currency-slice";
 import { fetchAsyncShopAgents } from "../../../store/user-slice";
-import { fetchAsyncRegion } from "../../../store/entities-slice";
+import { fetchAsyncRegion, fetchAsyncShopByTown, fetchAsyncTownByRegion, getRegionTowns, getTownShops } from "../../../store/entities-slice";
 import { fetchAsyncBundles } from "../../../store/bundle-slice";
 
 const url = "http://localhost:8082/smart-wifi/user/"; // URL variable stores JSON url || API taken from 10 Degrees WordPress Agency
@@ -21,6 +21,8 @@ export default function BusinessReports(){
 
     const[tabState, setTabState] = useState('')
     const active = useSelector(getToggleStatus)
+    const regionId = useSelector(getRegionTowns)
+    const townId = useSelector(getTownShops)
 
     const dispatch = useDispatch()
     
@@ -33,8 +35,10 @@ export default function BusinessReports(){
       dispatch(fetchAsyncDailyPayments())
       dispatch(fetchAsyncCurrency(true))
       dispatch(fetchAsyncRegion())
+      // dispatch(fetchAsyncTownByRegion(regionId))
+      // dispatch(fetchAsyncShopByTown(townId))
       dispatch(fetchAsyncBundles(true))
-    }, [dispatch, active]);
+    }, [dispatch, active, regionId, townId]);
 
     let tabinfo
     

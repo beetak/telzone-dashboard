@@ -1,15 +1,17 @@
 import React, {useState, useRef} from 'react';
-import Dropdown from 'react-bootstrap/Dropdown'
-import { Button } from "react-bootstrap";
-import { ButtonGroup, Form } from "react-bootstrap";
-import { getAgentSales, getAllSales, getTotalSales } from '../../store/sales-slice';
+import { getAgentLoadingStatus, getLoadingStatus, getRegionSales, getShopSales, getTotalSales, getTownSales } from '../../store/sales-slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { currencyActions, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
 import { useReactToPrint } from "react-to-print";
-import { getAllCustomerPayments, getPeriodicalPayments } from '../../store/customerPayments-slice';
 import { toggleActions } from '../../store/toggle-slice';
 import { getAllBusinessPartners } from '../../store/business-slice';
+import { BeatLoader } from 'react-spinners';
+import { getAllCustomerPayments, getOnlineLoading, getPeriodicalPayments } from '../../store/customerPayments-slice';
+import TelOneShopDropdown from '../TelOneShops/TelOneShopDropdown/TelOneShopDropdown';
+import { fetchAsyncShopByTown, fetchAsyncTownByRegion, getAllRegions, getRegionTowns, getTownShops } from '../../store/entities-slice';
+import TelOneTownDropdown from '../TelOneTowns/TelOneTownDropdown/TelOneTownDropdown';
+import TelOneRegionDropdown from '../TelOneRegions/TelOneRegionDropdown/TelOneRegionDropdown';
 // import datetime from 'datetime'
 
 const firstname = localStorage.getItem('firstname')
@@ -24,17 +26,34 @@ export default function SummarySalesCommission() {
 
     const totalSales = useSelector(getTotalSales)
     const periodicalSales = useSelector(getPeriodicalPayments)
+    const onlineSales = useSelector(getAllCustomerPayments)
+    const shopSales = useSelector(getShopSales)
+    const townSales = useSelector(getTownSales)
+    const regionSales = useSelector(getRegionSales)
+    const currencyData = useSelector(getAllCurrencies)
+    const businessPartnersData = useSelector(getAllBusinessPartners)
+
+    //Loading States
+    const loadingAgent = useSelector(getAgentLoadingStatus)
+    const loadingOnline = useSelector(getOnlineLoading)
     
     const[currencyID, setCurrencyID] = useState('')
     const[currencyState, setCurrencyState] = useState('Currency')
+    const[regionState, setRegionState] = useState('Region')
+    const[townState, setTownState] = useState('Town')
+    const[shopState, setShopState] = useState('Shop')
     const[currencyActioned, setCurrencyActioned]= useState('')
+    const[regionId, setRegionId] = useState('')
+    const[region, setRegion] = useState('All Regions')
+    const[shopId, setShopId] = useState('')
+    const[shopName, setShopName] = useState('All Shops')
+    const[townId, setTownId] = useState('')
+    const[town, setTown] = useState('All Towns')
     const[startDate, setStartDate] = useState('')
     const[endDate, setEndDate] = useState('')
     const[empty, setEmpty] = useState('')
     const[validate, setValidate] = useState('')
-
-    const currencyData = useSelector(getAllCurrencies)
-    const businessPartnersData = useSelector(getAllBusinessPartners)
+    const [searchLevel, setSearchLevel] = useState('')
 
     const dispatch = useDispatch()
   
@@ -61,7 +80,99 @@ export default function SummarySalesCommission() {
       ))
     ):(<div><h1>Error</h1></div>)
 
-    const data = periodicalSales
+    //SHOPS DATA
+    const shopData = useSelector(getTownShops)
+    const getShop =(id, name)=>{
+        setShopId(id)
+        setShopName(name)
+        setShopState(name)
+        setSearchLevel("shop")
+        dispatch(fetchAsyncShopByTown(id))
+    }
+    let renderedShop = ''
+    renderedShop = shopData ? (
+        <>
+            <tr>
+                <a  className="dropdown-item">
+                    Select All
+                </a>
+            </tr>
+            {
+                shopData.map((role, index)=>(
+                    <tr key={index}>
+                      <TelOneShopDropdown data={role.shop} setShop={getShop}/>
+                    </tr>
+                ))
+            }
+        </>
+    ):(<div><h1>Error</h1></div>)
+
+    //TOWNS DATA
+    const townData = useSelector(getRegionTowns)
+    const getTown =(id, name)=>{
+        setTownId(id)
+        setTown(name)
+        setTownState(name)
+        setShopName("All Shops")
+        setShopState("All Shops")
+        setSearchLevel("town")
+        dispatch(fetchAsyncShopByTown(id))
+    }
+    let renderedTown = ''
+    renderedTown = townData ? (
+        <>
+            <tr>
+                <a  className="dropdown-item">
+                    Select All
+                </a>
+            </tr>
+            {
+                townData.map((role, index)=>(
+                    <tr key={index}>
+                      <TelOneTownDropdown data={role.town} setTown={getTown}/>
+                    </tr>
+                ))
+            }
+        </>
+    ):(<div><h1>Error</h1></div>)
+
+    //REGIONS DATA
+    const regionData = useSelector(getAllRegions)
+    const getRegion =(id, name)=>{
+        setRegionId(id)
+        setRegion(name)
+        setRegionState(name)
+        setTown("All Towns")
+        setTownState("All Towns")
+        setShopState("All Shops")
+        setShopName("All Shops")
+        setSearchLevel("regional")
+        dispatch(fetchAsyncTownByRegion(id))
+    }
+    
+    let renderedRegions = ''
+    renderedRegions = regionData ? (
+      regionData.map((region, index)=>(
+        <tr key={index}>
+          <TelOneRegionDropdown data={region} setRegion={getRegion}/>
+        </tr>
+      ))
+    ):(<div><h1>Error</h1></div>)
+
+    let loadingAnimation = 
+    <tr className='' style={anime}>
+      <td colspan={6}>
+        <BeatLoader
+          color={'#055bb5'}
+          loading={loadingAgent}
+          cssOverride={override}
+          size={15}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
+      </td>
+    </tr>
+
     const salesData = totalSales
     const customerData = businessPartnersData
 
@@ -96,7 +207,7 @@ export default function SummarySalesCommission() {
     .map(([bundles, count, id]) => ({ bundles, id, count }))
     .sort((a, b) => b.count - a.count);
 
-    console.log("the output2: ",output2);
+    console.log("the output2: ",output3);
 
     const displayByBundle = (businessPartner, discount) => {
         let mybundles = []
@@ -140,7 +251,8 @@ export default function SummarySalesCommission() {
             return (
                 <>
                     <div style={{width: '30%', textAlign: 'left'}}>{bundle}</div>
-                    <div style={{width: '40%', textAlign: 'center'}}>${(Math.round(totalAmount*100)/100).toFixed(2)}</div>
+                    <div style={{width: '10%', textAlign: 'center'}}>{count}</div>
+                    <div style={{width: '30%', textAlign: 'right', paddingRight: 30}}>${(Math.round(totalAmount*100)/100).toFixed(2)}</div>
                     {businessPartner==='Free of charge (FOC)'?
                         <div style={{width: '30%', textAlign: 'right', paddingRight: 50}}>$ 0.00</div>
                     :
@@ -219,13 +331,43 @@ export default function SummarySalesCommission() {
         }
     }
 
+    let agentSalesData = ''
+
+    var count = Object.keys(salesData).length
+    if(count>0){
+        agentSalesData = (
+            output2.map((item)=>(
+                <tr key={item.businessPartner}>
+                    <th scope="row">{item.businessPartner}</th>
+                    <th scope="row">{getDiscount(item.businessPartner)}%</th>
+                    <td className="text-align-right">
+                        <div className="row">
+                            {displayByBundle(item.businessPartner, getDiscount(item.businessPartner))}
+                        </div>
+                    </td>
+                </tr>
+            ))
+        )
+    }
+    else{
+        agentSalesData = 
+        <tr>
+        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Commissions Found</h5></td>
+        </tr>
+    }
+
+    let errorMsg =  
+        <tr>
+        <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>
+        </tr>
+
   return (
     <>
         <div className='row'>
             <div className="col-12">
                 <div className="card pb-0 p-3 mb-1">
                     <div className="row">
-                        <div className="col-6 d-flex align-items-center">
+                        <div className="col-9 d-flex align-items-center">
                             {/* Currency dropdown */}
                             <div className="dropdown">
                                 <button 
@@ -241,9 +383,55 @@ export default function SummarySalesCommission() {
                                 {renderedCurrency}
                                 </ul>
                             </div>
+                            {/* Region Dropdown */}
+                            <div className="dropdown"  style={{paddingLeft: 10}}>
+                                <button 
+                                    className="btn bg-gradient-primary dropdown-toggle" 
+                                    type="button" 
+                                    id="dropdownMenuButton" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false"
+                                    >
+                                    {regionState}
+                                </button>
+                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                {renderedRegions}
+                                </ul>
+                            </div>
+                            {/* Town Dropdown */}
+                            <div className="dropdown"  style={{paddingLeft: 10}}>
+                                <button 
+                                    className="btn bg-gradient-primary dropdown-toggle" 
+                                    type="button" 
+                                    id="dropdownMenuButton" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false"
+                                    >
+                                    {townState}
+                                </button>
+                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                {renderedTown}
+                                </ul>
+                            </div>
+                            {/* Shop Dropdown */}
+                            <div className="dropdown"  style={{paddingLeft: 10}}>
+                                <button 
+                                    className="btn bg-gradient-primary dropdown-toggle" 
+                                    type="button" 
+                                    id="dropdownMenuButton" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false"
+                                    >
+                                    {shopState}
+                                </button>
+                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                {renderedShop}
+                                </ul>
+                            </div>
                             <div><sup style={{color: 'red', paddingLeft: 10}}>{empty}</sup></div>
+                            <button onClick={()=>submitRequest()} className="btn btn-primary">Search</button>
                         </div>
-                        <div className="col-6 text-end">
+                        <div className="col-3 text-end">
                             <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" onClick={()=>handlePrint()}><i class="material-icons text-lg position-relative me-1">picture_as_pdf</i> DOWNLOAD PDF</button>
                         </div> 
                     </div>
@@ -276,25 +464,19 @@ export default function SummarySalesCommission() {
                                     <th className="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         <div className="row">
                                             <div style={{width: '30%', textAlign: 'left'}}>Product Type</div>
-                                            <div style={{width: '30%', textAlign: 'right', paddingRight: 50}}>Total Sales</div>
-                                            <div style={{width: '40%', textAlign: 'right', paddingRight: 50}}>Total Commissions</div>
+                                            <div style={{width: '5%', textAlign: 'right'}}>Quantity</div>
+                                            <div style={{width: '30%', textAlign: 'right', paddingRight: 0}}>Total Sales</div>
+                                            <div style={{width: '35%', textAlign: 'right', paddingRight: 50}}>Total Commissions</div>
                                         </div>
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {
-                                    output2.map((item)=>(
-                                        <tr key={item.businessPartner}>
-                                            <th scope="row">{item.businessPartner}</th>
-                                            <th scope="row">{getDiscount(item.businessPartner)}%</th>
-                                            <td className="text-align-right">
-                                                <div className="row">
-                                                    {displayByBundle(item.businessPartner, getDiscount(item.businessPartner))}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
+                                    loadingAgent==='pending'?
+                                    loadingAnimation: 
+                                    loadingAgent ==='rejected'?
+                                    errorMsg: agentSalesData
                                 }
                                 <tr>
                                     <td>Total Commission Payable</td>
@@ -314,4 +496,18 @@ export default function SummarySalesCommission() {
         </div>
     </>
   );
+}
+
+const override = {
+    display: "block",
+    margin: "0 auto",
+    borderColor: "blue",
+};
+  
+const anime = {
+    textAlign: 'center', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    width: '100%', 
+    height: '10vh'
 }

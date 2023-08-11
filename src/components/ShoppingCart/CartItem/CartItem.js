@@ -53,30 +53,23 @@ const CartItem = ({ name, quantity, total, discount, price, id, product, rate, v
   const decrementCartItems = () => {
     dispatch(cartActions.removeFromCart(id));
   };
+
+  const unitPrice = (Math.round((price - (price*discount/100)) * 10000 * rate / (vat+100)) / 100).toFixed(2)
+  const totalPrice = (Math.round(unitPrice*quantity*100)/100).toFixed(2)
   return (
     <>
       <td>{name}</td>
-      <td style={{textAlign: 'center'}}>${(Math.round((price - (price*discount/100)) * 10000 * rate / (vat+100)) / 100).toFixed(2)}</td>
+      <td style={{textAlign: 'center'}}>${unitPrice}</td>
       <td>
         <button onClick={decrementCartItems} style={CartActionsStyles}>
           -
         </button>
         <label style={CartLabel}>{quantity}</label>
-        {/*<input 
-          style={{
-            'width': '80px',
-            'border-radius': '1rem',
-            'background-color': 'hsl(0, 0%, 100%)',
-            'border':' 4px solid hsl(0, 0%, 90%)'
-          }} 
-          type="text" 
-          placeholder={quantity} 
-        onChange={() => {(e)=>setQty(e.target.value); changeQty;}}/>*/}
         <button onClick={incrementCartItem} style={CartActionsStyles}>
           +
         </button>
       </td>
-      <td style={{textAlign: 'right'}}> ${(Math.round((total - (total*discount/100)) * 10000 * rate / (vat+100)) / 100).toFixed(2)}</td>
+      <td style={{textAlign: 'right'}}> ${totalPrice}</td>
     </>
                 
   );

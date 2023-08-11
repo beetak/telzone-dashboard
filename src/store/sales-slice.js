@@ -31,15 +31,46 @@ export const fetchAsyncAgentSalesByShop = createAsyncThunk('sale/fetchAsyncAgent
     return [...response.data.data]
 })
 
+export const fetchAsyncSalesByRegion = createAsyncThunk('sale/fetchAsyncSalesByRegion', async ({curId, regionId, startDate, endDate}) => {
+    const response = await Api
+    .get(`/order/currency/${startDate}/${endDate}/currencyId${curId}/regionId${regionId}`)
+    return [...response.data.data]
+})
+
+export const fetchAsyncSalesByTown = createAsyncThunk('sale/fetchAsyncSalesByTown', async ({curId, townId, startDate, endDate}) => {
+    const response = await Api
+    .get(`/order/currency/${startDate}/${endDate}/currencyId${curId}/townId${townId}`)
+    return [...response.data.data]
+})
+export const fetchAsyncSalesByShop = createAsyncThunk('sale/fetchAsyncSalesByShop', async ({curId, shopId, startDate, endDate}) => {
+    const response = await Api
+    .get(`/order/currency/${startDate}/${endDate}/currencyId${curId}/shopId${shopId}`)
+    return [...response.data.data]
+})
+
+// export const postSale = createAsyncThunk(
+//     'sale/postAsyncSale',
+//     async (initialData) => {
+//       console.log(initialData);
+//       return await Api
+//         .post('/payments/', 
+//           initialData
+//         )
+//         .then((res) => res.data);
+//     }
+// );
+
 export const postSale = createAsyncThunk(
     'sale/postAsyncSale',
     async (initialData) => {
       console.log(initialData);
-      return await Api
-        .post('/payments/', 
-          initialData
-        )
-        .then((res) => res.data);
+      try {
+        const response = await Api.post('/payments/', initialData);
+        return { success: true, data: response.data };
+      } catch (error) {
+        console.error('postSale error:', error);
+        throw error;
+      }
     }
 );
 
@@ -52,11 +83,15 @@ const saleSlice = createSlice({
         partnerSales: [],
         agentSales: [],
         shopAgent: [],
+        shopSales: [],
+        townSales: [],
+        regionSales: [],
         shopAgentSales: [],
         voucherList: [],
         totalQuantity: 0,
         showCart: false,
         loadingStatus: 'idle',
+        loadingAgent: 'idle',
         loadingByCurIdStatus: 'idle'
     },
     reducers: {
@@ -182,22 +217,77 @@ const saleSlice = createSlice({
             console.log("rejected")
             state.loadingStatus = 'rejected'
         },
+        [fetchAsyncSalesByShop.pending]: (state)=>{
+            console.log("pending")
+            state.loadingAgent = 'pending'
+        },
+        [fetchAsyncSalesByShop.fulfilled]: (state, action)=>{
+            console.log("fulfilled")
+            // return {...state, sales: payload}
+            const loadedSales = action.payload.map(sale=>{
+                return sale
+            })
+            state.shopSales = loadedSales
+            state.loadingAgent = 'fulfilled'
+        },
+        [fetchAsyncSalesByShop.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.loadingAgent = 'rejected'
+        },
+        [fetchAsyncSalesByTown.pending]: (state)=>{
+            console.log("pending")
+            state.loadingAgent = 'pending'
+        },
+        [fetchAsyncSalesByTown.fulfilled]: (state, action)=>{
+            console.log("fulfilled")
+            // return {...state, sales: payload}
+            const loadedSales = action.payload.map(sale=>{
+                return sale
+            })
+            state.townSales = loadedSales
+            state.loadingAgent = 'fulfilled'
+        },
+        [fetchAsyncSalesByTown.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.loadingAgent = 'rejected'
+        },
+        [fetchAsyncSalesByRegion.pending]: (state)=>{
+            console.log("pending")
+            state.loadingAgent = 'pending'
+        },
+        [fetchAsyncSalesByRegion.fulfilled]: (state, action)=>{
+            console.log("fulfilled")
+            // return {...state, sales: payload}
+            const loadedSales = action.payload.map(sale=>{
+                return sale
+            })
+            state.regionSales = loadedSales
+            state.loadingAgent = 'fulfilled'
+        },
+        [fetchAsyncSalesByRegion.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.loadingAgent = 'rejected'
+        },
         [postSale.pending]: ()=>{
             console.log("pending")
         },
-        [postSale.fulfilled]: (state, action)=>{
-            action.payload.active = true
-            action.payload.customers = {
-              email: "string",
-              firstname: "string",
-              password: "string",
-              id: 0,
-              phone_number: "string",
-              surname: "string"
+        [postSale.fulfilled]: (state, action) => {
+            if (action.payload.success) {
+              const { data } = action.payload;
+              data.active = true;
+              data.customers = {
+                email: "string",
+                firstname: "string",
+                password: "string",
+                id: 0,
+                phone_number: "string",
+                surname: "string"
+              };
+              console.log(data);
+              state.sales.push(data);
+            } else {
+              console.log('postSale failed:', action.payload.error);
             }
-            console.log(action.payload)
-            state.sales.push(action.payload)
-            
         },
         [postSale.rejected]: (state, {payload})=>{
             console.log("rejected")
@@ -211,6 +301,10 @@ export const getTotalSales = (state) => state.sale.totalSales
 export const getPartnerSales = (state) => state.sale.partnerSales
 export const getAgentSales = (state) => state.sale.agentSales
 export const getShopAgentSales = (state) => state.sale.shopAgentSales
+export const getShopSales = (state) => state.sale.shopSales
+export const getTownSales = (state) => state.sale.townSales
+export const getRegionSales = (state) => state.sale.regionSales
+export const getAgentLoadingStatus = (state) => state.sale.loadingAgent
 export const getLoadingStatus = (state) => state.sale.loadingStatus
 export const getLoadingByCurIdStatus = (state) => state.sale.loadingByCurIdStatus
 export default saleSlice

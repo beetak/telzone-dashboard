@@ -15,7 +15,7 @@ export default function TelOneRegionDropdown(props){
                 props.setRegion(data.id, data.name)
             }
         }>
-        {data.name}
+        {data.name==='No Region'? 'All Regions': data.name}
     </a>
     </>
   );

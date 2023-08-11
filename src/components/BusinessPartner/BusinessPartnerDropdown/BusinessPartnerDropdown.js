@@ -12,12 +12,13 @@ const BusinessPartnerDropdown = (props) => {
     <a  className="dropdown-item" 
         onClick={
             () => {
-                props.setBusinessPartner(data.id, data.name, data.email, data.businessPartnerRoles.discount, data.businessPartnerRoles.vat)
+                props.setBusinessPartner(data.id, data.name, data.email, data.phoneNumber, data.businessAddress, data.businessPartnerRoles.vat, data.businessPartnerRoles.discount)
                 dispatch(cartActions.setClient(
                   {
                     addBtn: false,
                     level: 2,
                     vat: data.businessPartnerRoles.vat,
+                    email: data.email,
                     discount: data.businessPartnerRoles.discount
                   })
                 )

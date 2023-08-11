@@ -52,7 +52,7 @@ const VoucherVerification = () => {
 
   let renderedError = 
     <div className="align-middle text-center">
-      <span class="badge badge-sm bg-gradient-secondary w-50 p-2">Voucher Not Found</span>
+      <span class="badge badge-sm bg-gradient-danger w-50 p-2">Voucher Not Found</span>
     </div>
   
   let renderedVouchers = ''
@@ -105,7 +105,7 @@ const VoucherVerification = () => {
               <form >
                 <label className="form-label">Voucher Code</label>
                 <div className="input-group input-group-dynamic mb-4">
-                  <input type="text" name="voucherCode" value={voucherCode} onChange={(e) => setVoucherCode(e.target.value)} className="form-control" placeholder='Coming Soon'/>
+                  <input type="text" name="voucherCode" value={voucherCode} onChange={(e) => setVoucherCode(e.target.value)} className="form-control" placeholder='Enter Voucher Code'/>
                 </div>
 
                 {

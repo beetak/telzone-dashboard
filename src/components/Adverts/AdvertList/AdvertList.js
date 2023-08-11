@@ -12,14 +12,14 @@ const AdvertList = () => {
 
   let loadingAnimation = 
   <div className='text-center' style={anime}>
-      <BeatLoader
-        color={'#055bb5'}
-        loading={loading}
-        cssOverride={override}
-        size={15}
-        aria-label="Loading Spinner"
-        data-testid="loader"
-      />
+    <BeatLoader
+      color={'#055bb5'}
+      loading={loading}
+      cssOverride={override}
+      size={15}
+      aria-label="Loading Spinner"
+      data-testid="loader"
+    />
   </div>
 
   const adverts = useSelector(getAllAdverts)

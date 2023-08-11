@@ -25,7 +25,9 @@ const initialState = {
     payments: [],
     dailyPayments: [],
     periodicalPayments: [],
-    loadingStatus: 'idle'
+    loadingStatus: 'idle',
+    loadingOnline: 'idle',
+    loadingDaily: 'idle'
 }
 const customerPaymentsSlice = createSlice({
     name: 'user',
@@ -54,7 +56,7 @@ const customerPaymentsSlice = createSlice({
         },
         [fetchAsyncDailyPayments.pending]: (state)=>{
             console.log("pending")
-            state.loadingStatus = 'pending'
+            state.loadingDaily = 'pending'
         },
         [fetchAsyncDailyPayments.fulfilled]: (state, action)=>{
             console.log("sucess")
@@ -62,15 +64,15 @@ const customerPaymentsSlice = createSlice({
                 return user
             })
             state.dailyPayments = loadedPartners
-            state.loadingStatus = 'fulfilled'
+            state.loadingDaily = 'fulfilled'
         },
         [fetchAsyncDailyPayments.rejected]: (state, {payload})=>{
             console.log("rejected")
-            state.loadingStatus = 'rejected'
+            state.loadingDaily = 'rejected'
         },
         [fetchAsyncPeriodicalPayments.pending]: (state)=>{
             console.log("pending")
-            state.loadingStatus = 'pending'
+            state.loadingOnline = 'pending'
         },
         [fetchAsyncPeriodicalPayments.fulfilled]: (state, action)=>{
             console.log("sucess")
@@ -78,16 +80,18 @@ const customerPaymentsSlice = createSlice({
                 return user
             })
             state.periodicalPayments = loadedPartners
-            state.loadingStatus = 'fulfilled'
+            state.loadingOnline = 'fulfilled'
         },
         [fetchAsyncPeriodicalPayments.rejected]: (state, {payload})=>{
             console.log("rejected")
-            state.loadingStatus = 'rejected'
+            state.loadingOnline = 'rejected'
         }
     }
 })
 export const {customerPaymentsActions} = customerPaymentsSlice.actions
 export const getAllCustomerPayments = (state) => state.customerPayments.payments
 export const getDailyPayments = (state) => state.customerPayments.dailyPayments
+export const getDailyLoading = (state) => state.customerPayments.loadingDaily
+export const getOnlineLoading = (state) => state.customerPayments.loadingOnline
 export const getPeriodicalPayments = (state) => state.customerPayments.periodicalPayments
 export default customerPaymentsSlice
