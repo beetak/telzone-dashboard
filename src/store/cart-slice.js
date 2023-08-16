@@ -4,7 +4,7 @@ import Api from "../components/Api/Api";
 export const fetchAsyncSales = createAsyncThunk('cart/fetchAsyncSales', async () => {
    
     const response = await Api
-    .get(`/batches/`)
+    .get(`/order/`)
     return [...response.data.data]
     
 })

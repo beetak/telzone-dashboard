@@ -1,24 +1,22 @@
 import React, {useState, useRef, useEffect} from 'react';
-import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getLoadingStatus, getRegionSales, getShopSales, getTotalSales, getTownSales } from '../../store/sales-slice';
+import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getAgentSales, getAllSales, getRegionSales, getShopSales, getTotalSales, getTownSales } from '../../store/sales-slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { currencyActions, fetchAsyncCurrency, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
 import { useReactToPrint } from "react-to-print";
-import { toggleActions } from '../../store/toggle-slice';
-import { getAllBusinessPartners } from '../../store/business-slice';
-import { BeatLoader } from 'react-spinners';
-import { getAllCustomerPayments, getOnlineLoading, getPeriodicalPayments } from '../../store/customerPayments-slice';
-import TelOneShopDropdown from '../TelOneShops/TelOneShopDropdown/TelOneShopDropdown';
-import { fetchAsyncShopByTown, fetchAsyncTownByRegion, getAllRegions, getRegionTowns, getTownShops } from '../../store/entities-slice';
-import TelOneTownDropdown from '../TelOneTowns/TelOneTownDropdown/TelOneTownDropdown';
+import { fetchAsyncPeriodicalPayments, getAllCustomerPayments, getOnlineLoading, getPeriodicalPayments } from '../../store/customerPayments-slice';
+import { fetchAsyncShopByTown, fetchAsyncTownByRegion, getAllRegions, getAllShops, getAllTowns, getRegionTowns, getTownShops } from '../../store/entities-slice';
 import TelOneRegionDropdown from '../TelOneRegions/TelOneRegionDropdown/TelOneRegionDropdown';
-// import datetime from 'datetime'
+import TelOneTownDropdown from '../TelOneTowns/TelOneTownDropdown/TelOneTownDropdown';
+import TelOneShopDropdown from '../TelOneShops/TelOneShopDropdown/TelOneShopDropdown';
+import { BeatLoader } from 'react-spinners';
 
 const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
+const userRole = localStorage.getItem('role')
 const img = "assets/img/telonelogo.png"
 
-export default function SummarySalesCommission() {
+export default function SummarySales() {
 
     useEffect(() => {
         dispatch(fetchAsyncCurrency(true))
@@ -29,13 +27,11 @@ export default function SummarySalesCommission() {
     const dateString = date.toString();
 
     const totalSales = useSelector(getTotalSales)
-    const regionSales = useSelector(getRegionSales)
-    const townSales = useSelector(getTownSales)
-    const shopSales = useSelector(getShopSales)
     const periodicalSales = useSelector(getPeriodicalPayments)
     const onlineSales = useSelector(getAllCustomerPayments)
-    const currencyData = useSelector(getAllCurrencies)
-    const businessPartnersData = useSelector(getAllBusinessPartners)
+    const shopSales = useSelector(getShopSales)
+    const townSales = useSelector(getTownSales)
+    const regionSales = useSelector(getRegionSales)
 
     //Loading States
     const loadingAgent = useSelector(getAgentLoadingStatus)
@@ -59,6 +55,9 @@ export default function SummarySalesCommission() {
     const[validate, setValidate] = useState('')
     const [searchLevel, setSearchLevel] = useState('')
 
+
+
+    const currencyData = useSelector(getAllCurrencies)
     const dispatch = useDispatch()
   
     const getCurrency =(id, name, symbol)=>{
@@ -71,8 +70,7 @@ export default function SummarySalesCommission() {
         )
         dispatch(
             currencyActions.setGlobalSymbol(symbol)
-        )
-        
+        )        
     }
 
     let renderedCurrency = ''
@@ -163,6 +161,11 @@ export default function SummarySalesCommission() {
       ))
     ):(<div><h1>Error</h1></div>)
 
+
+    const data = currencyID === 'currency'? onlineSales : periodicalSales
+    // const salesData = totalSales
+    const salesData = searchLevel === 'regional' ? regionSales : searchLevel === 'town' ? townSales : searchLevel === 'shop' ? shopSales:totalSales
+
     let loadingAnimation = 
     <tr className='' style={anime}>
       <td colspan={6}>
@@ -177,114 +180,96 @@ export default function SummarySalesCommission() {
       </td>
     </tr>
 
-    // const salesData = regionSales
-    const salesData = searchLevel === 'regional' ? regionSales : searchLevel === 'town' ? townSales : searchLevel === 'shop' ? shopSales:totalSales
-    const customerData = businessPartnersData
-
     const output = Object.entries(
-        customerData.reduce((prev, { businessPartnerRoles }) => {
-            prev[businessPartnerRoles.discount] = prev[businessPartnerRoles.discount] ? prev[businessPartnerRoles.discount] + 1 : 1;
+        data.reduce((prev, { bundleId }) => {
+            prev[bundleId.name] = prev[bundleId.name] ? prev[bundleId.name] + 1 : 1;
             return prev;
         }, {})
     )
-    .map(([businessPartnerRoles, count]) => ({ businessPartnerRoles, count }))
+    .map(([bundleId, count]) => ({ bundleId, count }))
     .sort((a, b) => b.count - a.count);
 
-    console.log("the discount output: ",output);
+    console.log("data, ", salesData)
+    console.log("the out put: ",output);
+
+    // let dataToUse = salesData;
+    // if (salesData === null) {
+    // dataToUse = totalSales;
+    // }
 
     const output2 = Object.entries(
-        salesData.reduce((prev, { businessPartner }) => {
-            prev[businessPartner.name] = prev[businessPartner.name] ? prev[businessPartner.name] + 1 : 1;
-            return prev;
-        }, {})
-    )
-    .map(([businessPartner, count]) => ({ businessPartner, count }))
-    .sort((a, b) => b.count - a.count);
-
-    console.log("the out put2: ",output2);
-
-    const output3 = Object.entries(
         salesData.reduce((prev, { bundles }) => {
             prev[bundles.name] = prev[bundles.name] ? prev[bundles.name] + 1 : 1;
             return prev;
         }, {})
     )
-    .map(([bundles, count, id]) => ({ bundles, id, count }))
+    .map(([bundles, count]) => ({ bundles, count }))
     .sort((a, b) => b.count - a.count);
 
-    console.log("the output2: ",output3);
+    console.log("the out put2: ",output2);
 
-    const displayByBundle = (businessPartner, discount) => {
-        let mybundles = []
-        output3.map((bundleItem)=>{
-            salesData.map((item, i)=>{
-                if(item.bundles.name === bundleItem.bundles){
-                    let newItem = item.bundles.name
-                    mybundles.indexOf(newItem) === -1 ? mybundles.push(newItem) : console.log("This item already exists");
-                }
-            })
-            console.log("my bundles", mybundles)
+    const calculateByPartner = (bundleName) =>{
+        let count = 0
+        let totalAmount = 0
+
+        periodicalSales.map((items, i)=>{
+            if(items.bundleId.name===bundleName&&items.status!=='FAILED'){
+                count ++
+                totalAmount += items.amount
+            }
         })
         return (
-           <>
-                {
-                    Object.values(mybundles).map((item, i)=>(
-                        <div className="row">
-                            <>{calculateByCustomer(item, businessPartner, discount)}</>
-                        </div>
-                    ))
-                }
-           </>
+            count !== 0 ? 
+            <>
+                <div style={{width: '50%', textAlign: 'center'}}>{count}</div>
+                <div style={{width: '50%', textAlign: 'right', paddingRight: 70}}>${(Math.round(totalAmount*100)/100).toFixed(2)}</div>
+            </>:''
         )
     }
 
-    const calculateByCustomer = (bundle, businessPartner, discount) =>{
+    const calculateByBundle = (bundleName) =>{
         let count = 0
-        let bname = ''
         let totalAmount = 0
-        let commission = 0
+
         salesData.map((items, i)=>{
-            if(items.businessPartner.name===businessPartner &&items.bundles.name===bundle){
-                bname = items.bundles.name
+            if(items.bundles.name===bundleName){
                 count +=items.order.quantity
                 totalAmount += items.order.amount
-                commission += items.order.discount
             }
         })
-
-        if(count>0)
-            return (
-                <>
-                    <div style={{width: '30%', textAlign: 'left'}}>{bundle}</div>
-                    <div style={{width: '10%', textAlign: 'center'}}>{count}</div>
-                    <div style={{width: '30%', textAlign: 'right', paddingRight: 30}}>${(Math.round(totalAmount*100)/100).toFixed(2)}</div>
-                    {businessPartner==='Free of charge (FOC)'?
-                        <div style={{width: '30%', textAlign: 'right', paddingRight: 50}}>$ 0.00</div>
-                    :
-                        <div style={{width: '30%', textAlign: 'right', paddingRight: 50}}>$ {(Math.round(commission*100)/100).toFixed(2)}</div>
-                    }
-                </>)
-        else{
-            return
-        }
+        return (
+            count !== 0 ? 
+            <>
+                <div style={{width: '50%', textAlign: 'center'}}>{count}</div>
+                <div style={{width: '50%', textAlign: 'right', paddingRight: 70}}>${(Math.round(totalAmount*100)/100).toFixed(2)}</div>
+            </>:''
+        )
     }
 
-    const getDiscount = (businessPartner) =>{
-        let disc = ''
+    const getBundle = (bundleName) =>{
+        let bname = ''
 
-        businessPartnersData.map((items, i)=>{
-            if(items.name===businessPartner){
-                disc = items.businessPartnerRoles.discount
+        salesData.map((items, i)=>{
+            if(items.bundles.name===bundleName&&items.status!=='FAILED'){
+                bname = bundleName
             }
         })
-        if(disc===''){
-            return 0
-        }
-        else{
-            return (
-                disc
-            )
-        }
+        return (
+            bname
+           )
+    }
+
+    const getBundleName = (bundleName) =>{
+        let bname = ''
+
+        periodicalSales.map((items, i)=>{
+            if(items.bundleId.name===bundleName&&items.status!=='FAILED'){
+                bname = bundleName
+            }
+        })
+        return (
+            bname
+           )
     }
 
     const componentRef = useRef()
@@ -296,21 +281,19 @@ export default function SummarySalesCommission() {
     
 
     const salesTotalCalc = () =>{
+        let successTotal = 0
         let total = 0
-        let disc = ''
+        periodicalSales.map((item, i)=>{
+            if(item.status === 'Successful'){
+                successTotal += item.amount
+            }                 
+        })
 
-        output2.map((customer, i)=>{
-            salesData.map((item, i)=>{
-                if(customer.businessPartner===item.businessPartner.name){
-                    if(customer.businessPartner!=='Free of charge (FOC)'){
-                        // total += item.order.amount*(getDiscount(customer.businessPartner)/100) 
-                        total += item.order.discount
-                    }
-                }
-            })
+        salesData.map((item, i)=>{
+            total += item.order.amount      
         })
         return(
-            (Math.round((total)*100)/100).toFixed(2)
+            (Math.round((successTotal+total)*100)/100).toFixed(2)
         )
     }
 
@@ -330,15 +313,19 @@ export default function SummarySalesCommission() {
         else{
             if(searchLevel === "regional"){
                 dispatch(fetchAsyncSalesByRegion({startDate, endDate, curId:currencyID, regionId}))
+                dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol:currencyState}))
             }
             else if(searchLevel === "town"){
                 dispatch(fetchAsyncSalesByTown({startDate, endDate, curId:currencyID, townId}))
+                dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol:currencyState}))
             }
             else if(searchLevel === "shop"){
                 dispatch(fetchAsyncSalesByShop({startDate, endDate, curId:currencyID, shopId}))
+                dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol:currencyState}))
             }
             else{
                 dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId:currencyID}))
+                dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol:currencyState}))
             }
         }
         setTimeout(()=>{
@@ -354,12 +341,11 @@ export default function SummarySalesCommission() {
     if(count>0){
         agentSalesData = (
             output2.map((item)=>(
-                <tr key={item.businessPartner}>
-                    <th scope="row">{item.businessPartner}</th>
-                    <th scope="row">{getDiscount(item.businessPartner)}%</th>
+                <tr key={item.bundles}>
+                    <th scope="row">{getBundle(item.bundles)}</th>
                     <td className="text-align-right">
                         <div className="row">
-                            {displayByBundle(item.businessPartner, getDiscount(item.businessPartner))}
+                            {calculateByBundle(item.bundles)}
                         </div>
                     </td>
                 </tr>
@@ -369,7 +355,7 @@ export default function SummarySalesCommission() {
     else{
         agentSalesData = 
         <tr>
-        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Commissions Found</h5></td>
+        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Agent Sales Found</h5></td>
         </tr>
     }
 
@@ -377,6 +363,93 @@ export default function SummarySalesCommission() {
         <tr>
         <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>
         </tr>
+
+    let onlineSalesData = ''
+
+    var count = Object.keys(periodicalSales).length
+    if(count>0){
+        onlineSalesData = (
+            output.map((item)=>(
+                <tr key={item.bundleId}>
+                    <th scope="row">{getBundleName(item.bundleId)}</th>
+                    <td className="text-align-right">
+                        <div className="row">
+                            {calculateByPartner(item.bundleId)}
+                        </div>
+                    </td>
+                </tr>
+            ))
+        )
+    }
+    else{
+        onlineSalesData = 
+        <tr>
+        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Online Sales Found</h5></td>
+        </tr>
+    }
+
+    let errorMsg1 =  
+        <tr>
+        <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>
+        </tr>
+
+    let selectionLevel = ''
+
+    if(userRole === 'Supervisor'){
+
+    }
+    else if(userRole === 'Area Manager' || userRole === 'Regional Manager'){
+
+    }
+    else{
+        <>
+            {/* Region Dropdown */}
+            <div className="dropdown"  style={{paddingLeft: 10}}>
+                <button 
+                    className="btn bg-gradient-primary dropdown-toggle" 
+                    type="button" 
+                    id="dropdownMenuButton" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    >
+                    {regionState}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedRegions}
+                </ul>
+            </div>
+            {/* Town Dropdown */}
+            <div className="dropdown"  style={{paddingLeft: 10}}>
+                <button 
+                    className="btn bg-gradient-primary dropdown-toggle" 
+                    type="button" 
+                    id="dropdownMenuButton" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    >
+                    {townState}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedTown}
+                </ul>
+            </div>
+            {/* Shop Dropdown */}
+            <div className="dropdown"  style={{paddingLeft: 10}}>
+                <button 
+                    className="btn bg-gradient-primary dropdown-toggle" 
+                    type="button" 
+                    id="dropdownMenuButton" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    >
+                    {shopState}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedShop}
+                </ul>
+            </div>
+        </>
+    }
 
   return (
     <>
@@ -400,51 +473,7 @@ export default function SummarySalesCommission() {
                                 {renderedCurrency}
                                 </ul>
                             </div>
-                            {/* Region Dropdown */}
-                            <div className="dropdown"  style={{paddingLeft: 10}}>
-                                <button 
-                                    className="btn bg-gradient-primary dropdown-toggle" 
-                                    type="button" 
-                                    id="dropdownMenuButton" 
-                                    data-bs-toggle="dropdown" 
-                                    aria-expanded="false"
-                                    >
-                                    {regionState}
-                                </button>
-                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                {renderedRegions}
-                                </ul>
-                            </div>
-                            {/* Town Dropdown */}
-                            <div className="dropdown"  style={{paddingLeft: 10}}>
-                                <button 
-                                    className="btn bg-gradient-primary dropdown-toggle" 
-                                    type="button" 
-                                    id="dropdownMenuButton" 
-                                    data-bs-toggle="dropdown" 
-                                    aria-expanded="false"
-                                    >
-                                    {townState}
-                                </button>
-                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                {renderedTown}
-                                </ul>
-                            </div>
-                            {/* Shop Dropdown */}
-                            <div className="dropdown"  style={{paddingLeft: 10}}>
-                                <button 
-                                    className="btn bg-gradient-primary dropdown-toggle" 
-                                    type="button" 
-                                    id="dropdownMenuButton" 
-                                    data-bs-toggle="dropdown" 
-                                    aria-expanded="false"
-                                    >
-                                    {shopState}
-                                </button>
-                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                {renderedShop}
-                                </ul>
-                            </div>
+                            {selectionLevel}
                             <div><sup style={{color: 'red', paddingLeft: 10}}>{empty}</sup></div>
                             <button onClick={()=>submitRequest()} className="btn btn-primary">Search</button>
                         </div>
@@ -460,7 +489,7 @@ export default function SummarySalesCommission() {
                                 <img src={img} style={{width: '200px'}}/>
                             </div>                      
                             <div class="col-6 text-end">
-                                <h6 className="mb-0">SUMMARY NATIONAL SALES COMMISSION REPORT</h6>
+                                <h6 className="mb-0">SUMMARY NATIONAL SALES REPORT</h6>
                                 <h6 className="mb-0">National Total</h6>
                             </div>
                         </div>
@@ -470,37 +499,47 @@ export default function SummarySalesCommission() {
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>To Date:</span><input type="date" style={{border: 0}} name="endDate" onChange={(e) => setEndDate(e.target.value)} value={endDate} max={dateString}/><sup style={{color: 'red', paddingLeft: 10}}>{validate}</sup></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Currency:</span> {currencyState}</h6>
                             </div> 
+                            <div className="col-6 align-items-center">
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Region:</span> {region==='No Region'? 'All Regions': region}</h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Town:</span> {town==='No Town'? 'All Towns': town}</h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Shop:</span> {shopName==='No Shop'? 'All Shops': shopName}</h6>
+                            </div> 
                         </div>
                     </div>
                     <div className="card-body p-3 pb-0">
                         <table className="table align-items-center mb-0 p-5">
                             <thead>
                                 <tr>
-                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" style={{width:'20%'}}>Customer</th>
-                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" style={{width:'10%', paddingRight:'0.5rem'}}>Discount</th>
+                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
                                     <th className="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         <div className="row">
-                                            <div style={{width: '30%', textAlign: 'left'}}>Product Type</div>
-                                            <div style={{width: '5%', textAlign: 'right'}}>Quantity</div>
-                                            <div style={{width: '30%', textAlign: 'right', paddingRight: 0}}>Total Sales</div>
-                                            <div style={{width: '35%', textAlign: 'right', paddingRight: 50}}>Total Commissions</div>
+                                            <div style={{width: '50%', textAlign: 'center'}}>Quantity</div>
+                                            <div style={{width: '50%', textAlign: 'right', paddingRight: 50}}>Total Collections</div>
                                         </div>
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr>Online Sales</tr>
+                                {
+                                    loadingOnline==='pending'?
+                                    loadingAnimation: 
+                                    loadingOnline ==='rejected'?
+                                      errorMsg1: onlineSalesData
+                                    
+                                }
+                                <tr>Agent Sales</tr>
                                 {
                                     loadingAgent==='pending'?
                                     loadingAnimation: 
                                     loadingAgent ==='rejected'?
-                                    errorMsg: agentSalesData
+                                      errorMsg: agentSalesData
                                 }
                                 <tr>
-                                    <td>Total Commission Payable</td>
-                                    <td></td>
+                                    <td>Total</td>
                                     <td>
                                         <div className="row">
-                                            <div style={{textAlign: 'right', paddingRight: 75}}>${salesTotalCalc()}</div>
+                                            <div style={{textAlign: 'right', paddingRight: 70}}>${salesTotalCalc()}</div>
                                         </div>
                                     </td>
                                 </tr>

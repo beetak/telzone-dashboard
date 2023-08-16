@@ -1,9 +1,16 @@
+import {useEffect} from 'react'
+import { useDispatch } from "react-redux";
 import SideNavigation from "../../components/NavBar/sideNav";
 import TopNavigation from "../../components/NavBar/topNav";
 import SummarySales from "../../components/SalesReport/SummarySales";
+import { fetchAsyncRegion } from "../../store/entities-slice";
 
 
 export default function HORSalesReport() {
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(fetchAsyncRegion())
+  }, []);
   return (
     <div>
         {<SideNavigation/>}

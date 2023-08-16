@@ -129,7 +129,13 @@ const saleSlice = createSlice({
           },
         setShowCart(state){
             state.showCart=true
-        }
+        },
+        clearSales(state) {
+            state.totalSales = []
+            state.regionSales = []
+            state.townSales = []
+            state.shopSales = []
+        },
     },
     extraReducers: {
         [fetchAsyncSalesByAgent.pending]: (state)=>{

@@ -1,12 +1,12 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import Dropdown from 'react-bootstrap/Dropdown'
 import { Button } from "react-bootstrap";
 import InputGroup from 'react-bootstrap/InputGroup'
 import { FormControl } from "react-bootstrap";
 import { ButtonGroup, Form } from "react-bootstrap";
-import { fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getAgentSales, getRegionSales, getShopSales, getTotalSales, getTownSales } from '../../store/sales-slice';
+import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getAgentSales, getRegionSales, getShopSales, getTotalSales, getTownSales } from '../../store/sales-slice';
 import { useDispatch, useSelector } from 'react-redux';
-import { currencyActions, getAllCurrencies } from '../../store/currency-slice';
+import { currencyActions, fetchAsyncCurrency, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
 import { useReactToPrint } from "react-to-print";
 import { toggleActions } from '../../store/toggle-slice';
@@ -23,6 +23,10 @@ const surname = localStorage.getItem('surname')
 const img = "assets/img/telonelogo.png"
 
 export default function SummarySalesCustomer() {
+
+    useEffect(() => {
+        dispatch(fetchAsyncCurrency(true))
+      }, []);
 
     const today = new Date()
     const date = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
@@ -149,7 +153,7 @@ export default function SummarySalesCustomer() {
         setTownState("All Towns")
         setShopState("All Shops")
         setShopName("All Shops")
-        setSearchLevel("regional")
+        setSearchLevel(name==='No Region'?'':"regional")
         dispatch(fetchAsyncTownByRegion(id))
     }
     
@@ -270,11 +274,13 @@ export default function SummarySalesCustomer() {
 
     const submitRequest = async () => {
         // setEndDate(endDate)
-        if(currencyID===''){
-          setEmpty("Please select the currency")
-        }
-        if(startDate==='' || endDate===''){
-            setValidate("Please select the start date and end date")
+        if(currencyID===''||startDate==='' || endDate===''){
+            if(startDate==='' || endDate===''){
+                setValidate("Please select the start date and end date")
+            }
+            if(currencyID===''){
+                setEmpty("Please select the currency")
+            }
         }
         else if(startDate>endDate){
             setValidate("Invalid Time Range")
@@ -290,7 +296,7 @@ export default function SummarySalesCustomer() {
                 dispatch(fetchAsyncSalesByShop({startDate, endDate, curId:currencyID, shopId}))
             }
             else{
-                dispatch(fetchAsyncSales())
+                dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId:currencyID}))
             }
         }
         setTimeout(()=>{

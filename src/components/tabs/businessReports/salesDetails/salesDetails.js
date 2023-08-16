@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getGlobalCurrency, getGlobalSymbol } from "../../../../store/currency-slice";
-import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByPartnerId } from "../../../../store/sales-slice";
+import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByPartnerId, saleActions } from "../../../../store/sales-slice";
 import { getEndTime, getStartTime } from "../../../../store/toggle-slice";
 import SummarySales from "../../../SalesReport/SummarySales";
 import SummarySalesShop from "../../../SalesReport/SummarySalesShop";
 import SummarySalesCustomer from "../../../SalesReport/SummarySalesCustomer";
 import SummaryTaxes from "../../../SalesReport/SummaryTaxes";
 import SummarySalesCommission from "../../../SalesReport/SummarySalesCommision";
+import { customerPaymentsActions } from "../../../../store/customerPayments-slice";
 
 export default function SalesDetails (){
 
@@ -25,7 +26,7 @@ export default function SalesDetails (){
 
   useEffect(() => {
     dispatch(fetchAsyncSalesByPartnerId(id))
-    dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId}))
+    // dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId}))
     // dispatch(fetchAsyncDailyPayments({date, curSymbol}))
   }, [dispatch, id, endDate, curId, curSymbol, startDate]);
 
@@ -69,6 +70,8 @@ export default function SalesDetails (){
                   onClick={
                     ()=>{
                       setShow('summary_sales')
+                      dispatch(saleActions.clearSales())
+                      dispatch(customerPaymentsActions.clearPayments())
                     }
                   }>
                   <i className="as fa-rotate-left text-light text-sm pb-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile" />
@@ -78,6 +81,8 @@ export default function SalesDetails (){
                   onClick={
                     ()=>{
                       setShow('tax_summary')
+                      dispatch(saleActions.clearSales())
+                      dispatch(customerPaymentsActions.clearPayments())
                     }
                   }>
                   <i className="as fa-rotate-left text-light text-sm pb-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile" />
@@ -87,6 +92,8 @@ export default function SalesDetails (){
                   onClick={
                     ()=>{
                       setShow('customer_summary')
+                      dispatch(saleActions.clearSales())
+                      dispatch(customerPaymentsActions.clearPayments())
                     }
                   }>
                   <i className="as fa-rotate-left text-light text-sm pb-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile" />
@@ -96,6 +103,8 @@ export default function SalesDetails (){
                   onClick={
                     ()=>{
                       setShow('commission_summary')
+                      dispatch(saleActions.clearSales())
+                      dispatch(customerPaymentsActions.clearPayments())
                     }
                   }>
                   <i className="as fa-rotate-left text-light text-sm pb-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile" />

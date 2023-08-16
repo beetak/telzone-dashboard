@@ -1,26 +1,25 @@
 import React, {useState, useRef, useEffect} from 'react';
-import Dropdown from 'react-bootstrap/Dropdown'
-import { Button } from "react-bootstrap";
-import { ButtonGroup, Form } from "react-bootstrap";
-import { fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getAgentSales, getAllSales, getRegionSales, getShopSales, getTotalSales, getTownSales } from '../../store/sales-slice';
+import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getAgentSales, getAllSales, getRegionSales, getShopSales, getTotalSales, getTownSales } from '../../store/sales-slice';
 import { useDispatch, useSelector } from 'react-redux';
-import { currencyActions, getAllCurrencies } from '../../store/currency-slice';
+import { currencyActions, fetchAsyncCurrency, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
 import { useReactToPrint } from "react-to-print";
 import { fetchAsyncPeriodicalPayments, getAllCustomerPayments, getOnlineLoading, getPeriodicalPayments } from '../../store/customerPayments-slice';
-import { toggleActions } from '../../store/toggle-slice';
 import { fetchAsyncShopByTown, fetchAsyncTownByRegion, getAllRegions, getAllShops, getAllTowns, getRegionTowns, getTownShops } from '../../store/entities-slice';
 import TelOneRegionDropdown from '../TelOneRegions/TelOneRegionDropdown/TelOneRegionDropdown';
 import TelOneTownDropdown from '../TelOneTowns/TelOneTownDropdown/TelOneTownDropdown';
 import TelOneShopDropdown from '../TelOneShops/TelOneShopDropdown/TelOneShopDropdown';
 import { BeatLoader } from 'react-spinners';
-import { fetchAsyncSales } from '../../store/cart-slice';
 
 const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
 const img = "assets/img/telonelogo.png"
 
 export default function SummarySales() {
+
+    useEffect(() => {
+        dispatch(fetchAsyncCurrency(true))
+      }, []);
 
     const today = new Date()
     const date = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
@@ -70,8 +69,7 @@ export default function SummarySales() {
         )
         dispatch(
             currencyActions.setGlobalSymbol(symbol)
-        )
-        
+        )        
     }
 
     let renderedCurrency = ''
@@ -149,7 +147,7 @@ export default function SummarySales() {
         setTownState("All Towns")
         setShopState("All Shops")
         setShopName("All Shops")
-        setSearchLevel("regional")
+        setSearchLevel(name==='No Region'?'':"regional")
         dispatch(fetchAsyncTownByRegion(id))
     }
     
@@ -190,7 +188,13 @@ export default function SummarySales() {
     .map(([bundleId, count]) => ({ bundleId, count }))
     .sort((a, b) => b.count - a.count);
 
+    console.log("data, ", salesData)
     console.log("the out put: ",output);
+
+    // let dataToUse = salesData;
+    // if (salesData === null) {
+    // dataToUse = totalSales;
+    // }
 
     const output2 = Object.entries(
         salesData.reduce((prev, { bundles }) => {
@@ -294,11 +298,13 @@ export default function SummarySales() {
 
     const submitRequest = async () => {
         // setEndDate(endDate)
-        if(currencyID===''){
-          setEmpty("Please select the currency")
-        }
-        if(startDate==='' || endDate===''){
-            setValidate("Please select the start date and end date")
+        if(currencyID===''||startDate==='' || endDate===''){
+            if(startDate==='' || endDate===''){
+                setValidate("Please select the start date and end date")
+            }
+            if(currencyID===''){
+                setEmpty("Please select the currency")
+            }
         }
         else if(startDate>endDate){
             setValidate("Invalid Time Range")
@@ -317,7 +323,7 @@ export default function SummarySales() {
                 dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol:currencyState}))
             }
             else{
-                dispatch(fetchAsyncSales())
+                dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId:currencyID}))
                 dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol:currencyState}))
             }
         }
@@ -518,7 +524,7 @@ export default function SummarySales() {
                                     <td>Total</td>
                                     <td>
                                         <div className="row">
-                                            <div style={{textAlign: 'right', padding: 70}}>{salesTotalCalc()}</div>
+                                            <div style={{textAlign: 'right', paddingRight: 70}}>${salesTotalCalc()}</div>
                                         </div>
                                     </td>
                                 </tr>

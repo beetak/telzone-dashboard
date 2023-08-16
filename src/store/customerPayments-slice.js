@@ -35,7 +35,10 @@ const customerPaymentsSlice = createSlice({
     reducers: {
         addUser: (state, {payload})=>{
             state.partners = payload
-        }
+        },
+        clearPayments(state) {
+            state.periodicalPayments = []
+        },
     },
     extraReducers: {
         [fetchAsyncPayments.pending]: (state)=>{

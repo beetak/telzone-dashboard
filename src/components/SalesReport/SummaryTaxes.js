@@ -2,9 +2,9 @@ import React, {useState, useRef} from 'react';
 import Dropdown from 'react-bootstrap/Dropdown'
 import { Button } from "react-bootstrap";
 import { ButtonGroup, Form } from "react-bootstrap";
-import { fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getAgentSales, getAllSales, getLoadingByCurIdStatus, getRegionSales, getShopSales, getTotalSales, getTownSales } from '../../store/sales-slice';
+import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getAgentSales, getAllSales, getLoadingByCurIdStatus, getRegionSales, getShopSales, getTotalSales, getTownSales } from '../../store/sales-slice';
 import { useDispatch, useSelector } from 'react-redux';
-import { currencyActions, getAllCurrencies } from '../../store/currency-slice';
+import { currencyActions, fetchAsyncCurrency, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
 import { useReactToPrint } from "react-to-print";
 import { fetchAsyncPeriodicalPayments, getAllCustomerPayments, getOnlineLoading, getPeriodicalPayments } from '../../store/customerPayments-slice';
@@ -71,6 +71,7 @@ export default function SummaryTaxes() {
     let priceCount = ''
 
     useEffect(() => {
+        dispatch(fetchAsyncCurrency(true))
         dispatch(fetchAsyncBasePrice())
         priceCount = Object.keys(prices).length
         if(priceCount<=0){
@@ -180,7 +181,7 @@ export default function SummaryTaxes() {
         setTownState("All Towns")
         setShopState("All Shops")
         setShopName("All Shops")
-        setSearchLevel("regional")
+        setSearchLevel(name==='No Region'?'':"regional")
         dispatch(fetchAsyncTownByRegion(id))
     }
     
@@ -350,11 +351,13 @@ export default function SummaryTaxes() {
 
     const submitRequest = async () => {
         // setEndDate(endDate)
-        if(currencyID===''){
-          setEmpty("Please select the currency")
-        }
-        if(startDate==='' || endDate===''){
-            setValidate("Please select the start date and end date")
+        if(currencyID===''||startDate==='' || endDate===''){
+            if(startDate==='' || endDate===''){
+                setValidate("Please select the start date and end date")
+            }
+            if(currencyID===''){
+                setEmpty("Please select the currency")
+            }
         }
         else if(startDate>endDate){
             setValidate("Invalid Time Range")
@@ -373,7 +376,7 @@ export default function SummaryTaxes() {
                 dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol:currencyState}))
             }
             else{
-                dispatch(fetchAsyncSales())
+                dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId:currencyID}))
                 dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol:currencyState}))
             }
         }
@@ -578,7 +581,7 @@ export default function SummaryTaxes() {
                                     <td>Total</td>
                                     <td>
                                         <div className="row">
-                                            <div style={{textAlign: 'right', padding: 70}}>$ {salesTotalCalc()}</div>
+                                            <div style={{textAlign: 'right', paddingRight: 70}}>$ {salesTotalCalc()}</div>
                                         </div>
                                     </td>
                                 </tr>

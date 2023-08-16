@@ -29,11 +29,11 @@ export default function BusinessReports(){
     useEffect(() => {
       dispatch(fetchAsyncBusiness(active))
       dispatch(fetchAsyncClients())
-      dispatch(fetchAsyncSales())
+      // dispatch(fetchAsyncSales())
       dispatch(fetchAsyncBusinessRole())
       dispatch(fetchAsyncPayments())
       dispatch(fetchAsyncDailyPayments())
-      dispatch(fetchAsyncCurrency(true))
+      // dispatch(fetchAsyncCurrency(true))
       dispatch(fetchAsyncRegion())
       // dispatch(fetchAsyncTownByRegion(regionId))
       // dispatch(fetchAsyncShopByTown(townId))
