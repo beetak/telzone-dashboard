@@ -13,13 +13,18 @@ import { BeatLoader } from 'react-spinners';
 
 const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
+const userRole = localStorage.getItem('role')
+const userShop = localStorage.getItem('shopId')
 const img = "assets/img/telonelogo.png"
 
 export default function SummarySales() {
 
     useEffect(() => {
         dispatch(fetchAsyncCurrency(true))
-      }, []);
+        dispatch(fetchAsyncSalesByShop({startDate, endDate, curId:currencyID, userShop}))
+        if (userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager') 
+            setSearchLevel('shop');
+      }, [userRole]);
 
     const today = new Date()
     const date = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
@@ -392,6 +397,77 @@ export default function SummarySales() {
         <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>
         </tr>
 
+    let selectionLevel = ''
+
+    if(userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager'){
+        {/* Shop Dropdown */}
+        selectionLevel =
+        <div className="dropdown"  style={{paddingLeft: 10}}>
+            <button 
+                className="btn bg-gradient-primary dropdown-toggle" 
+                type="button" 
+                id="dropdownMenuButton" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+                >
+                {shopState}
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {renderedShop}
+            </ul>
+        </div>
+    }
+    else{
+        selectionLevel =
+        <>
+            {/* Region Dropdown */}
+            <div className="dropdown"  style={{paddingLeft: 10}}>
+                <button 
+                    className="btn bg-gradient-primary dropdown-toggle" 
+                    type="button" 
+                    id="dropdownMenuButton" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    >
+                    {regionState}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedRegions}
+                </ul>
+            </div>
+            {/* Town Dropdown */}
+            <div className="dropdown"  style={{paddingLeft: 10}}>
+                <button 
+                    className="btn bg-gradient-primary dropdown-toggle" 
+                    type="button" 
+                    id="dropdownMenuButton" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    >
+                    {townState}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedTown}
+                </ul>
+            </div>
+            {/* Shop Dropdown */}
+            <div className="dropdown"  style={{paddingLeft: 10}}>
+                <button 
+                    className="btn bg-gradient-primary dropdown-toggle" 
+                    type="button" 
+                    id="dropdownMenuButton" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    >
+                    {shopState}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedShop}
+                </ul>
+            </div>
+        </>
+    }
+
   return (
     <>
         <div className='row'>
@@ -414,51 +490,7 @@ export default function SummarySales() {
                                 {renderedCurrency}
                                 </ul>
                             </div>
-                            {/* Region Dropdown */}
-                            <div className="dropdown"  style={{paddingLeft: 10}}>
-                                <button 
-                                    className="btn bg-gradient-primary dropdown-toggle" 
-                                    type="button" 
-                                    id="dropdownMenuButton" 
-                                    data-bs-toggle="dropdown" 
-                                    aria-expanded="false"
-                                    >
-                                    {regionState}
-                                </button>
-                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                {renderedRegions}
-                                </ul>
-                            </div>
-                            {/* Town Dropdown */}
-                            <div className="dropdown"  style={{paddingLeft: 10}}>
-                                <button 
-                                    className="btn bg-gradient-primary dropdown-toggle" 
-                                    type="button" 
-                                    id="dropdownMenuButton" 
-                                    data-bs-toggle="dropdown" 
-                                    aria-expanded="false"
-                                    >
-                                    {townState}
-                                </button>
-                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                {renderedTown}
-                                </ul>
-                            </div>
-                            {/* Shop Dropdown */}
-                            <div className="dropdown"  style={{paddingLeft: 10}}>
-                                <button 
-                                    className="btn bg-gradient-primary dropdown-toggle" 
-                                    type="button" 
-                                    id="dropdownMenuButton" 
-                                    data-bs-toggle="dropdown" 
-                                    aria-expanded="false"
-                                    >
-                                    {shopState}
-                                </button>
-                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                {renderedShop}
-                                </ul>
-                            </div>
+                            {selectionLevel}
                             <div><sup style={{color: 'red', paddingLeft: 10}}>{empty}</sup></div>
                             <button onClick={()=>submitRequest()} className="btn btn-primary">Search</button>
                         </div>
