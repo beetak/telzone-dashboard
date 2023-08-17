@@ -38,6 +38,8 @@ const customerPaymentsSlice = createSlice({
         },
         clearPayments(state) {
             state.periodicalPayments = []
+            state.payments = []
+            state.dailyPayments = []
         },
     },
     extraReducers: {

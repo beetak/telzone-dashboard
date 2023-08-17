@@ -4,7 +4,7 @@ import { Button } from "react-bootstrap";
 import InputGroup from 'react-bootstrap/InputGroup'
 import { FormControl } from "react-bootstrap";
 import { ButtonGroup, Form } from "react-bootstrap";
-import { getAgentSales, getAllSales } from '../../store/sales-slice';
+import { fetchAsyncSalesByAgent, getAgentSales, getAllSales } from '../../store/sales-slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { currencyActions, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
@@ -13,6 +13,7 @@ import { toggleActions } from '../../store/toggle-slice';
 
 const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
+const userID = localStorage.getItem('userId')
 const img = "assets/img/telonelogo.png"
 
 export default function DailyReport() {
@@ -25,6 +26,9 @@ export default function DailyReport() {
     const[currencyState, setCurrencyState] = useState('Currency')
     const[currencyActioned, setCurrencyActioned]= useState('')
     const[date, setDate]= useState('')
+    const[transactionDate, setTransactionDate]= useState('')
+    const[empty, setEmpty] = useState('')
+    const[validate, setValidate] = useState('')
 
     const currencyData = useSelector(getAllCurrencies)
     const dispatch = useDispatch()
@@ -133,11 +137,23 @@ export default function DailyReport() {
         )
     }
 
-    const calcDate = (startDay) => {
-        setDate(startDay)
-        dispatch(
-            toggleActions.setDateFrom(startDay)
-        )
+    const submitRequest = async () => {
+        // setEndDate(endDate)
+        if(currencyID===''||transactionDate===''){
+            if(transactionDate===''){
+                setValidate("Please select the start date and end date")
+            }
+            if(currencyID===''){
+                setEmpty("Please select the currency")
+            }
+        }
+        else{
+            dispatch(fetchAsyncSalesByAgent({curId: currencyID, userID, date: transactionDate}))  
+        }
+        setTimeout(()=>{
+            setEmpty("")
+            setValidate("")
+        }, 3000)    
     }
 
   return (
@@ -162,7 +178,8 @@ export default function DailyReport() {
                                 {renderedCurrency}
                                 </ul>
                             </div>
-                            <button onClick={'()=>submitRequest()'} className="btn btn-primary">Search</button>
+                            <div><sup style={{color: 'red', paddingLeft: 10}}>{empty}</sup></div>
+                            <button onClick={()=>submitRequest()} className="btn btn-primary">Search</button>
                         </div>
                         <div className="col-6 text-end">
                             <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" onClick={()=>handlePrint()}><i class="material-icons text-lg position-relative me-1">picture_as_pdf</i> DOWNLOAD PDF</button>
@@ -186,7 +203,7 @@ export default function DailyReport() {
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Region:</span></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Town:</span></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Shop:</span></h6>
-                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Date:</span> <input type="date" style={{border: 0}} name="date" onChange={(e) => calcDate(e.target.value)} value={date}/></h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Date:</span> <input type="date" style={{border: 0}} name="date" onChange={(e) => setTransactionDate(e.target.value)} value={transactionDate}/></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Currency:</span> {currencyState}</h6>
                             </div> 
                         </div>

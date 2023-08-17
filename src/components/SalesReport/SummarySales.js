@@ -14,16 +14,19 @@ import { BeatLoader } from 'react-spinners';
 const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
 const userRole = localStorage.getItem('role')
-const userShop = localStorage.getItem('shopId')
+const userTownName = localStorage.getItem('townName')
+const userTownId = localStorage.getItem('townId')
+const userRegion = localStorage.getItem('regionName')
 const img = "assets/img/telonelogo.png"
 
 export default function SummarySales() {
 
     useEffect(() => {
         dispatch(fetchAsyncCurrency(true))
-        dispatch(fetchAsyncSalesByShop({startDate, endDate, curId:currencyID, userShop}))
-        if (userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager') 
-            setSearchLevel('shop');
+        
+        if (userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager'){
+            dispatch(fetchAsyncShopByTown(userTownId))
+        }
       }, [userRole]);
 
     const today = new Date()
@@ -328,15 +331,19 @@ export default function SummarySales() {
                 dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol:currencyState}))
             }
             else{
-                dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId:currencyID}))
-                dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol:currencyState}))
+                if (userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager'){
+                    dispatch(fetchAsyncSalesByShop({startDate, endDate, curId:currencyID, shopId}))
+                }
+                else{
+                    dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId:currencyID}))
+                    dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol:currencyState}))
+                }
             }
         }
         setTimeout(()=>{
             setEmpty("")
             setValidate("")
-        }, 3000)
-        
+        }, 3000)    
     }
 
     let agentSalesData = ''

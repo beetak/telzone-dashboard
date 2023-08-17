@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getGlobalCurrency, getGlobalSymbol } from "../../../../store/currency-slice";
-import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByPartnerId, saleActions } from "../../../../store/sales-slice";
+import { fetchAsyncSalesByPartnerId, saleActions } from "../../../../store/sales-slice";
 import { getEndTime, getStartTime } from "../../../../store/toggle-slice";
 import SummarySales from "../../../SalesReport/SummarySales";
 import SummarySalesShop from "../../../SalesReport/SummarySalesShop";
