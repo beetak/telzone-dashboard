@@ -82,16 +82,19 @@ export const updateVoucherOnSale = createAsyncThunk('cart/updateVoucherOnSale',
     return {data}
 })
 
-export const updateVoucherStatus = createAsyncThunk('cart/updateVoucherStatus', 
-    async (
-        voucherIds
-        ) => {
-    const response = await Api
-    .put(`/sales/${voucherIds}`,  
-    {headers})
-    const data = response.data
-    return {data}
-})
+export const updateVoucherStatus = createAsyncThunk(
+    'cart/updateVoucherStatus',
+    async (soldId) => {
+        try {
+            const response = await Api.put(`/sales/${soldId}`,
+            {headers})
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error('update error:', error);
+            throw error;
+        }
+    }
+);
 
 const cartSlice = createSlice({
     name: 'cart',

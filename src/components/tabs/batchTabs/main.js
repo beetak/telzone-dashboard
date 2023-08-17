@@ -4,6 +4,7 @@ import BatchCreateForm from "./createBatch/createBatch";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAsyncBatches, fetchAsyncVouchers } from "../../../store/batch-slice";
 import { fetchAsyncBundles } from "../../../store/bundle-slice";
+import BlockedVouchers from "./blockedVouchers/blocedVouchers";
 
 const url = "http://localhost:8082/smart-wifi/user/"; // URL variable stores JSON url || API taken from 10 Degrees WordPress Agency
 
@@ -37,6 +38,10 @@ export default function BundleDetails(){
                 tabinfo = <BatchesTab/>;
                   // tabinfo = <VouchersTable/>
               }
+              else if(tabState === 'blockTab') {
+                tabinfo = <BlockedVouchers/>;
+                  // tabinfo = <VouchersTable/>
+              }
               else{
                 tabinfo = <BatchCreateForm/>;
               }
@@ -49,20 +54,20 @@ export default function BundleDetails(){
         <div className="card my-4">
             <div className="row">
                 {userRole==='Admin'? (
-                <div className="col-6">
-                    <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
-                        <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
-                            onClick={()=>setTabState('catTab')}
-                            style={Style2}
-                            >
-                            <div className="col-12 d-flex align-items-center">
-                                <h6 className="text-white text-capitalize ps-3">Generate Vouchers</h6>
-                            </div>
-                        </a>
+                    <div className="col-4">
+                        <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
+                            <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
+                                onClick={()=>setTabState('catTab')}
+                                style={Style2}
+                                >
+                                <div className="col-12 d-flex align-items-center">
+                                    <h6 className="text-white text-capitalize ps-3">Generate Vouchers</h6>
+                                </div>
+                            </a>
+                        </div>
                     </div>
-                </div>
                 ): ("")}
-                <div className="col-6">
+                <div className="col-4">
                     <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
                         <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
                             onClick={()=>setTabState('bundles')}
@@ -73,6 +78,20 @@ export default function BundleDetails(){
                         </a>
                     </div>
                 </div>
+                {userRole==='Admin'? (
+                    <div className="col-4">
+                        <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
+                            <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
+                                onClick={()=>setTabState('blockTab')}
+                                style={Style2}
+                                >
+                                <div className="col-12 d-flex align-items-center">
+                                    <h6 className="text-white text-capitalize ps-3">Block Vouchers</h6>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                ): ("")}
             </div>
         <div className="card-body px-0 pb-2">
           <div className="table-responsive p-0">

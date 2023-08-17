@@ -17,7 +17,8 @@ import {
   getStateUpdate, 
   getVATPercentage,  
   postSale, 
-  postVoucherSaleByBundleId
+  postVoucherSaleByBundleId,
+  updateVoucherStatus
 } from "../../../store/cart-slice";
 import BusinessPartnerDropdown from "../../BusinessPartner/BusinessPartnerDropdown/BusinessPartnerDropdown";
 import CartItem from "../CartItem/CartItem";
@@ -53,11 +54,6 @@ const CartItems = () => {
   const dispatch  = useDispatch()
   const prices  = useSelector(getBasePrice)
   
-  const bpname = useSelector(getCustomerName)
-  const bpemail = useSelector(getCustomerEmail)
-  const customerPhone = useSelector(getCustomerNumber)
-  const customerAddress = useSelector(getCustomerAddress)
-  const [printState, setPrintState] = useState(false)
   const [empty, setEmpty] = useState('')
   const [loadingStatus, setLoadingStatus] = useState(false)
   const [loadingSuccess, setLoadingSuccess] = useState(false)
@@ -78,6 +74,7 @@ const CartItems = () => {
   const[currencyState, setCurrencyState] = useState('Currency')
   const[currencyActioned, setCurrencyActioned]= useState('')
   const[currencySymbol, setCurrencySymbol]= useState('')
+  const[soldId, setSoldId]= useState([])
 
   const btnState = useSelector(getBtnState)
   const discountPercentage = useSelector(getDicountPercentage)
@@ -252,14 +249,10 @@ const CartItems = () => {
     )).then(response => {
       console.log("voucher response ", response);
       if (response.payload && response.payload.success === true) {
-        setLoadingSuccess(true);
-        // Request was successful
-        if(quantity===1){
-          printSingleVoucher(response.payload.data.data, orderID)
-        }
-        else{
-          printVouchers(response.payload.data.data, orderID)
-        }
+        response.payload.data.data.forEach(function(voucher, i){
+              soldId.push(voucher.id)
+        })
+        updateVoucherState(soldId, quantity, orderID, response.payload.data.data)
       } else {
         // Request was not successful
         console.log('postVoucher failed');
@@ -267,6 +260,24 @@ const CartItems = () => {
     }).catch(error => {
       // Handle any errors that occurred during postSale dispatch
       console.error('Error during postSale:', error);
+    })
+  }
+
+  const updateVoucherState = (soldId, quantity, orderID, data) => {
+    console.log("SOLD VOUCHERS",soldId)
+    dispatch(updateVoucherStatus(
+      soldId
+    )).then((response)=>{
+      if(response.payload && response.payload.success === true){
+        setLoadingSuccess(true);
+        // Request was successful
+        if(quantity===1){
+          printSingleVoucher(data, orderID)
+        }
+        else{
+          printVouchers(data, orderID)
+        }
+      }
     }).finally(() => {
       // Clear the loading state after 5 seconds
       setTimeout(() => {

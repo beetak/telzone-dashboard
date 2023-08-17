@@ -111,6 +111,38 @@ export const reactivateVoucher = createAsyncThunk('batch/reactivateVoucher',
     return {data}
 })
 
+// export const blockVoucher = createAsyncThunk('batch/blockVoucher', 
+//     async (
+//         {      
+//             isBlocked,
+//             voucherCode
+//         }) => {
+    
+//     const response = await Api
+//     .put(`/vouchers/${voucherCode}`, {
+//         isBlocked,
+//         voucherCode
+//     } ,  {headers})
+//     const data = response.data
+//     return {data}
+// })
+
+export const blockVoucher = createAsyncThunk(
+    'batch/blockVoucher',
+    async ({isBlocked, voucherCode}) => {
+        try {
+            const response = await Api.put(`/vouchers/blocked/${voucherCode}`,{
+                isBlocked,
+                voucherCode
+            }, {headers})
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error('update error:', error);
+            throw error;
+        }
+    }
+);
+
 export const updateAsyncVoucher = createAsyncThunk('batch/updateAsyncVoucher', 
     async (
         {
@@ -191,7 +223,8 @@ const batchSlice = createSlice({
         message: 'idle',
         verificationResponse: '',
         showMore: false,
-        reactivateStatus: 'idle'
+        reactivateStatus: 'idle',
+        blockingStatus: 'idle'
     },
     reducers: {
         clearVouchers(state, action){
@@ -445,6 +478,19 @@ const batchSlice = createSlice({
             console.log("rejected")
             state.reactivateStatus = 'failed'
         },
+        [blockVoucher.pending]: (state)=>{
+            console.log("voucher update pending")
+            state.blockingStatus = 'pending'
+        },
+        [blockVoucher.fulfilled]: (state, action) =>{
+            console.log("Update Successful")
+            console.log(action.payload)
+            state.blockingStatus = 'success'
+        },
+        [blockVoucher.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.blockingStatus = 'rejected'
+        },
     }
 })
 
@@ -471,6 +517,7 @@ export const getStatusSearch = (state) => state.batch.statusSearch
 export const getSearchMessage = (state) => state.batch.message
 export const getVerified = (state) => state.batch.verificationResponse
 export const getReactivate = (state) => state.batch.reactivateStatus
+export const getBlockingStatus = (state) => state.batch.blockingStatus
 export const getShow = (state) => state.batch.showMore
 export const {clearVouchers} = batchSlice.actions
 export default batchSlice
