@@ -1,15 +1,10 @@
 import React, {useState, useRef} from 'react';
-import Dropdown from 'react-bootstrap/Dropdown'
-import { Button } from "react-bootstrap";
-import InputGroup from 'react-bootstrap/InputGroup'
-import { FormControl } from "react-bootstrap";
-import { ButtonGroup, Form } from "react-bootstrap";
-import { fetchAsyncSalesByAgent, getAgentSales, getAllSales } from '../../store/sales-slice';
+import { fetchAsyncSalesByAgent, getAgentSales, getAllSales, getLoadingStatus } from '../../store/sales-slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { currencyActions, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
 import { useReactToPrint } from "react-to-print";
-import { toggleActions } from '../../store/toggle-slice';
+import { BeatLoader } from 'react-spinners';
 
 const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
@@ -18,14 +13,12 @@ const img = "assets/img/telonelogo.png"
 
 export default function DailyReport() {
 
-    const totalSales = useSelector(getAllSales)
     const agentSales = useSelector(getAgentSales)
+    const loading = useSelector(getLoadingStatus)
     
-    const [filter, setFilter] = useState('Filter by');
     const[currencyID, setCurrencyID] = useState('')
     const[currencyState, setCurrencyState] = useState('Currency')
     const[currencyActioned, setCurrencyActioned]= useState('')
-    const[date, setDate]= useState('')
     const[transactionDate, setTransactionDate]= useState('')
     const[empty, setEmpty] = useState('')
     const[validate, setValidate] = useState('')
@@ -51,6 +44,20 @@ export default function DailyReport() {
         </tr>
       ))
     ):(<div><h1>Error</h1></div>)
+
+    let loadingAnimation = 
+    <tr className='' style={anime}>
+      <td colspan={6}>
+        <BeatLoader
+          color={'#055bb5'}
+          loading={loading}
+          cssOverride={override}
+          size={15}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
+      </td>
+    </tr>
 
     const data = agentSales
     const output = Object.entries(
@@ -156,6 +163,33 @@ export default function DailyReport() {
         }, 3000)    
     }
 
+    let agentSalesData = ''
+
+    var count = Object.keys(agentSales).length
+    if(count>0){
+        agentSalesData = (
+            output.map((item)=>(
+                <tr key={item.bundles}>
+                    <th scope="row">{item.bundles}</th>
+                    <td colSpan={4} className="text-center">
+                        {displayByPartner(item.bundles)}
+                    </td>
+                </tr>
+            ))
+        )
+    }
+    else{
+        agentSalesData = 
+        <tr>
+        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Sales Record Found</h5></td>
+        </tr>
+    }
+
+    let errorMsg =  
+        <tr>
+        <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>
+        </tr>
+
   return (
     <>
         <div className='row'>
@@ -225,14 +259,10 @@ export default function DailyReport() {
                             </thead>
                             <tbody>
                                 {
-                                    output.map((item)=>(
-                                        <tr key={item.bundles}>
-                                            <th scope="row">{item.bundles}</th>
-                                            <td colSpan={4} className="text-center">
-                                                {displayByPartner(item.bundles)}
-                                            </td>
-                                        </tr>
-                                    ))
+                                    loading==='pending'?
+                                    loadingAnimation: 
+                                    loading ==='rejected'?
+                                      errorMsg: agentSalesData
                                 }
                                 <tr>
                                     <td>Total Revenue</td>
@@ -251,4 +281,18 @@ export default function DailyReport() {
         </div>
     </>
   );
+}
+
+const override = {
+    display: "block",
+    margin: "0 auto",
+    borderColor: "blue",
+};
+  
+const anime = {
+    textAlign: 'center', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    width: '100%', 
+    height: '10vh'
 }

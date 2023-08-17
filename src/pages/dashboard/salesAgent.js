@@ -6,16 +6,9 @@ import DailyReport from '../../components/SalesReport/DailyReport';
 import { fetchAsyncBundles } from '../../store/bundle-slice';
 import { fetchAsyncBusiness } from '../../store/business-slice';
 import { fetchAsyncCurrency, getGlobalCurrency } from '../../store/currency-slice';
-import { fetchAsyncSales, fetchAsyncSalesByAgent } from '../../store/sales-slice';
 import { getStartTime } from '../../store/toggle-slice';
 const userID = localStorage.getItem('userId')
 export default function SalesAgent() {
-
-  // const today = new Date()
-  // const date = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
-  // console.log("date: ", date)
-
-
 
   const dispatch = useDispatch()
 
@@ -23,7 +16,6 @@ export default function SalesAgent() {
   const date = useSelector(getStartTime)
 
   useEffect(() => {
-    dispatch(fetchAsyncSalesByAgent({curId, userID, date}))
     dispatch(fetchAsyncBundles(true))
     dispatch(fetchAsyncBusiness(true))
     dispatch(fetchAsyncCurrency(true))
