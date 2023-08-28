@@ -41,11 +41,16 @@ const BatchCard = ({index, id, name, status, suspended, firstname, lastname, bun
   useEffect(()=>{
     setBatchId(index)
   },[])
+
+  const convertDate = (dateCreated) => {
+    const dateString = new Date(dateCreated);
+    return dateString.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
   
   return (
     <>
       <td className="align-middle">
-        <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{id}</p>
+        <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{++index}</p>
       </td>
       <td className="align-middle text-center">
         {status && !suspended ? (
@@ -63,7 +68,7 @@ const BatchCard = ({index, id, name, status, suspended, firstname, lastname, bun
         <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{bundleName} </p>
       </td>
       <td>
-        <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{dateCreated} </p>
+        <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{convertDate(dateCreated)} </p>
       </td>
       <td className="align-middle text-center">
         {

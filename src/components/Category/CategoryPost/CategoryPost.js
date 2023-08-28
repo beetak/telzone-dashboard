@@ -7,9 +7,10 @@ const CategoryPost = () => {
 
   const[empty, setEmpty] = useState('')
   const[name, setName] = useState('')
-  const[duration, setDuration] = useState('Bundle Life Span')
+  const[duration, setDuration] = useState('')
+  const[durationLength, setDurationLength] = useState('')
   const[description, setDescription] = useState('')
-
+  const[time, setTime] = useState('Bundle Life Span')
 
     const dispatch = useDispatch()
 
@@ -42,15 +43,18 @@ const CategoryPost = () => {
                 <div className="p-4">
                     <form >
                         <div style={{color: 'red', marginBottom: '10px'}}>{empty}</div>
+                        <div className="input-group input-group-dynamic mb-0">
+                            <input type="text" name="name" value={name} onChange={(e)=>setName(e.target.value)} className="form-control" style={{lineHeight: 1}}/>
+                        </div>
                         <label className="form-label">Category Name</label>
-                        <div className="input-group input-group-dynamic mb-4">
-                            <input type="text" name="name" value={name} onChange={(e)=>setName(e.target.value)} className="form-control" />
+                        <div className="input-group input-group-dynamic mb-0">
+                            <input type="text" name="description" value={description} onChange={(e)=>setDescription(e.target.value)} className="form-control" style={{lineHeight: 1}}/>
                         </div>
-                        <label className="form-label">Category Description</label>
-                        <div className="input-group input-group-dynamic mb-4">
-                            <input type="text" name="description" value={description} onChange={(e)=>setDescription(e.target.value)} className="form-control" />
+                        <label className="form-label" style={{padding: 0}}>Description</label>
+                        <div className="input-group input-group-dynamic mb-0">
+                            <input type="text" name="description" value={durationLength} onChange={(e)=>setDurationLength(e.target.value)} className="form-control" style={{lineHeight: 1}}/>
                         </div>
-                        <label className="form-label" style={{padding: 0}}>Bundle Life Span</label>
+                        <label className="form-label" style={{padding: 0}}>Duration</label>
                         {/* Currency dropdown */}
                         <div className="dropdown">
                             <button 
@@ -60,70 +64,57 @@ const CategoryPost = () => {
                                 data-bs-toggle="dropdown" 
                                 aria-expanded="false"
                                 >
-                                {duration}
+                                {time}
                             </button>
                             <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <li>
                                     <a  className="dropdown-item" 
                                         onClick={(e)=>{
                                             e.preventDefault()
-                                            setDuration(900)
+                                            setDuration(60*durationLength)
+                                            setTime(60*durationLength)
                                         }}>
-                                        15 Min
+                                        Minutes
                                     </a>
                                 </li>
                                 <li>
                                     <a  className="dropdown-item" 
                                         onClick={(e)=>{
                                             e.preventDefault()
-                                            setDuration(1800)
+                                            setDuration(3600*durationLength)
+                                            setTime(3600*durationLength)
                                         }}>
-                                        30 Min
+                                        Hours
                                     </a>
                                 </li>
                                 <li>
                                     <a  className="dropdown-item" 
                                         onClick={(e)=>{
                                             e.preventDefault()
-                                            setDuration(2700)
+                                            setDuration(86400*durationLength)
+                                            setTime(86400*durationLength)
                                         }}>
-                                        45 Min
+                                        Days
                                     </a>
                                 </li>
                                 <li>
                                     <a  className="dropdown-item" 
                                         onClick={(e)=>{
                                             e.preventDefault()
-                                            setDuration(3600)
+                                            setDuration(604800*durationLength)
+                                            setTime(604800*durationLength)
                                         }}>
-                                        1 Hour
+                                        Weeks
                                     </a>
                                 </li>
                                 <li>
                                     <a  className="dropdown-item" 
                                         onClick={(e)=>{
                                             e.preventDefault()
-                                            setDuration(86400)
+                                            setDuration(2592000*durationLength)
+                                            setTime(2592000*durationLength)
                                         }}>
-                                        1 Day
-                                    </a>
-                                </li>
-                                <li>
-                                    <a  className="dropdown-item" 
-                                        onClick={(e)=>{
-                                            e.preventDefault()
-                                            setDuration(604800)
-                                        }}>
-                                        1 Week
-                                    </a>
-                                </li>
-                                <li>
-                                    <a  className="dropdown-item" 
-                                        onClick={(e)=>{
-                                            e.preventDefault()
-                                            setDuration(2592000)
-                                        }}>
-                                        1 Month
+                                        Months
                                     </a>
                                 </li>
                             </ul>

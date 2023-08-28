@@ -6,14 +6,15 @@ import { updateCategory } from '../../../store/category-slice';
 const CategoryCard = (props) => {
   const [active, setActive] = useState('')
   const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [duration, setDuration] = useState('')
   const [id, setId] = useState('')
   const [activeState, setActiveState] = useState('')
   const [isOpen, setIsOpen] = useState(false)
-  const [current, setCurrent] = useState('')
   const [actioned, setActioned] = useState('Duration')
   const [categoryId, setCategoryId] = useState('')
+  const[duration, setDuration] = useState('')
+  const[durationLength, setDurationLength] = useState('')
+  const[description, setDescription] = useState('')
+  const[time, setTime] = useState('Bundle Life Span')
 
 
   const openModal = () => setIsOpen(true);
@@ -113,6 +114,19 @@ const CategoryCard = (props) => {
             />
           </InputGroup>
 
+          <InputGroup className="mb-3">
+            <InputGroup.Text id="basic-addon2">Duration</InputGroup.Text>
+            <FormControl
+              // value={currencySymbol}
+              aria-label="Username"
+              aria-describedby="basic-addon2"
+              placeholder = {duration + " Seconds"}
+              name = "description"
+              onChange = {(e)=>setDurationLength(e.target.value)}
+              className='customCont'
+            />
+          </InputGroup>
+
           <Dropdown as={ButtonGroup}>
             <Button variant="info">{actioned}</Button>
             <Dropdown.Toggle split variant="info" id="dropdown-split-basic" />
@@ -120,38 +134,52 @@ const CategoryCard = (props) => {
             <Dropdown.Item 
               onClick={
                 () => {
-                  setDuration(3600)
-                  setActioned('1 Hour')
+                  setDuration(60*durationLength)
+                  setActioned(60*durationLength)
+                  setTime(60*durationLength)
                 }
               }
-              >1 Hour
+              >Minutes
               </Dropdown.Item>
               <Dropdown.Item 
               onClick={
                 () => {
-                  setDuration(86400)
-                  setActioned('1 Day')
-                }
-              }
-              >1 Day
+                  setDuration(3600*durationLength)
+                  setActioned(3600*durationLength)
+                  setTime(3600*durationLength)
+                }}
+              >
+              Hours
               </Dropdown.Item>
               <Dropdown.Item
               onClick={
                 () => {
-                  setDuration(604800)
-                  setActioned('1 Week')
+                  setDuration(86400*durationLength)
+                  setActioned(86400*durationLength)
+                  setTime(86400*durationLength)
                 }
               }
-              >1 Week
+              >Days
               </Dropdown.Item>
               <Dropdown.Item
               onClick={
                 () => {
-                  setDuration(2592000)
-                  setActioned('1 Month')
+                  setDuration(604800*durationLength)
+                  setActioned(604800*durationLength)
+                  setTime(604800*durationLength)
                 }
               }
-              >1 Month
+              >Weeks
+              </Dropdown.Item>
+              <Dropdown.Item
+              onClick={
+                () => {
+                  setDuration(2592000*durationLength)
+                  setActioned(2592000*durationLength)
+                  setTime(2592000*durationLength)
+                }
+              }
+              >Months
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
@@ -193,3 +221,9 @@ const CategoryCard = (props) => {
 }
 
 export default CategoryCard;
+
+const customCont = {
+  '.customFormControl::placeholder': {
+    color: 'rgba(0, 0, 0, 0.9)'
+  }
+}

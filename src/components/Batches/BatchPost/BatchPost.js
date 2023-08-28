@@ -16,10 +16,8 @@ const BatchPost = () => {
   const[voucherList, setVoucherList] = useState([])
   const[currentState, setCurrentState] = useState('Product')
   const[empty, setEmpty] = useState('')
-  const[batchName, setBatchName] = useState("TelOnev1")
   const[bundleName, setBundleName] = useState('')
   const[bundleID, setBundleID] = useState('')
-  const [postVouchers, setPostVouchers] = useState("")
   const [loadingStatus, setLoadingStatus] = useState(false)
   const [loadingSuccess, setLoadingSuccess] = useState(false)
 
@@ -30,8 +28,6 @@ const BatchPost = () => {
 
   
   const response = useSelector(getBatchStatus)
-  const batch = useSelector(getCreatedBatch)
-  const storedVCodes = useSelector(getVCodes)
 
   const handleSubmit = async () => {
     // setLoadingStatus(true);
@@ -94,8 +90,6 @@ const BatchPost = () => {
       // setLoadingSuccess(false);
       dispatch(batchActions.successStatus(false))
     }, 2000);
-    setCurrentState('Product')
-    setPostVouchers("50 Vouchers Have Been Saved. Refreshing Soon...")
   // alert("Done")
   // window.location = "/batch"
 }
@@ -105,7 +99,7 @@ const generateVoucher = (batchID) => {
   console.log('before batch creation: ', response)
     let vcode = voucher_codes.generate({
       length: 16,
-      count: 50,
+      count: 3000,
       charset: '0123456789',
       pattern: '################'
     })

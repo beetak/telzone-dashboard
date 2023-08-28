@@ -30,6 +30,8 @@ import { fetchAsyncBasePrice, getBasePrice } from "../../../store/basePrice-slic
 import { BeatLoader } from "react-spinners";
 import CurrencyDropdown from "../../Currency/CurrencyDropdown/CurrencyDropdown";
 import { getAllCurrencies } from "../../../store/currency-slice";
+import Modal from 'react-bootstrap/Modal'
+import { Button } from "react-bootstrap";
 
 const img = "assets/img/telonelogo.png"
 const firstname = localStorage.getItem('firstname')
@@ -57,7 +59,7 @@ const CartItems = () => {
   const [empty, setEmpty] = useState('')
   const [loadingStatus, setLoadingStatus] = useState(false)
   const [loadingSuccess, setLoadingSuccess] = useState(false)
-  const [orderId, setOrderId] = useState('')
+  const [insufficient, setInsufficient] = useState(false)
 
   const [businessPartnerName, setBusinessPartnerName] = useState(`Client's Name`)
   const [businessPartnerId, setBusinessPartnerId] = useState('')
@@ -75,6 +77,9 @@ const CartItems = () => {
   const[currencyActioned, setCurrencyActioned]= useState('')
   const[currencySymbol, setCurrencySymbol]= useState('')
   const[soldId, setSoldId]= useState([])
+  const[available, setAvailable]= useState('')
+  const[requested, setRequested]= useState('')
+  const [isOpen, setIsOpen] = useState(false)
 
   const btnState = useSelector(getBtnState)
   const discountPercentage = useSelector(getDicountPercentage)
@@ -83,6 +88,10 @@ const CartItems = () => {
   const soldVouchersId = useSelector(getSoldVoucherIds)
   const stateUpdate = useSelector(getStateUpdate)
   const postBundleId = useSelector(getBundleId)
+
+  const openModal = () => setIsOpen(true);
+
+  const closeModal = () => setIsOpen(false);
 
   let priceCount = ''
   useEffect(() => {
@@ -208,7 +217,7 @@ const CartItems = () => {
         businessPartnerId,
         currencyId,
         order: {
-          amount: totalPrice,
+          amount: netTotal,
           dateCreated: today,
           discount: totalDiscount,
           payingAccountNumber: "TelOne",
@@ -249,10 +258,25 @@ const CartItems = () => {
     )).then(response => {
       console.log("voucher response ", response);
       if (response.payload && response.payload.success === true) {
-        response.payload.data.data.forEach(function(voucher, i){
-              soldId.push(voucher.id)
-        })
-        updateVoucherState(soldId, quantity, orderID, response.payload.data.data)
+        if(response.payload.data.data.length < quantity){
+          setAvailable(response.payload.data.data.length)
+          setRequested(quantity)
+          setInsufficient(true)
+          openModal()
+          setTimeout(()=>{
+            setInsufficient(false)
+            setLoadingStatus(false)
+            setBusinessPartnerName(`Client's Name`)
+            setCurrencyState('Currency')
+            dispatch(cartActions.deleteFromCart())
+          }, 5000)
+        }
+        else{
+          response.payload.data.data.forEach(function(voucher, i){
+            soldId.push(voucher.id)
+          })
+          updateVoucherState(soldId, quantity, orderID, response.payload.data.data)
+        }
       } else {
         // Request was not successful
         console.log('postVoucher failed');
@@ -515,12 +539,19 @@ const CartItems = () => {
 
   let loadingSalesAnimation = 
     <div className='text-center' style={anime}>
-        <h5 style={{color: '#055bb5'}}> {
-          loadingStatus && !loadingSuccess? 
-            "Preparing Invoice":
-            loadingStatus && loadingSuccess? 
-              "Successful":""
-          }</h5>
+        <h5 style={{ color: '#055bb5' }}>
+          {loadingStatus && !loadingSuccess && !insufficient ? 
+            "Preparing Invoice" :
+            loadingStatus && loadingSuccess ? 
+              "Successful" :
+              loadingStatus && insufficient ? (
+                <span>
+                  Insufficient vouchers available to complete this transaction. <br />
+                  <span style={{ color: 'red' }}>There is a shortage of {requested - available} Vouchers. <br /></span>
+                  Please contact the administrator.
+                </span>
+              ) : ""}
+        </h5>
         <BeatLoader
           color={'#055bb5'}
           loading={loadingStatus}
@@ -605,7 +636,7 @@ const CartItems = () => {
             >Cancel
             </button>
             {
-              loadingStatus?
+              loadingStatus && !insufficient?
                 loadingSalesAnimation:''
             }
           </div>
@@ -614,27 +645,55 @@ const CartItems = () => {
     </>
 
   return (
-    <div class="col-lg-7 py-4"> 
-      <div className="row">
-        <div className="col-12">
-          <div className="card my-4">
-            <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
-              <div className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" style={Style2}>
-                  <div className="col-8">
-                    <h6 className="text-white text-capitalize ps-3">Generate Sale</h6>
+    <>
+      <div class="col-lg-7 py-4"> 
+        <div className="row">
+          <div className="col-12">
+            <div className="card my-4">
+              <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
+                <div className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" style={Style2}>
+                    <div className="col-8">
+                      <h6 className="text-white text-capitalize ps-3">Generate Sale</h6>
+                    </div>
+                    <div className="col-4">
+                      <h6 className="text-white text-capitalize ps-3"><span style={{float: 'right'}}>Total Price: ${netTotal}</span></h6>
+                    </div>
                   </div>
-                  <div className="col-4">
-                    <h6 className="text-white text-capitalize ps-3"><span style={{float: 'right'}}>Total Price: ${netTotal}</span></h6>
-                  </div>
-                </div>
-            </div>
-            <div className="card-body px-0 pb-2">
-              {showData}  
+              </div>
+              <div className="card-body px-0 pb-2">
+                {showData}  
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Activate / Deactivate Modal */}
+      <Modal show={isOpen} onHide={closeModal} style={{ marginTop: 20 }}>
+        <Modal.Body>
+          {/*
+            insufficient && loadingStatus?
+            loadingSalesAnimation:''
+          */}
+          <img style={{width:"100%"}} src="./images/500.gif" alt="Animation error"/>
+          <br/>
+          <div className="d-flex justify-content-center">
+              <p className="text-bold text-center">Insufficient vouchers available to complete this transaction. <br />
+              <span style={{ color: 'red' }}>There is a shortage of {requested - available} Voucher(s). <br /></span>
+              Please contact the administrator.</p>
+          </div>
+          <br/>
+          <div  className="d-flex justify-content-center">
+          <Button variant="info" onClick={''} className="me-2">
+            Proceed
+          </Button>
+          <Button variant="secondary" onClick={closeModal}>
+            Cancel
+          </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
+    </>
   );
 };
 
