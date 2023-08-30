@@ -36,7 +36,7 @@ export default class ShopSupervisor extends Component{
                     <span className="nav-link-text ms-1">Reports</span>
                   </Link>
                 </li>
-                {/*<li className="nav-item">
+                {/*<li className="nav-item">1
                   <Link className="nav-link text-white " to="/sales-reports">
                     <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
                       <i className="material-icons opacity-10">receipt_long</i>
