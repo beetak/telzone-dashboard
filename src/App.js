@@ -31,27 +31,6 @@ const userRole = localStorage.getItem('role')
 function App() {
 
   const dispatch = useDispatch()
-
-  // useEffect(()=>{
-  //   dispatch(fetchAsyncOrganisationReports())
-  // },[dispatch])
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     dispatch(fetchAsyncNetworkReports())
-  //   }, 5000);
-  //   return () => clearInterval(interval);
-  // }, []);
-    
-
-  // useEffect(() => {
-  //   return () => {
-  //     const script = document.createElement("script");
-  //     script.src = "assets/js/material-dashboard.js";
-  //     script.async = true;
-  //     document.body.appendChild(script);
-  //     };
-  //   }, []); 
     
     const cartItems = useSelector((state)=> state.cart.itemsList)
     console.log(cartItems)

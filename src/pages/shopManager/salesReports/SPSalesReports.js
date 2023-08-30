@@ -24,11 +24,11 @@ export default function SPSalesReports() {
     
     useEffect(() => {
         dispatch(fetchAsyncCurrency(true))
-        dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId}))
-        dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol}))
+        // dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId}))
+        // dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol}))
         dispatch(fetchAsyncShopAgents({roleId:3, shopId}))
-        dispatch(fetchAsyncAgentSalesByShop({curId, userID:agentId, startDate, endDate}))
-        dispatch(fetchAsyncSalesByShop({curId,shopId, startDate, endDate}))
+        // dispatch(fetchAsyncAgentSalesByShop({curId, userID:agentId, startDate, endDate}))
+        // dispatch(fetchAsyncSalesByShop({curId,shopId, startDate, endDate}))
     }, [dispatch, startDate, endDate, curId, userID]);
 
     return (

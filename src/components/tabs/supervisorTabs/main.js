@@ -8,17 +8,7 @@ export default function SupervisorReportDetails(){
     
     const [tabState, setTabState] = useState('')
 
-        let tabinfo
-        
-        if (tabState === 'shopReports') {
-          tabinfo = <ShopReportsTab/>;
-        } 
-        else if(tabState === 'agentReports') {
-          tabinfo = <AgentReportsTab/>;
-        }
-        else{
-          tabinfo = <ShopReportsTab/>;
-        }
+        let tabinfo = <AgentReportsTab/>
 
         return(
 <div>
@@ -26,18 +16,6 @@ export default function SupervisorReportDetails(){
     <div className="col-12">
         <div className="card my-4">
             <div className="row">
-                <div className="col-3">
-                    <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
-                        <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
-                            onClick={()=>setTabState('shopReports')}
-                            style={Style2}
-                            >
-                            <div className="col-12 d-flex align-items-center">
-                                <h6 className="text-white text-capitalize ps-3">National Sales Report</h6>
-                            </div>
-                        </a>
-                    </div>
-                </div>
                 <div className="col-3">
                     <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
                         <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 

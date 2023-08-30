@@ -1,5 +1,5 @@
 import React, {useState, useRef} from 'react';
-import { getShopAgentSales, getShopSales } from '../../store/sales-slice';
+import { fetchAsyncAgentSalesByShop, fetchAsyncSalesByShop, getAgentLoadingStatus, getShopAgentSales, getShopSales } from '../../store/sales-slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { currencyActions, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
@@ -8,7 +8,11 @@ import { toggleActions } from '../../store/toggle-slice';
 import { getShopAgents, userActions } from '../../store/user-slice';
 import AgentDropdown from '../User/AgentDropdown/AgentDropdown';
 import { Dropdown } from 'react-bootstrap';
+import { BeatLoader } from 'react-spinners';
 // import datetime from 'datetime'
+
+const userRole = localStorage.getItem('role')
+const shopId = localStorage.getItem('shopId')
 
 const img = "assets/img/telonelogo.png"
 
@@ -20,6 +24,7 @@ export default function SummarySalesShopAgent() {
 
     const totalSales = useSelector(getShopAgentSales)
     const shopSales = useSelector(getShopSales)
+    const loadingAgent = useSelector(getAgentLoadingStatus)
     
     const[currencyID, setCurrencyID] = useState('')
     const[currencyState, setCurrencyState] = useState('Currency')
@@ -32,6 +37,7 @@ export default function SummarySalesShopAgent() {
     const[adminPortalUserId, setAdminPortalUserId]= useState('')
     const[agentName, setAgentName]= useState('')
     const[agentState, setAgentState]= useState('Find By Agent')
+    const[userID, setUserID]= useState('')
 
     const currencyData = useSelector(getAllCurrencies)
     const agentData = useSelector(getShopAgents)
@@ -61,10 +67,8 @@ export default function SummarySalesShopAgent() {
 
     const getUser =(id, name)=>{
         setAdminPortalUserId(id)
+        setUserID(id)
         setAgentState(name)
-        dispatch(
-            userActions.setGlobalUser(id)
-        )
     }
 
     let renderedAgent = ''
@@ -156,7 +160,7 @@ export default function SummarySalesShopAgent() {
         )
     }
 
-    const submitRequest = async () => {
+    const submitRequest1 = async () => {
         if(currencyID===''){
           setEmpty("Please select the currency")
         }
@@ -192,6 +196,79 @@ export default function SummarySalesShopAgent() {
             }
         }
     }
+
+    const submitRequest = async () => {
+        // setEndDate(endDate)
+        if(currencyID===''||startDate==='' || endDate==='' || adminPortalUserId===''){
+            if(startDate==='' || endDate===''){
+                setValidate("Please select the start date and end date")
+            }
+            if(currencyID===''){
+                setEmpty("Please select the currency")
+            }
+            if(adminPortalUserId===''){
+                setAgentEmpty("Please select the agent")
+            }
+        }
+        else if(startDate>endDate){
+            setValidate("Invalid Time Range")
+        }
+        else{
+            if(adminPortalUserId===0){
+                dispatch(fetchAsyncSalesByShop({startDate, endDate, curId:currencyID, shopId}))                
+            }
+            else{
+                dispatch(fetchAsyncAgentSalesByShop({curId:currencyID, userID, startDate, endDate}))
+            }
+        }
+        setTimeout(()=>{
+            setEmpty("")
+            setValidate("")
+        }, 3000)    
+    }
+
+    let loadingAnimation = 
+    <tr className='' style={anime}>
+      <td colspan={6}>
+        <BeatLoader
+          color={'#055bb5'}
+          loading={loadingAgent}
+          cssOverride={override}
+          size={15}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
+      </td>
+    </tr>
+
+    let agentSalesData = ''
+
+    var count = Object.keys(salesData).length
+    if(count>0){
+        agentSalesData = (
+            output2.map((item)=>(
+                <tr key={item.bundles}>
+                    <th scope="row">{getBundle(item.bundles)}</th>
+                    <td className="text-align-right">
+                        <div className="row">
+                            {calculateByBundle(item.bundles)}
+                        </div>
+                    </td>
+                </tr>
+            ))
+        )
+    }
+    else{
+        agentSalesData = 
+        <tr>
+        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Agent Sales Found</h5></td>
+        </tr>
+    }
+
+    let errorMsg =  
+        <tr>
+        <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>
+        </tr>
 
   return (
     <>
@@ -273,16 +350,10 @@ export default function SummarySalesShopAgent() {
                             </thead>
                             <tbody>
                                 {
-                                    output2.map((item)=>(
-                                        <tr key={item.bundles}>
-                                            <th scope="row">{getBundle(item.bundles)}</th>
-                                            <td className="text-align-right">
-                                                <div className="row">
-                                                    {calculateByBundle(item.bundles)}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
+                                    loadingAgent==='pending'?
+                                    loadingAnimation: 
+                                    loadingAgent ==='rejected'?
+                                    errorMsg: agentSalesData
                                 }
                                 <tr>
                                     <td>Total</td>
@@ -300,4 +371,18 @@ export default function SummarySalesShopAgent() {
         </div>
     </>
   );
+}
+
+const override = {
+    display: "block",
+    margin: "0 auto",
+    borderColor: "blue",
+};
+  
+const anime = {
+    textAlign: 'center', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    width: '100%', 
+    height: '10vh'
 }

@@ -48,18 +48,6 @@ export const fetchAsyncSalesByShop = createAsyncThunk('sale/fetchAsyncSalesBySho
     return [...response.data.data]
 })
 
-// export const postSale = createAsyncThunk(
-//     'sale/postAsyncSale',
-//     async (initialData) => {
-//       console.log(initialData);
-//       return await Api
-//         .post('/payments/', 
-//           initialData
-//         )
-//         .then((res) => res.data);
-//     }
-// );
-
 export const postSale = createAsyncThunk(
     'sale/postAsyncSale',
     async (initialData) => {
