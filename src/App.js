@@ -25,6 +25,7 @@ import HORSalesReport from "./pages/headManager/HORSalesReport";
 import ABMSalesReport from "./pages/areaBusManager/ABMSalesReport";
 import RegionalSalesReport from "./pages/regionalManager/RegionalSalesReport";
 import Customers from "./pages/customers";
+import Commission from "./pages/commission";
 
 const userRole = localStorage.getItem('role')
 
@@ -64,6 +65,7 @@ function App() {
           <Route path={'/abm-reports'} element={<ABMSalesReport/>} />
           <Route path={'/regional-reports'} element={<RegionalSalesReport/>} /> 
           <Route path={'/customers'} element={<Customers/>} /> 
+          <Route path={'/commission'} element={<Commission/>} /> 
         </Routes>
       </div>
       </BrowserRouter>

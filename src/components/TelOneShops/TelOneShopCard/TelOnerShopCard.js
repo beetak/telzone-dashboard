@@ -64,7 +64,7 @@ export default function TelOneShopCard(props){
     <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{data.address}</p>
   </td> 
   <td>
-    <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{data.townId.name}</p>
+    <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{data.shopTownId.name}</p>
   </td>
   <td>
     <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{data.phoneNumber}</p>

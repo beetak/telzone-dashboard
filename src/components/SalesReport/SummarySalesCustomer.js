@@ -20,13 +20,27 @@ import TelOneShopDropdown from '../TelOneShops/TelOneShopDropdown/TelOneShopDrop
 
 const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
+const userRole = localStorage.getItem('role')
+const userTownName = localStorage.getItem('townName')
+const userTownId = localStorage.getItem('townId')
+const userRegion = localStorage.getItem('regionName')
 const img = "assets/img/telonelogo.png"
 
 export default function SummarySalesCustomer() {
 
     useEffect(() => {
         dispatch(fetchAsyncCurrency(true))
-      }, []);
+        
+        if (userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager'){
+            dispatch(fetchAsyncShopByTown(userTownId))
+        }
+        if(userRole==="Area Manager"){
+            setSearchLevel("town")
+            setTownId(userTownId)
+            setTown(userTownName)
+            setRegion(userRegion)
+        }
+    }, [userRole]);
 
     const today = new Date()
     const date = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
@@ -60,6 +74,8 @@ export default function SummarySalesCustomer() {
     const[empty, setEmpty] = useState('')
     const[validate, setValidate] = useState('')
     const [searchLevel, setSearchLevel] = useState('')
+    const [filterBy, setFilterBy] = useState('Transaction Status')
+    const [status, setStatus] = useState(true)
 
     const currencyData = useSelector(getAllCurrencies)
     const dispatch = useDispatch()
@@ -94,13 +110,15 @@ export default function SummarySalesCustomer() {
         setShopName(name)
         setShopState(name)
         setSearchLevel("shop")
-        dispatch(fetchAsyncShopByTown(id))
+        // dispatch(fetchAsyncShopByTown(id))
     }
     let renderedShop = ''
     renderedShop = shopData ? (
         <>
             <tr>
-                <a  className="dropdown-item">
+                <a  className="dropdown-item"
+                    onClick={()=>{setSearchLevel("town"); setShopState("All Shops")}}
+                >
                     Select All
                 </a>
             </tr>
@@ -287,16 +305,16 @@ export default function SummarySalesCustomer() {
         }
         else{
             if(searchLevel === "regional"){
-                dispatch(fetchAsyncSalesByRegion({startDate, endDate, curId:currencyID, regionId}))
+                dispatch(fetchAsyncSalesByRegion({startDate, endDate, curId:currencyID, regionId, status}))
             }
             else if(searchLevel === "town"){
-                dispatch(fetchAsyncSalesByTown({startDate, endDate, curId:currencyID, townId}))
+                dispatch(fetchAsyncSalesByTown({startDate, endDate, curId:currencyID, townId, status}))
             }
             else if(searchLevel === "shop"){
-                dispatch(fetchAsyncSalesByShop({startDate, endDate, curId:currencyID, shopId}))
+                dispatch(fetchAsyncSalesByShop({startDate, endDate, curId:currencyID, shopId, status}))
             }
             else{
-                dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId:currencyID}))
+                dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId:currencyID, status}))
             }
         }
         setTimeout(()=>{
@@ -333,13 +351,120 @@ export default function SummarySalesCustomer() {
         <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>
         </tr>
 
+        let selectionLevel = ''
+
+        if(userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager'){
+            {/* Shop Dropdown */}
+            selectionLevel =
+            <div className="dropdown"  style={{paddingLeft: 10}}>
+                <button 
+                    className="btn bg-gradient-primary dropdown-toggle" 
+                    type="button" 
+                    id="dropdownMenuButton" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    >
+                    {shopState}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedShop}
+                </ul>
+            </div>
+        }
+        else{
+            selectionLevel =
+            <>
+                {/* Region Dropdown */}
+                <div className="dropdown"  style={{paddingLeft: 10}}>
+                    <button 
+                        className="btn bg-gradient-primary dropdown-toggle" 
+                        type="button" 
+                        id="dropdownMenuButton" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                        >
+                        {regionState}
+                    </button>
+                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    {renderedRegions}
+                    </ul>
+                </div>
+                {/* Town Dropdown */}
+                <div className="dropdown"  style={{paddingLeft: 10}}>
+                    <button 
+                        className="btn bg-gradient-primary dropdown-toggle" 
+                        type="button" 
+                        id="dropdownMenuButton" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                        >
+                        {townState}
+                    </button>
+                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    {renderedTown}
+                    </ul>
+                </div>
+                {/* Shop Dropdown */}
+                <div className="dropdown"  style={{paddingLeft: 10}}>
+                    <button 
+                        className="btn bg-gradient-primary dropdown-toggle" 
+                        type="button" 
+                        id="dropdownMenuButton" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                        >
+                        {shopState}
+                    </button>
+                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    {renderedShop}
+                    </ul>
+                </div>
+            </>
+        }
+
+    let filterButton = <>
+        <div className="dropdown" style={{paddingLeft: 10}}>
+            <button 
+                className="btn bg-gradient-primary dropdown-toggle" 
+                type="button" 
+                id="dropdownMenuButton" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+                >
+                {filterBy}
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li>
+                    <a  className="dropdown-item" 
+                        onClick={(e)=>{
+                            e.preventDefault()
+                            setStatus(true)
+                            setFilterBy("Successful Transactions")
+                        }}>
+                        Successful Transactions
+                    </a>
+                </li>
+                <li>
+                    <a  className="dropdown-item" 
+                        onClick={(e)=>{
+                            e.preventDefault()
+                            setStatus(false)
+                            setFilterBy("Failed Transactions")
+                        }}>
+                        Failed Transactions
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </>
+
   return (
     <>
         <div className='row'>
             <div className="col-12">
                 <div className="card pb-0 p-3 mb-1">
                     <div className="row">
-                        <div className="col-9 d-flex align-items-center">
+                        <div className="col-10 d-flex align-items-center">
                             {/* Currency dropdown */}
                             <div className="dropdown">
                                 <button 
@@ -355,55 +480,12 @@ export default function SummarySalesCustomer() {
                                 {renderedCurrency}
                                 </ul>
                             </div>
-                            {/* Region Dropdown */}
-                            <div className="dropdown"  style={{paddingLeft: 10}}>
-                                <button 
-                                    className="btn bg-gradient-primary dropdown-toggle" 
-                                    type="button" 
-                                    id="dropdownMenuButton" 
-                                    data-bs-toggle="dropdown" 
-                                    aria-expanded="false"
-                                    >
-                                    {regionState}
-                                </button>
-                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                {renderedRegions}
-                                </ul>
-                            </div>
-                            {/* Town Dropdown */}
-                            <div className="dropdown"  style={{paddingLeft: 10}}>
-                                <button 
-                                    className="btn bg-gradient-primary dropdown-toggle" 
-                                    type="button" 
-                                    id="dropdownMenuButton" 
-                                    data-bs-toggle="dropdown" 
-                                    aria-expanded="false"
-                                    >
-                                    {townState}
-                                </button>
-                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                {renderedTown}
-                                </ul>
-                            </div>
-                            {/* Shop Dropdown */}
-                            <div className="dropdown"  style={{paddingLeft: 10}}>
-                                <button 
-                                    className="btn bg-gradient-primary dropdown-toggle" 
-                                    type="button" 
-                                    id="dropdownMenuButton" 
-                                    data-bs-toggle="dropdown" 
-                                    aria-expanded="false"
-                                    >
-                                    {shopState}
-                                </button>
-                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                {renderedShop}
-                                </ul>
-                            </div>
+                            {selectionLevel}
+                            {filterButton}
                             <div><sup style={{color: 'red', paddingLeft: 10}}>{empty}</sup></div>
                             <button onClick={()=>submitRequest()} className="btn btn-primary">Search</button>
                         </div>
-                        <div className="col-3 text-end">
+                        <div className="col-2 text-end">
                             <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" onClick={()=>handlePrint()}><i class="material-icons text-lg position-relative me-1">picture_as_pdf</i> DOWNLOAD PDF</button>
                         </div> 
                     </div>
@@ -424,6 +506,7 @@ export default function SummarySalesCustomer() {
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>From Date:</span><input type="date" style={{border: 0}} name="startDate" onChange={(e) => setStartDate(e.target.value)} value={startDate} max={dateString}/></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>To Date:</span><input type="date" style={{border: 0}} name="endDate" onChange={(e) => setEndDate(e.target.value)} value={endDate} max={dateString}/><sup style={{color: 'red', paddingLeft: 10}}>{validate}</sup></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Currency:</span> {currencyState}</h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Transaction Status:</span> {status? "Successful":"Failed"}</h6>
                             </div> 
                             <div className="col-6 align-items-center">
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Region:</span> {region==='No Region'? 'All Regions': region}</h6>

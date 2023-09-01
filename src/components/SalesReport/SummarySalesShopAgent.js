@@ -38,6 +38,8 @@ export default function SummarySalesShopAgent() {
     const[agentName, setAgentName]= useState('')
     const[agentState, setAgentState]= useState('Find By Agent')
     const[userID, setUserID]= useState('')
+    const[filterBy, setFilterBy]= useState('Transaction Status')
+    const[status, setStatus]= useState(true)
 
     const currencyData = useSelector(getAllCurrencies)
     const agentData = useSelector(getShopAgents)
@@ -65,10 +67,10 @@ export default function SummarySalesShopAgent() {
       ))
     ):(<div><h1>Error</h1></div>)
 
-    const getUser =(id, name)=>{
+    const getUser =(id, firstname, surname)=>{
         setAdminPortalUserId(id)
         setUserID(id)
-        setAgentState(name)
+        setAgentState(firstname+" "+surname)
     }
 
     let renderedAgent = ''
@@ -215,10 +217,10 @@ export default function SummarySalesShopAgent() {
         }
         else{
             if(adminPortalUserId===0){
-                dispatch(fetchAsyncSalesByShop({startDate, endDate, curId:currencyID, shopId}))                
+                dispatch(fetchAsyncSalesByShop({startDate, endDate, curId:currencyID, shopId, status}))                
             }
             else{
-                dispatch(fetchAsyncAgentSalesByShop({curId:currencyID, userID, startDate, endDate}))
+                dispatch(fetchAsyncAgentSalesByShop({curId:currencyID, userID, startDate, endDate, status}))
             }
         }
         setTimeout(()=>{
@@ -270,13 +272,49 @@ export default function SummarySalesShopAgent() {
         <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>
         </tr>
 
+    let filterButton = <>
+        <div className="dropdown" style={{paddingLeft: 10}}>
+            <button 
+                className="btn bg-gradient-primary dropdown-toggle" 
+                type="button" 
+                id="dropdownMenuButton" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+                >
+                {filterBy}
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li>
+                    <a  className="dropdown-item" 
+                        onClick={(e)=>{
+                            e.preventDefault()
+                            setStatus(true)
+                            setFilterBy("Successful Transactions")
+                        }}>
+                        Successful Transactions
+                    </a>
+                </li>
+                <li>
+                    <a  className="dropdown-item" 
+                        onClick={(e)=>{
+                            e.preventDefault()
+                            setStatus(false)
+                            setFilterBy("Failed Transactions")
+                        }}>
+                        Failed Transactions
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </>
+
   return (
     <>
         <div className='row'>
             <div className="col-12">
                 <div className="card pb-0 p-3 mb-1">
                     <div className="row">
-                        <div className="col-6 d-flex align-items-center">
+                        <div className="col-10 d-flex align-items-center">
                             {/* Currency dropdown */}
                             <div className="dropdown">
                                 <button 
@@ -308,10 +346,11 @@ export default function SummarySalesShopAgent() {
                                     {renderedAgent}
                                 </ul>
                             </div>
+                            {filterButton}
                             <div><sup style={{color: 'red', paddingLeft: 10}}>{emptyAgent}</sup></div>
                             <button onClick={()=>submitRequest()} className="btn btn-primary">Search</button>
                         </div>
-                        <div className="col-6 text-end">
+                        <div className="col-2 text-end">
                             <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" onClick={()=>handlePrint()}><i class="material-icons text-lg position-relative me-1">picture_as_pdf</i> DOWNLOAD PDF</button>
                         </div> 
                     </div>
@@ -332,6 +371,7 @@ export default function SummarySalesShopAgent() {
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>From Date:</span><input type="date" style={{border: 0}} name="startDate" onChange={(e) => setStartDate(e.target.value)} value={startDate} max={dateString}/></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>To Date:</span><input type="date" style={{border: 0}} name="endDate" onChange={(e) => setEndDate(e.target.value)} value={endDate} max={dateString}/><sup style={{color: 'red', paddingLeft: 10}}>{validate}</sup></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Currency:</span> {currencyState}</h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Transaction Status:</span> {status? "Successful":"Failed"}</h6>
                             </div> 
                         </div>
                     </div>

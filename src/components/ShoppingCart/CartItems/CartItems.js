@@ -2,19 +2,11 @@ import {useState, useRef, useEffect} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllBusinessPartners } from "../../../store/business-slice";
 import { 
+  cancelSale,
   cartActions,  
   getBtnState, 
   getBundleId, 
-  getCustomerAddress, 
-  getCustomerEmail, 
-  getCustomerLevel, 
-  getCustomerName, 
-  getCustomerNumber, 
-  getDicountPercentage, 
-  getRetrievalStatus, 
-  getSoldVoucherIds, 
-  getSoldVouchers, 
-  getStateUpdate, 
+  getDicountPercentage,
   getVATPercentage,  
   postSale, 
   postVoucherSaleByBundleId,
@@ -25,7 +17,6 @@ import CartItem from "../CartItem/CartItem";
 import jsPDF from 'jspdf'
 import "jspdf-autotable";
 import { useReactToPrint } from "react-to-print";
-import InvoiceItem from "../InvoiceItem/InvoiceItem";
 import { fetchAsyncBasePrice, getBasePrice } from "../../../store/basePrice-slice";
 import { BeatLoader } from "react-spinners";
 import CurrencyDropdown from "../../Currency/CurrencyDropdown/CurrencyDropdown";
@@ -66,15 +57,9 @@ const CartItems = () => {
   const [businessPartnerEmail, setBusinessPartnerEmail] = useState('')
   const [businessPartnerPhone, setBusinessPartnerPhone] = useState('')
   const [businessPartnerAddress, setBusinessPartnerAddress] = useState('')
-  const [businessPartnerDiscount, setBusinessPartnerDiscount] = useState('')
-  const [businessPartnerVat, setBusinessPartnerVat] = useState('')
-  const [currentDate, setCurrentDate] = useState('')
-  const [rateStatus, setRateStatus] = useState('')
   const [rate, setRate] = useState(1)
-  const [rateId, setRateId] = useState('')
   const[currencyId, setCurrencyID] = useState('')
   const[currencyState, setCurrencyState] = useState('Currency')
-  const[currencyActioned, setCurrencyActioned]= useState('')
   const[currencySymbol, setCurrencySymbol]= useState('')
   const[soldId, setSoldId]= useState([])
   const[available, setAvailable]= useState('')
@@ -84,9 +69,6 @@ const CartItems = () => {
   const btnState = useSelector(getBtnState)
   const discountPercentage = useSelector(getDicountPercentage)
   const vatPercentage = useSelector(getVATPercentage)
-  const clientLevel = useSelector(getCustomerLevel)
-  const soldVouchersId = useSelector(getSoldVoucherIds)
-  const stateUpdate = useSelector(getStateUpdate)
   const postBundleId = useSelector(getBundleId)
 
   const openModal = () => setIsOpen(true);
@@ -97,13 +79,10 @@ const CartItems = () => {
   useEffect(() => {
     dispatch(fetchAsyncBasePrice())
       priceCount = Object.keys(prices).length
-      if(priceCount<=0){
-        setRateStatus(false)    
+      if(priceCount<=0){   
       }
       else{
-        setRateStatus(true)
         currencySymbol === 'ZWL'?setRate(prices[0].price):setRate(1)
-        setRateId(prices[0].id)
       }
   }, [dispatch, currencySymbol, postBundleId]);
 
@@ -124,8 +103,6 @@ const CartItems = () => {
     setBusinessPartnerEmail(email)
     setBusinessPartnerPhone(phoneNumber)
     setBusinessPartnerAddress(physicalAddress)
-    setBusinessPartnerDiscount(discount)
-    setBusinessPartnerVat(vat)
   }
   
   const businessPartners = useSelector(getAllBusinessPartners)
@@ -149,8 +126,6 @@ const CartItems = () => {
                     setBusinessPartnerId(100)
                     setBusinessPartnerName("Walk In Client")
                     setBusinessPartnerEmail("N/A")
-                    setBusinessPartnerDiscount(0)
-                    setBusinessPartnerVat(14.5)
                     dispatch(cartActions.setClient(
                       {
                         addBtn: false,
@@ -217,12 +192,13 @@ const CartItems = () => {
         businessPartnerId,
         currencyId,
         order: {
-          amount: netTotal,
+          amount: totalPrice,
           dateCreated: today,
           discount: totalDiscount,
           payingAccountNumber: "TelOne",
           quantity: totalQty,
-          vat: totalVat
+          vat: totalVat,
+          status: false
         },
         regionId,
         shopId,
@@ -232,7 +208,6 @@ const CartItems = () => {
         if (response.payload && response.payload.code === "SUCCESS") {
           // Request was successful
           var todayDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
-          setCurrentDate(todayDate);
           console.log(todayDate);
           // setPrintState(true);
   
@@ -248,6 +223,9 @@ const CartItems = () => {
       })
     }
   };
+
+  // let available = 0
+  // let requested = 0
 
   const saleByBundle = (bundleId, quantity, orderID) => {
     dispatch(postVoucherSaleByBundleId(
@@ -275,7 +253,16 @@ const CartItems = () => {
           response.payload.data.data.forEach(function(voucher, i){
             soldId.push(voucher.id)
           })
-          updateVoucherState(soldId, quantity, orderID, response.payload.data.data)
+          dispatch(cancelSale(
+            {
+              orderId: orderID,
+              status: true
+            }
+          )).then((updateResponse)=>{
+            if(updateResponse && updateResponse.payload.success ){
+              updateVoucherState(soldId, quantity, orderID, response.payload.data.data)
+            }
+          })
         }
       } else {
         // Request was not successful
@@ -307,6 +294,9 @@ const CartItems = () => {
       setTimeout(() => {
         setLoadingStatus(false);
         setLoadingSuccess(false);
+        setBusinessPartnerName(`Client's Name`)
+        setCurrencyState('Currency')
+        dispatch(cartActions.deleteFromCart())
       }, 5000);
     });
   }
@@ -389,7 +379,6 @@ const CartItems = () => {
   }
   const getCurrency =(id, name, symbol)=>{
     setCurrencyID(id)
-    setCurrencyActioned(name)
     setCurrencyState(name)
     setCurrencySymbol(symbol)
   }
@@ -627,7 +616,7 @@ const CartItems = () => {
             <button 
               onClick={()=>makeSale()} 
               className="btn btn-info"
-              disabled = {businessPartnerName===`Client's Name` || totalQty === 0 ?true:false}
+              disabled = {businessPartnerName===`Client's Name` || totalQty === 0 || loadingStatus ?true:false}
             >Print Vouchers
             </button>
             <button 
@@ -646,29 +635,29 @@ const CartItems = () => {
 
   return (
     <>
-      <div class="col-lg-7 py-4"> 
-        <div className="row">
-          <div className="col-12">
-            <div className="card my-4">
-              <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
-                <div className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" style={Style2}>
-                    <div className="col-8">
-                      <h6 className="text-white text-capitalize ps-3">Generate Sale</h6>
-                    </div>
-                    <div className="col-4">
-                      <h6 className="text-white text-capitalize ps-3"><span style={{float: 'right'}}>Total Price: ${netTotal}</span></h6>
-                    </div>
+    <div class="col-lg-7 py-4"> 
+      <div className="row">
+        <div className="col-12">
+          <div className="card my-4">
+            <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
+              <div className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" style={Style2}>
+                  <div className="col-8">
+                    <h6 className="text-white text-capitalize ps-3">Generate Sale</h6>
                   </div>
-              </div>
-              <div className="card-body px-0 pb-2">
-                {showData}  
-              </div>
+                  <div className="col-4">
+                    <h6 className="text-white text-capitalize ps-3"><span style={{float: 'right'}}>Total Price: ${netTotal}</span></h6>
+                  </div>
+                </div>
+            </div>
+            <div className="card-body px-0 pb-2">
+              {showData}  
             </div>
           </div>
         </div>
       </div>
+    </div>
+    {/* Activate / Deactivate Modal */}
 
-      {/* Activate / Deactivate Modal */}
       <Modal show={isOpen} onHide={closeModal} style={{ marginTop: 20 }}>
         <Modal.Body>
           {/*
@@ -693,7 +682,7 @@ const CartItems = () => {
           </div>
         </Modal.Body>
       </Modal>
-    </>
+      </>
   );
 };
 

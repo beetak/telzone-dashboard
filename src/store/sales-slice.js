@@ -13,38 +13,38 @@ export const fetchAsyncSalesByPartnerId = createAsyncThunk('sale/fetchAsyncSales
     return [...response.data.data]
 })
 
-export const fetchAsyncSalesByCurrencyId = createAsyncThunk('sale/fetchAsyncSalesByCurrencyId', async ({startDate, endDate, curId}) => {
+export const fetchAsyncSalesByCurrencyId = createAsyncThunk('sale/fetchAsyncSalesByCurrencyId', async ({startDate, endDate, curId, status}) => {
     const response = await Api
-    .get(`/order/currency/${startDate}/${endDate}/${curId}`)
+    .get(`/order/currency/${startDate}/${endDate}/${curId}/${status}`)
     return [...response.data.data]
 })
 
-export const fetchAsyncSalesByAgent = createAsyncThunk('sale/fetchAsyncSalesByAgent', async ({curId, userID, date}) => {
+export const fetchAsyncSalesByAgent = createAsyncThunk('sale/fetchAsyncSalesByAgent', async ({curId, userID, date, status}) => {
     const response = await Api
-    .get(`/order/currency${curId}/adminPortalUser${userID}/date${date}`)
+    .get(`/order/currency${curId}/adminPortalUser${userID}/date${date}/${status}`)
     return [...response.data.data]
 })
 
-export const fetchAsyncAgentSalesByShop = createAsyncThunk('sale/fetchAsyncAgentSalesByShop', async ({curId, userID, startDate, endDate}) => {
+export const fetchAsyncAgentSalesByShop = createAsyncThunk('sale/fetchAsyncAgentSalesByShop', async ({curId, userID, startDate, endDate, status}) => {
     const response = await Api
-    .get(`/order/currency${curId}/adminPortalUser${userID}/startDate${startDate}/endDate${endDate}`)
+    .get(`/order/currency${curId}/adminPortalUser${userID}/startDate${startDate}/endDate${endDate}/${status}`)
     return [...response.data.data]
 })
 
-export const fetchAsyncSalesByRegion = createAsyncThunk('sale/fetchAsyncSalesByRegion', async ({curId, regionId, startDate, endDate}) => {
+export const fetchAsyncSalesByRegion = createAsyncThunk('sale/fetchAsyncSalesByRegion', async ({curId, regionId, startDate, endDate, status}) => {
     const response = await Api
-    .get(`/order/currency/${startDate}/${endDate}/currencyId${curId}/regionId${regionId}`)
+    .get(`/order/currency/${startDate}/${endDate}/currencyId${curId}/regionId${regionId}/${status}`)
     return [...response.data.data]
 })
 
-export const fetchAsyncSalesByTown = createAsyncThunk('sale/fetchAsyncSalesByTown', async ({curId, townId, startDate, endDate}) => {
+export const fetchAsyncSalesByTown = createAsyncThunk('sale/fetchAsyncSalesByTown', async ({curId, townId, startDate, endDate, status}) => {
     const response = await Api
-    .get(`/order/currency/${startDate}/${endDate}/currencyId${curId}/townId${townId}`)
+    .get(`/order/currency/${startDate}/${endDate}/currencyId${curId}/townId${townId}/${status}`)
     return [...response.data.data]
 })
-export const fetchAsyncSalesByShop = createAsyncThunk('sale/fetchAsyncSalesByShop', async ({curId, shopId, startDate, endDate}) => {
+export const fetchAsyncSalesByShop = createAsyncThunk('sale/fetchAsyncSalesByShop', async ({curId, shopId, startDate, endDate, status}) => {
     const response = await Api
-    .get(`/order/currency/${startDate}/${endDate}/currencyId${curId}/shopId${shopId}`)
+    .get(`/order/currency/${startDate}/${endDate}/currencyId${curId}/shopId${shopId}/${status}`)
     return [...response.data.data]
 })
 

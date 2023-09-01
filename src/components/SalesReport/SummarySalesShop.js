@@ -25,6 +25,8 @@ export default function SummarySalesShop() {
     const[currencyID, setCurrencyID] = useState('')
     const[currencyState, setCurrencyState] = useState('Currency')
     const[currencyActioned, setCurrencyActioned]= useState('')
+    const[filterBy, setFilterBy]= useState('Transaction Status')
+    const[status, setStatus]= useState(true)
 
     const currencyData = useSelector(getAllCurrencies)
     const dispatch = useDispatch()
@@ -185,6 +187,42 @@ export default function SummarySalesShop() {
         )
     }
 
+    let filterButton = <>
+        <div className="dropdown" style={{paddingLeft: 10}}>
+            <button 
+                className="btn bg-gradient-primary dropdown-toggle" 
+                type="button" 
+                id="dropdownMenuButton" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+                >
+                {filterBy}
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li>
+                    <a  className="dropdown-item" 
+                        onClick={(e)=>{
+                            e.preventDefault()
+                            setStatus(true)
+                            setFilterBy("Successful Transactions")
+                        }}>
+                        Successful Transactions
+                    </a>
+                </li>
+                <li>
+                    <a  className="dropdown-item" 
+                        onClick={(e)=>{
+                            e.preventDefault()
+                            setStatus(false)
+                            setFilterBy("Failed Transactions")
+                        }}>
+                        Failed Transactions
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </>
+
   return (
     <>
         <div className='row'>
@@ -207,6 +245,7 @@ export default function SummarySalesShop() {
                                 {renderedCurrency}
                                 </ul>
                             </div>
+                            {filterButton}
                             <button onClick={"()=>submitRequest()"} className="btn btn-primary">Search</button>
                         </div>
                         <div className="col-6 text-end">

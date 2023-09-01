@@ -5,7 +5,7 @@ import TopNavigation from '../../../components/NavBar/topNav';
 import SupervisorReportDetails from '../../../components/tabs/supervisorTabs/main';
 import { fetchAsyncCurrency, getGlobalCurrency, getGlobalSymbol } from '../../../store/currency-slice';
 import { fetchAsyncPeriodicalPayments } from '../../../store/customerPayments-slice';
-import { fetchAsyncAgentSalesByShop, fetchAsyncSalesByCurrencyId, fetchAsyncSalesByShop } from '../../../store/sales-slice';
+import { fetchAsyncAgentSalesByShop, fetchAsyncSalesByCurrencyId, fetchAsyncSalesByShop, saleActions } from '../../../store/sales-slice';
 import { getAgentId, getEndTime, getStartTime } from '../../../store/toggle-slice';
 import { fetchAsyncShopAgents, getGlobalUser } from '../../../store/user-slice';
 
@@ -24,11 +24,8 @@ export default function SPSalesReports() {
     
     useEffect(() => {
         dispatch(fetchAsyncCurrency(true))
-        // dispatch(fetchAsyncSalesByCurrencyId({startDate, endDate, curId}))
-        // dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol}))
         dispatch(fetchAsyncShopAgents({roleId:3, shopId}))
-        // dispatch(fetchAsyncAgentSalesByShop({curId, userID:agentId, startDate, endDate}))
-        // dispatch(fetchAsyncSalesByShop({curId,shopId, startDate, endDate}))
+        dispatch(saleActions.clearSales())
     }, [dispatch, startDate, endDate, curId, userID]);
 
     return (

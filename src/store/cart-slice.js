@@ -42,12 +42,17 @@ export const postVoucherSaleByBundleId = createAsyncThunk(
     }
 );
 
-export const postSalegggg = createAsyncThunk(
-    'sale/postAsyncSale',
-    async (initialData) => {
-      console.log(initialData);
+export const cancelSale = createAsyncThunk(
+    'sale/cancelSale',
+    async ({
+        orderId,
+        status
+    }) => {
       try {
-        const response = await Api.post('/payments/', initialData);
+        const response = await Api.put(`/order/${orderId}`, {
+            orderId,
+            status
+        });
         return { success: true, data: response.data };
       } catch (error) {
         console.error('postSale error:', error);
@@ -124,6 +129,7 @@ const cartSlice = createSlice({
         loadingStatus: 'idle',
         retrieveStatus: 'idle',
         stateUpdate: 'idle',
+        cancelStatus: 'idle',
         bundleId: ''
     },
     reducers: {
@@ -291,6 +297,17 @@ const cartSlice = createSlice({
             console.log("rejected")
             state.stateUpdate = 'rejected'
             state.retrieveStatus = 'rejected'
+        },
+        [cancelSale.pending]: (state)=>{
+            console.log("pending")
+            state.cancelStatus = 'pending'
+        },
+        [cancelSale.fulfilled]: (state, action)=>{         
+            state.cancelStatus = 'fulfilled'
+        },
+        [cancelSale.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.cancelStatus = 'rejected'
         }
     }
 })
@@ -314,6 +331,7 @@ export const getVATPercentage = (state) => state.cart.clientVAT
 export const getCustomerLevel = (state) => state.cart.clientLevel
 export const getLoadingStatus = (state) => state.cart.loadingStatus
 export const getRetrievalStatus = (state) => state.cart.retrieveStatus
+export const getCancelStatus = (state) => state.cart.cancelStatus
 export const getSoldVoucherIds = (state) => state.cart.soldId
 export const getStateUpdate = (state) => state.cart.stateUpdate
 export const getBundleId = (state) => state.cart.bundleId

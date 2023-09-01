@@ -4,11 +4,13 @@ import TopNavigation from '../../components/NavBar/topNav';
 import { useDispatch } from 'react-redux';
 import { fetchAsyncClients } from '../../store/clients-slice';
 import SummarySalesCustomer from '../../components/SalesReport/SummarySalesCustomer';
+import { saleActions } from '../../store/sales-slice';
 
 export default function Customers() {
     const dispatch = useDispatch()
     useEffect(() => {
         dispatch(fetchAsyncClients())
+        dispatch(saleActions.clearSales())
       }, [dispatch]);
   return (
     <div>

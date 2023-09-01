@@ -1,10 +1,17 @@
+import {useEffect} from 'react'
+import { useDispatch } from "react-redux";
 import SideNavigation from "../../components/NavBar/sideNav";
 import TopNavigation from "../../components/NavBar/topNav";
 // import ShopSales from "../../components/SalesReport/ShopSales";
 import SummarySales from "../../components/SalesReport/SummarySales";
+import { saleActions } from "../../store/sales-slice";
 
 
 export default function ABMSalesReport() {
+  const dispatch = useDispatch()
+    useEffect(() => {
+        dispatch(saleActions.clearSales())
+    }, [dispatch]);
   return (
     <div>
         {<SideNavigation/>}

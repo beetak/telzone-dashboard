@@ -327,6 +327,40 @@ export default function ShopSales() {
         }
     }
 
+    let filterButton = <>
+        <div className="dropdown" style={{paddingLeft: 10}}>
+            <button 
+                className="btn bg-gradient-primary dropdown-toggle" 
+                type="button" 
+                id="dropdownMenuButton" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+                >
+                {currencyState}
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li>
+                    <a  className="dropdown-item" 
+                        onClick={(e)=>{
+                            e.preventDefault()
+                            setStatus(true)
+                        }}>
+                        Successful Transactions
+                    </a>
+                </li>
+                <li>
+                    <a  className="dropdown-item" 
+                        onClick={(e)=>{
+                            e.preventDefault()
+                            setStatus(false)
+                        }}>
+                        Failed Transactions
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </>
+
   return (
     <>
         <div className='row'>

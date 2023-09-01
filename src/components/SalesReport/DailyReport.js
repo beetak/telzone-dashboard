@@ -22,6 +22,8 @@ export default function DailyReport() {
     const[transactionDate, setTransactionDate]= useState('')
     const[empty, setEmpty] = useState('')
     const[validate, setValidate] = useState('')
+    const[filterBy, setFilterBy] = useState('Transaction Status')
+    const[status, setStatus] = useState(true)
 
     const currencyData = useSelector(getAllCurrencies)
     const dispatch = useDispatch()
@@ -155,7 +157,7 @@ export default function DailyReport() {
             }
         }
         else{
-            dispatch(fetchAsyncSalesByAgent({curId: currencyID, userID, date: transactionDate}))  
+            dispatch(fetchAsyncSalesByAgent({curId: currencyID, userID, date: transactionDate, status}))  
         }
         setTimeout(()=>{
             setEmpty("")
@@ -190,6 +192,42 @@ export default function DailyReport() {
         <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>
         </tr>
 
+    let filterButton = <>
+        <div className="dropdown" style={{paddingLeft: 10}}>
+            <button 
+                className="btn bg-gradient-primary dropdown-toggle" 
+                type="button" 
+                id="dropdownMenuButton" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+                >
+                {filterBy}
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li>
+                    <a  className="dropdown-item" 
+                        onClick={(e)=>{
+                            e.preventDefault()
+                            setStatus(true)
+                            setFilterBy("Successful Transactions")
+                        }}>
+                        Successful Transactions
+                    </a>
+                </li>
+                <li>
+                    <a  className="dropdown-item" 
+                        onClick={(e)=>{
+                            e.preventDefault()
+                            setStatus(false)
+                            setFilterBy("Failed Transactions")
+                        }}>
+                        Failed Transactions
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </>
+
   return (
     <>
         <div className='row'>
@@ -212,6 +250,7 @@ export default function DailyReport() {
                                 {renderedCurrency}
                                 </ul>
                             </div>
+                            {filterButton}
                             <div><sup style={{color: 'red', paddingLeft: 10}}>{empty}</sup></div>
                             <button onClick={()=>submitRequest()} className="btn btn-primary">Search</button>
                         </div>
@@ -239,6 +278,7 @@ export default function DailyReport() {
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Shop:</span></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Date:</span> <input type="date" style={{border: 0}} name="date" onChange={(e) => setTransactionDate(e.target.value)} value={transactionDate}/></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Currency:</span> {currencyState}</h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Transaction Status:</span> {status? "Successful":"Failed"}</h6>
                             </div> 
                         </div>
                     </div>
