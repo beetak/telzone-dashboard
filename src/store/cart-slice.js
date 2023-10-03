@@ -181,6 +181,7 @@ const cartSlice = createSlice({
         },
         deleteFromCart(state, action) {
             state.itemsList = []
+            state.addBtn = true
         },
         setShowCart(state){
             state.showCart=true

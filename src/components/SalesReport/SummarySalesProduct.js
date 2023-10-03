@@ -29,7 +29,7 @@ const userRegion = localStorage.getItem('regionName')
 const userRegionId = localStorage.getItem('regionId')
 const img = "assets/img/telonelogo.png"
 
-export default function SummaryTaxes() {
+export default function SummarySalesProduct() {
 
     const dispatch = useDispatch()
 
@@ -315,12 +315,11 @@ export default function SummaryTaxes() {
         return (
             count !== 0 ? 
             <>
-                {/*<div style={{width: '25%', textAlign: 'center'}}>{price}</div>*/}
+                <div style={{width: '25%', textAlign: 'center'}}>{price}</div>
                 <div style={{width: '10%', textAlign: 'center'}}>{count}</div>
-                <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>$ {(Math.round((totalAmount-totalVAT)*100)/100).toFixed(2)}</div>
+                <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>$ {(Math.round((totalAmount+totalDiscount)*100)/100).toFixed(2)}</div>
                 <div style={{width: '15%', textAlign: 'right', paddingRight: 70}}>$ {(Math.round((totalDiscount)*100)/100).toFixed(2)}</div>
                 <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>$ {(Math.round((totalAmount)*100)/100).toFixed(2)}</div>
-                <div style={{width: '25%', textAlign: 'right', paddingRight: 70}}>$ {(Math.round(totalVAT*100)/100).toFixed(2)}</div>
             </>:''
         )
     }
@@ -381,7 +380,7 @@ export default function SummaryTaxes() {
         })
 
         salesData.map((item, i)=>{
-            total += item.order.vat      
+            total += item.order.amount      
         })
         return(
             (Math.round(((successTotal*100/115*0.15)+total)*100)/100).toFixed(2)
@@ -446,7 +445,7 @@ export default function SummaryTaxes() {
     else{
         agentSalesData = 
         <tr>
-        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Taxes Found</h5></td>
+        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Sales Found</h5></td>
         </tr>
     }
 
@@ -468,7 +467,7 @@ export default function SummaryTaxes() {
     else{
         onlineSalesData = 
         <tr>
-        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Taxes Found</h5></td>
+        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Sales Found</h5></td>
         </tr>
     }
 
@@ -639,8 +638,8 @@ export default function SummaryTaxes() {
                                 <img src={img} style={{width: '200px'}}/>
                             </div>                      
                             <div class="col-6 text-end">
-                                <h6 className="mb-0">NATIONAL TAX REPORT</h6>
-                                <h6 className="mb-0">National Tax</h6>
+                                <h6 className="mb-0">NATIONAL PRODUCT SUMMARY REPORT</h6>
+                                <h6 className="mb-0">National Sales</h6>
                             </div>
                         </div>
                         <div className="row">
@@ -648,7 +647,6 @@ export default function SummaryTaxes() {
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>From Date:</span><input type="date" style={{border: 0}} name="startDate" onChange={(e) => setStartDate(e.target.value)} value={startDate} max={dateString}/></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>To Date:</span><input type="date" style={{border: 0}} name="endDate" onChange={(e) => setEndDate(e.target.value)} value={endDate} max={dateString}/><sup style={{color: 'red', paddingLeft: 10}}>{validate}</sup></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Currency:</span> {currencyState}</h6>
-                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Tax Percentage:</span> 15%</h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Transaction Status:</span> {status? "Successful":"Failed"}</h6>
                             </div> 
                             <div className="col-6 align-items-center">
@@ -665,12 +663,11 @@ export default function SummaryTaxes() {
                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Product Type</th>
                                     <th className="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         <div className="row">
-                                            {/*<div style={{width: '25%', textAlign: 'center'}}>Unit Price</div>*/}
+                                            <div style={{width: '25%', textAlign: 'center'}}>Unit Price</div>
                                             <div style={{width: '10%', textAlign: 'center'}}>Quantity</div>
-                                            <div style={{width: '25%', textAlign: 'right', paddingRight: 50}}>Collections excTax</div>
+                                            <div style={{width: '25%', textAlign: 'right', paddingRight: 50}}>Collections excDisc</div>
                                             <div style={{width: '15%', textAlign: 'right', paddingRight: 50}}>Total Discount</div>
                                             <div style={{width: '25%', textAlign: 'right', paddingRight: 50}}>Total Collections</div>
-                                            <div style={{width: '25%', textAlign: 'right', paddingRight: 50}}>Total Tax</div>
                                         </div>
                                     </th>
                                 </tr>

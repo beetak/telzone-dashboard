@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getLoadingStatus, getRegionSales, getShopSales, getTotalSales, getTownSales } from '../../store/sales-slice';
+import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getLoadingStatus, getRegionSales, getShopSales, getTotalSales, getTownSales, saleActions } from '../../store/sales-slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { currencyActions, fetchAsyncCurrency, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
@@ -20,6 +20,7 @@ const userRole = localStorage.getItem('role')
 const userTownName = localStorage.getItem('townName')
 const userTownId = localStorage.getItem('townId')
 const userRegion = localStorage.getItem('regionName')
+const userRegionId = localStorage.getItem('regionId')
 const img = "assets/img/telonelogo.png"
 
 export default function SummarySalesCommission() {
@@ -29,6 +30,10 @@ export default function SummarySalesCommission() {
         
         if (userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager'){
             dispatch(fetchAsyncShopByTown(userTownId))
+        }
+        if (userRole === 'Regional Accountant' || userRole === 'Regional Manager'){
+            dispatch(fetchAsyncTownByRegion(userRegionId))
+            setRegion(userRegion)
         }
         if(userRole==="Area Manager"){
             setSearchLevel("town")
@@ -105,14 +110,19 @@ export default function SummarySalesCommission() {
         setShopName(name)
         setShopState(name)
         setSearchLevel("shop")
-        // dispatch(fetchAsyncShopByTown(id))
+        dispatch(saleActions.clearSales())
     }
     let renderedShop = ''
     renderedShop = shopData ? (
         <>
             <tr>
                 <a  className="dropdown-item"
-                    onClick={()=>{setSearchLevel("town"); setShopState("All Shops")}}
+                    onClick={()=>{
+                        setSearchLevel("town")
+                        setShopState("All Shops") 
+                        setShopName("All Shops")
+                        dispatch(saleActions.clearSales())
+                    }}
                 >
                     Select All
                 </a>
@@ -141,11 +151,14 @@ export default function SummarySalesCommission() {
     let renderedTown = ''
     renderedTown = townData ? (
         <>
-            <tr>
-                <a  className="dropdown-item">
-                    Select All
-                </a>
-            </tr>
+            {
+                userRole !== 'Regional Manager' || userRole !== 'Regional Accountant' && <tr>
+                    <a  className="dropdown-item"
+                        onClick={()=>{setSearchLevel("regional"); setTownState("All Towns")}}>
+                        Select All
+                    </a>
+                </tr>
+            }
             {
                 townData.map((role, index)=>(
                     <tr key={index}>
@@ -396,9 +409,42 @@ export default function SummarySalesCommission() {
 
     let selectionLevel = ''
 
-        if(userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager'){
+    if(userRole === 'Supervisor' || userRole === 'Area Manager'){
+        {/* Shop Dropdown */}
+        selectionLevel =
+        <div className="dropdown"  style={{paddingLeft: 10}}>
+            <button 
+                className="btn bg-gradient-primary dropdown-toggle" 
+                type="button" 
+                id="dropdownMenuButton" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+                >
+                {shopState}
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {renderedShop}
+            </ul>
+        </div>
+    }
+    else if( userRole === 'Regional Manager' || userRole === 'Regional Accountant'){
+        selectionLevel = <>
+            {/* Town Dropdown */}
+            <div className="dropdown"  style={{paddingLeft: 10}}>
+                <button 
+                    className="btn bg-gradient-primary dropdown-toggle" 
+                    type="button" 
+                    id="dropdownMenuButton" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    >
+                    {townState}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedTown}
+                </ul>
+            </div>
             {/* Shop Dropdown */}
-            selectionLevel =
             <div className="dropdown"  style={{paddingLeft: 10}}>
                 <button 
                     className="btn bg-gradient-primary dropdown-toggle" 
@@ -413,57 +459,58 @@ export default function SummarySalesCommission() {
                 {renderedShop}
                 </ul>
             </div>
-        }
-        else{
-            selectionLevel =
-            <>
-                {/* Region Dropdown */}
-                <div className="dropdown"  style={{paddingLeft: 10}}>
-                    <button 
-                        className="btn bg-gradient-primary dropdown-toggle" 
-                        type="button" 
-                        id="dropdownMenuButton" 
-                        data-bs-toggle="dropdown" 
-                        aria-expanded="false"
-                        >
-                        {regionState}
-                    </button>
-                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    {renderedRegions}
-                    </ul>
-                </div>
-                {/* Town Dropdown */}
-                <div className="dropdown"  style={{paddingLeft: 10}}>
-                    <button 
-                        className="btn bg-gradient-primary dropdown-toggle" 
-                        type="button" 
-                        id="dropdownMenuButton" 
-                        data-bs-toggle="dropdown" 
-                        aria-expanded="false"
-                        >
-                        {townState}
-                    </button>
-                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    {renderedTown}
-                    </ul>
-                </div>
-                {/* Shop Dropdown */}
-                <div className="dropdown"  style={{paddingLeft: 10}}>
-                    <button 
-                        className="btn bg-gradient-primary dropdown-toggle" 
-                        type="button" 
-                        id="dropdownMenuButton" 
-                        data-bs-toggle="dropdown" 
-                        aria-expanded="false"
-                        >
-                        {shopState}
-                    </button>
-                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    {renderedShop}
-                    </ul>
-                </div>
-            </>
-        }
+        </>
+    }
+    else{
+        selectionLevel =
+        <>
+            {/* Region Dropdown */}
+            <div className="dropdown"  style={{paddingLeft: 10}}>
+                <button 
+                    className="btn bg-gradient-primary dropdown-toggle" 
+                    type="button" 
+                    id="dropdownMenuButton" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    >
+                    {regionState}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedRegions}
+                </ul>
+            </div>
+            {/* Town Dropdown */}
+            <div className="dropdown"  style={{paddingLeft: 10}}>
+                <button 
+                    className="btn bg-gradient-primary dropdown-toggle" 
+                    type="button" 
+                    id="dropdownMenuButton" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    >
+                    {townState}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedTown}
+                </ul>
+            </div>
+            {/* Shop Dropdown */}
+            <div className="dropdown"  style={{paddingLeft: 10}}>
+                <button 
+                    className="btn bg-gradient-primary dropdown-toggle" 
+                    type="button" 
+                    id="dropdownMenuButton" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    >
+                    {shopState}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedShop}
+                </ul>
+            </div>
+        </>
+    }
 
     let filterButton = <>
         <div className="dropdown" style={{paddingLeft: 10}}>

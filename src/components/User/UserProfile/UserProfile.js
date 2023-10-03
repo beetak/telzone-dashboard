@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { updateUser } from "../../store/user-slice";
+import { updateUser } from "../../../store/user-slice";
 
 const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
@@ -9,9 +9,9 @@ const emailAddress = localStorage.getItem('email')
 const role = localStorage.getItem('role')
 const id = localStorage.getItem('userId')
 
-export default function ProfileDetails(){
+export default function UserProfile(){
 
-    const [empty, setEmpty] = useState('')
+  const [empty, setEmpty] = useState('')
     const [password, setPassword] = useState('')
     const dispatch = useDispatch()
 

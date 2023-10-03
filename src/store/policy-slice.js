@@ -10,6 +10,12 @@ export const fetchAsyncGroupPolicy = createAsyncThunk('policies/fetchAsyncGroupP
     return [...response.data]
 })
 
+export const fetchAsyncSSID = createAsyncThunk('policies/fetchAsyncSSID', async () => {
+    const response = await MerakiApi
+    .get(`/networks/L_575897802350008785/wireless/ssids`)
+    return [...response.data]
+})
+
 export const postGroupPolicy = createAsyncThunk('policies/fetchAsyncGroupPolicy', async (initialData) => {
     const response = await MerakiApi
         .post(`/networks/L_575897802350008785/groupPolicies`, initialData)
@@ -44,7 +50,9 @@ const postData = createAsyncThunk(
 
 const initialState = {
     policies: [],
-    loadingStatus: 'idle'
+    ssid: [],
+    loadingStatus: 'idle',
+    ssidLoadingStatus: 'idle'
 }
 const policySlice = createSlice({
     name: 'policies',
@@ -70,6 +78,22 @@ const policySlice = createSlice({
             console.log("rejected")
             state.loadingStatus = 'rejected'
         },
+        [fetchAsyncSSID.pending]: (state)=>{
+            console.log("pending")
+            state.ssidLoadingStatus = 'pending'
+        },
+        [fetchAsyncSSID.fulfilled]: (state, action)=>{
+            const loadedPolicies = action.payload.map(policy=>{
+                return policy
+            })
+            state.ssid = loadedPolicies
+            // state.ssid.push(action.payload)
+            state.ssidLoadingStatus = 'fulfilled'
+        },
+        [fetchAsyncSSID.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.ssidLoadingStatus = 'rejected'
+        },
         [postGroupPolicy.pending]: ()=>{
             console.log("pending")
         },
@@ -85,4 +109,6 @@ const policySlice = createSlice({
 export const {addPolicy} = policySlice.actions
 export const getAllPolicies = (state) => state.policy.policies
 export const getLoadingStatus = (state) => state.policy.loadingStatus
+export const getAllSSIDs = (state) => state.policy.ssid
+export const getSSIDLoadingStatus = (state) => state.policy.ssidLoadingStatus
 export default policySlice

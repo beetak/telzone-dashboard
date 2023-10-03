@@ -180,7 +180,7 @@ const CartItems = () => {
     </tr>
   ))
 
-  const makeSale = () => {
+  const makeSale = (printSize) => {
     if (currencyId === '') {
       setEmpty("Please select currency");
     } else {
@@ -192,7 +192,7 @@ const CartItems = () => {
         businessPartnerId,
         currencyId,
         order: {
-          amount: totalPrice,
+          amount: netTotal,
           dateCreated: today,
           discount: totalDiscount,
           payingAccountNumber: "TelOne",
@@ -212,7 +212,7 @@ const CartItems = () => {
           // setPrintState(true);
   
           // Execute postVoucherSaleByBundleId
-          saleByBundle(postBundleId, totalQty, response.payload.data.order.id);
+          saleByBundle(postBundleId, totalQty, response.payload.data.order.id, printSize);
         } else {
           // Request was not successful
           console.log('postSale failed');
@@ -227,7 +227,7 @@ const CartItems = () => {
   // let available = 0
   // let requested = 0
 
-  const saleByBundle = (bundleId, quantity, orderID) => {
+  const saleByBundle = (bundleId, quantity, orderID, printSize) => {
     dispatch(postVoucherSaleByBundleId(
       {
         bundleId,
@@ -260,7 +260,7 @@ const CartItems = () => {
             }
           )).then((updateResponse)=>{
             if(updateResponse && updateResponse.payload.success ){
-              updateVoucherState(soldId, quantity, orderID, response.payload.data.data)
+              updateVoucherState(soldId, quantity, orderID, response.payload.data.data, printSize)
             }
           })
         }
@@ -274,7 +274,7 @@ const CartItems = () => {
     })
   }
 
-  const updateVoucherState = (soldId, quantity, orderID, data) => {
+  const updateVoucherState = (soldId, quantity, orderID, data, printSize) => {
     console.log("SOLD VOUCHERS",soldId)
     dispatch(updateVoucherStatus(
       soldId
@@ -282,8 +282,11 @@ const CartItems = () => {
       if(response.payload && response.payload.success === true){
         setLoadingSuccess(true);
         // Request was successful
-        if(quantity===1){
+        if(printSize === 'thermal'){
           printSingleVoucher(data, orderID)
+        }
+        else if(printSize === 'a4'){
+          printVouchers(data, orderID)
         }
         else{
           printVouchers(data, orderID)
@@ -326,8 +329,10 @@ const CartItems = () => {
     const dateString = new Date(current);
     const formattedDate = dateString.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
     // var doc = new jsPDF('potrait', 'px', 'a6', 'false')
-    var doc = new jsPDF('potrait', 'px', [280,160], 'false')
-    doc.addImage(img, 'PNG', 15, 0, 70, 25)
+    const pageHeight = 260 + (voucherDetails.length * 12); // Calculate the required height based on voucherDetails length
+    var doc = new jsPDF('portrait', 'px', [pageHeight, 160], 'false');
+    // var doc = new jsPDF('potrait', 'px', [280,160], 'false')
+    doc.addImage(img, 'PNG', 15, 5, 70, 25)
     doc.setFont('Times New Roman', 'bold')
     doc.setFontSize(12)
     doc.text(15, 40, 'Headquarters: Runhare House')
@@ -364,13 +369,13 @@ const CartItems = () => {
 
     doc.setTextColor(0,0,0);
     doc.setFontSize(10)
-    // doc.autoTable(content);
+    doc.text(15, 250, 'Bundle: ' + Object.values(voucherDetails)[0].bundle.name + "\n")
 
     voucherDetails.map((item, i)=>{
       doc.text(
         15,
-        250 + i * 18,
-        'Bundle: ' + item.bundle.name + '\nPIN: ' + item.voucherCode
+        260 + i * 12,
+        'PIN: ' + item.voucherCode
       )
     });
 
@@ -614,14 +619,20 @@ const CartItems = () => {
           </div>
           <div className="">
             <button 
-              onClick={()=>makeSale()} 
-              className="btn btn-info"
+              onClick={()=>makeSale('thermal')} 
+              className="btn btn-success"
               disabled = {businessPartnerName===`Client's Name` || totalQty === 0 || loadingStatus ?true:false}
-            >Print Vouchers
+            >Thermal Print
+            </button>
+            <button 
+              onClick={()=>makeSale('a4')} 
+              className="btn btn-info mx-2"
+              disabled = {businessPartnerName===`Client's Name` || totalQty === 0 || loadingStatus ?true:false}
+            >A4 Print
             </button>
             <button 
               onClick={deleteCartItem} 
-              className="btn btn-danger mx-2"
+              className="btn btn-danger"
             >Cancel
             </button>
             {

@@ -3,14 +3,6 @@ import BundlesTab from "./bundleTable/bundleTable";
 import CategoryCreate from "./createBundle/createBundle";
 import CurrencyDetails from "./currencyDetails/currencyDetails";
 import BaseCurrencyTab from "./baseCurr/baseCurrency";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAsyncBundles } from "../../../store/bundle-slice";
-import { fetchAsyncCategory } from "../../../store/category-slice";
-import { fetchAsyncCurrency } from "../../../store/currency-slice";
-import { fetchAsyncGroupPolicy } from "../../../store/policy-slice";
-import { fetchAsyncBasePrice } from "../../../store/basePrice-slice";
-import { getToggleStatus } from "../../../store/toggle-slice";
-
  // URL variable stores JSON url || API taken from 10 Degrees WordPress Agency
 
 export default function BundleDetails(){

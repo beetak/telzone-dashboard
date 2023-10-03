@@ -1,7 +1,8 @@
-import BatchPost from "../../../Batches/BatchPost/BatchPost";
-import BatchPostResponse from "../../../Batches/BatchPostResponse/BatchPostResponse";
+import MerchandiseVoucherPost from "../../../Batches/BatchPost/MerchandiseVoucherPost";
+import MerchandiseVoucherList from "../../../Batches/MerchandiseVoucherList/MerchandiseVoucherList";
 
-export default function BatchCreateForm(){
+export default function MerchandiseVouchers(){
+    
     
         return(
 
@@ -18,7 +19,7 @@ export default function BatchCreateForm(){
             </div>
             <div className="card-body px-0 pb-2">
               <div className="table-responsive p-0">
-                <BatchPostResponse/>
+                <MerchandiseVoucherList/>
               </div>
             </div>
           </div>
@@ -36,7 +37,7 @@ export default function BatchCreateForm(){
             </div>
             <div className="card-body px-0 pb-2">
               <div className="table-responsive p-0">
-                <BatchPost/>
+                <MerchandiseVoucherPost/>
               </div>
             </div>
           </div>

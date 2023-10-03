@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getAgentSales, getAllSales, getRegionSales, getShopSales, getTotalSales, getTownSales } from '../../store/sales-slice';
+import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getAgentSales, getAllSales, getRegionSales, getShopSales, getTotalSales, getTownSales, saleActions } from '../../store/sales-slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { currencyActions, fetchAsyncCurrency, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
@@ -17,14 +17,39 @@ const userRole = localStorage.getItem('role')
 const userTownName = localStorage.getItem('townName')
 const userTownId = localStorage.getItem('townId')
 const userRegion = localStorage.getItem('regionName')
+const userRegionId = localStorage.getItem('regionId')
 const img = "assets/img/telonelogo.png"
 
 export default function SummarySales() {
 
+    const[currencyID, setCurrencyID] = useState('')
+    const[currencyState, setCurrencyState] = useState('Currency')
+    const[regionState, setRegionState] = useState('Region')
+    const[townState, setTownState] = useState('Town')
+    const[shopState, setShopState] = useState('Shop')
+    const[currencyActioned, setCurrencyActioned]= useState('')
+    const[regionId, setRegionId] = useState('')
+    const[region, setRegion] = useState('All Regions')
+    const[shopId, setShopId] = useState('')
+    const[shopName, setShopName] = useState('All Shops')
+    const[townId, setTownId] = useState('')
+    const[town, setTown] = useState('All Towns')
+    const[startDate, setStartDate] = useState('')
+    const[endDate, setEndDate] = useState('')
+    const[empty, setEmpty] = useState('')
+    const[validate, setValidate] = useState('')
+    const [searchLevel, setSearchLevel] = useState('')
+    const [filterBy, setFilterBy] = useState('Transaction Status')
+    const [status, setStatus] = useState(true)
+
     useEffect(() => {
         dispatch(fetchAsyncCurrency(true))
-        if (userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager'){
+        if (userRole === 'Supervisor' || userRole === 'Area Manager'){
             dispatch(fetchAsyncShopByTown(userTownId))
+        }
+        if (userRole === 'Regional Accountant' || userRole === 'Regional Manager'){
+            dispatch(fetchAsyncTownByRegion(userRegionId))
+            setRegion(userRegion)
         }
         if(userRole==="Area Manager"){
             setSearchLevel("town")
@@ -48,28 +73,6 @@ export default function SummarySales() {
     //Loading States
     const loadingAgent = useSelector(getAgentLoadingStatus)
     const loadingOnline = useSelector(getOnlineLoading)
-    
-    const[currencyID, setCurrencyID] = useState('')
-    const[currencyState, setCurrencyState] = useState('Currency')
-    const[regionState, setRegionState] = useState('Region')
-    const[townState, setTownState] = useState('Town')
-    const[shopState, setShopState] = useState('Shop')
-    const[currencyActioned, setCurrencyActioned]= useState('')
-    const[regionId, setRegionId] = useState('')
-    const[region, setRegion] = useState('All Regions')
-    const[shopId, setShopId] = useState('')
-    const[shopName, setShopName] = useState('All Shops')
-    const[townId, setTownId] = useState('')
-    const[town, setTown] = useState('All Towns')
-    const[startDate, setStartDate] = useState('')
-    const[endDate, setEndDate] = useState('')
-    const[empty, setEmpty] = useState('')
-    const[validate, setValidate] = useState('')
-    const [searchLevel, setSearchLevel] = useState('')
-    const [filterBy, setFilterBy] = useState('Transaction Status')
-    const [status, setStatus] = useState(true)
-
-
 
     const currencyData = useSelector(getAllCurrencies)
     const dispatch = useDispatch()
@@ -103,14 +106,19 @@ export default function SummarySales() {
         setShopName(name)
         setShopState(name)
         setSearchLevel("shop")
-        // dispatch(fetchAsyncShopByTown(id))
+        dispatch(saleActions.clearSales())
     }
     let renderedShop = ''
     renderedShop = shopData ? (
         <>
             <tr>
                 <a  className="dropdown-item"
-                    onClick={()=>{setSearchLevel("town"); setShopState("All Shops")}}
+                    onClick={()=>{
+                        setSearchLevel("town")
+                        setShopState("All Shops") 
+                        setShopName("All Shops")
+                        dispatch(saleActions.clearSales())
+                    }}
                 >
                     Select All
                 </a>
@@ -139,11 +147,14 @@ export default function SummarySales() {
     let renderedTown = ''
     renderedTown = townData ? (
         <>
-            <tr>
-                <a  className="dropdown-item">
-                    Select All
-                </a>
-            </tr>
+            {
+                (userRole === 'Super Admin' || userRole === 'Admin' || userRole === 'Head Retail' || userRole === 'Finance Manager') && <tr>
+                    <a  className="dropdown-item"
+                        onClick={()=>{setSearchLevel("regional"); setTownState("All Towns")}}>
+                        Select All
+                    </a>
+                </tr>
+            }
             {
                 townData.map((role, index)=>(
                     <tr key={index}>
@@ -275,18 +286,30 @@ export default function SummarySales() {
            )
     }
 
-    const getBundleName = (bundleName) =>{
-        let bname = ''
-
-        periodicalSales.map((items, i)=>{
-            if(items.bundleId.name===bundleName&&items.status!=='FAILED'){
-                bname = bundleName
-            }
-        })
-        return (
-            bname
-           )
-    }
+    const getBundleName = (data) => {
+        let bname = '';
+      
+        periodicalSales.map((items, i) => {
+          if (items.bundleId.name === data.bundleId && items.status !== 'FAILED') {
+            bname = data.bundleId;
+          }
+        });
+      
+        if (bname !== '') {
+          return (
+            <tr>
+                <th scope="row">{bname}</th>
+                <td className="text-align-right">
+                    <div className="row">
+                        {calculateByPartner(data.bundleId)}
+                    </div>
+                </td>
+            </tr>
+          );
+        } else {
+          return null;
+        }
+    };
 
     const componentRef = useRef()
     const handlePrint = useReactToPrint({
@@ -340,7 +363,13 @@ export default function SummarySales() {
                 dispatch(fetchAsyncPeriodicalPayments({startDate, endDate, curSymbol:currencyState}))
             }
             else{
-                if (userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager'){
+                if (userRole === 'Supervisor' || userRole === 'Area Manager'){
+                    if(searchLevel === "town")
+                        dispatch(fetchAsyncSalesByTown({startDate, endDate, curId:currencyID, townId, status}))
+                    else
+                        dispatch(fetchAsyncSalesByShop({startDate, endDate, curId:currencyID, shopId, status}))
+                }
+                if (userRole === 'Regional Manager' || userRole === 'Regional Accountant'){
                     dispatch(fetchAsyncSalesByShop({startDate, endDate, curId:currencyID, shopId, status}))
                 }
                 else{
@@ -390,14 +419,7 @@ export default function SummarySales() {
     if(count>0){
         onlineSalesData = (
             output.map((item)=>(
-                <tr key={item.bundleId}>
-                    <th scope="row">{getBundleName(item.bundleId)}</th>
-                    <td className="text-align-right">
-                        <div className="row">
-                            {calculateByPartner(item.bundleId)}
-                        </div>
-                    </td>
-                </tr>
+                getBundleName(item)
             ))
         )
     }
@@ -415,7 +437,7 @@ export default function SummarySales() {
 
     let selectionLevel = ''
 
-    if(userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager'){
+    if(userRole === 'Supervisor' || userRole === 'Area Manager'){
         {/* Shop Dropdown */}
         selectionLevel =
         <div className="dropdown"  style={{paddingLeft: 10}}>
@@ -432,6 +454,40 @@ export default function SummarySales() {
             {renderedShop}
             </ul>
         </div>
+    }
+    else if( userRole === 'Regional Manager' || userRole === 'Regional Accountant'){
+        selectionLevel = <>
+            {/* Town Dropdown */}
+            <div className="dropdown"  style={{paddingLeft: 10}}>
+                <button 
+                    className="btn bg-gradient-primary dropdown-toggle" 
+                    type="button" 
+                    id="dropdownMenuButton" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    >
+                    {townState}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedTown}
+                </ul>
+            </div>
+            {/* Shop Dropdown */}
+            <div className="dropdown"  style={{paddingLeft: 10}}>
+                <button 
+                    className="btn bg-gradient-primary dropdown-toggle" 
+                    type="button" 
+                    id="dropdownMenuButton" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    >
+                    {shopState}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {renderedShop}
+                </ul>
+            </div>
+        </>
     }
     else{
         selectionLevel =
@@ -573,7 +629,7 @@ export default function SummarySales() {
                             <div className="col-6 align-items-center">
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Region:</span> {region==='No Region'? 'All Regions': region}</h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Town:</span> {town==='No Town'? 'All Towns': town}</h6>
-                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Shop:</span> {shopName==='No Shop'? 'All Shops': shopName}</h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Shop:</span> {shopName}</h6>
                             </div> 
                         </div>
                     </div>

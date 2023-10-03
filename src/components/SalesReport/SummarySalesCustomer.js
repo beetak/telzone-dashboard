@@ -4,7 +4,7 @@ import { Button } from "react-bootstrap";
 import InputGroup from 'react-bootstrap/InputGroup'
 import { FormControl } from "react-bootstrap";
 import { ButtonGroup, Form } from "react-bootstrap";
-import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getAgentSales, getRegionSales, getShopSales, getTotalSales, getTownSales } from '../../store/sales-slice';
+import { fetchAsyncSalesByCurrencyId, fetchAsyncSalesByRegion, fetchAsyncSalesByShop, fetchAsyncSalesByTown, getAgentLoadingStatus, getAgentSales, getRegionSales, getShopSales, getTotalSales, getTownSales, saleActions } from '../../store/sales-slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { currencyActions, fetchAsyncCurrency, getAllCurrencies } from '../../store/currency-slice';
 import CurrencyDropdown from '../Currency/CurrencyDropdown/CurrencyDropdown';
@@ -24,6 +24,7 @@ const userRole = localStorage.getItem('role')
 const userTownName = localStorage.getItem('townName')
 const userTownId = localStorage.getItem('townId')
 const userRegion = localStorage.getItem('regionName')
+const userRegionId = localStorage.getItem('regionId')
 const img = "assets/img/telonelogo.png"
 
 export default function SummarySalesCustomer() {
@@ -33,6 +34,10 @@ export default function SummarySalesCustomer() {
         
         if (userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager'){
             dispatch(fetchAsyncShopByTown(userTownId))
+        }
+        if (userRole === 'Regional Accountant' || userRole === 'Regional Manager'){
+            dispatch(fetchAsyncTownByRegion(userRegionId))
+            setRegion(userRegion)
         }
         if(userRole==="Area Manager"){
             setSearchLevel("town")
@@ -110,14 +115,19 @@ export default function SummarySalesCustomer() {
         setShopName(name)
         setShopState(name)
         setSearchLevel("shop")
-        // dispatch(fetchAsyncShopByTown(id))
+        dispatch(saleActions.clearSales())
     }
     let renderedShop = ''
     renderedShop = shopData ? (
         <>
             <tr>
                 <a  className="dropdown-item"
-                    onClick={()=>{setSearchLevel("town"); setShopState("All Shops")}}
+                    onClick={()=>{
+                        setSearchLevel("town")
+                        setShopState("All Shops") 
+                        setShopName("All Shops")
+                        dispatch(saleActions.clearSales())
+                    }}
                 >
                     Select All
                 </a>
@@ -146,11 +156,14 @@ export default function SummarySalesCustomer() {
     let renderedTown = ''
     renderedTown = townData ? (
         <>
-            <tr>
-                <a  className="dropdown-item">
-                    Select All
-                </a>
-            </tr>
+            {
+                userRole !== 'Regional Manager' || userRole !== 'Regional Accountant' && <tr>
+                    <a  className="dropdown-item"
+                        onClick={()=>{setSearchLevel("regional"); setTownState("All Towns")}}>
+                        Select All
+                    </a>
+                </tr>
+            }
             {
                 townData.map((role, index)=>(
                     <tr key={index}>
@@ -351,9 +364,9 @@ export default function SummarySalesCustomer() {
         <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>
         </tr>
 
-        let selectionLevel = ''
+    let selectionLevel = ''
 
-        if(userRole === 'Supervisor' || userRole === 'Area Manager' || userRole === 'Regional Manager'){
+        if(userRole === 'Supervisor' || userRole === 'Area Manager'){
             {/* Shop Dropdown */}
             selectionLevel =
             <div className="dropdown"  style={{paddingLeft: 10}}>
@@ -370,6 +383,40 @@ export default function SummarySalesCustomer() {
                 {renderedShop}
                 </ul>
             </div>
+        }
+        else if( userRole === 'Regional Manager' || userRole === 'Regional Accountant'){
+            selectionLevel = <>
+                {/* Town Dropdown */}
+                <div className="dropdown"  style={{paddingLeft: 10}}>
+                    <button 
+                        className="btn bg-gradient-primary dropdown-toggle" 
+                        type="button" 
+                        id="dropdownMenuButton" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                        >
+                        {townState}
+                    </button>
+                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    {renderedTown}
+                    </ul>
+                </div>
+                {/* Shop Dropdown */}
+                <div className="dropdown"  style={{paddingLeft: 10}}>
+                    <button 
+                        className="btn bg-gradient-primary dropdown-toggle" 
+                        type="button" 
+                        id="dropdownMenuButton" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                        >
+                        {shopState}
+                    </button>
+                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    {renderedShop}
+                    </ul>
+                </div>
+            </>
         }
         else{
             selectionLevel =

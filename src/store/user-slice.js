@@ -1,8 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Api from "../components/Api/Api";
 
-
-
 export const fetchAsyncUser = createAsyncThunk('user/fetchAsyncUser', async () => {
     const response = await Api
     .get(`/admin-portal-user/`)
@@ -23,13 +21,18 @@ export const postAsyncUser = createAsyncThunk('user/postAsyncUser', async (initi
         .then((res) => res.data);
 })
 
-export const userLogin = createAsyncThunk('user/userLogin', async (initialData) => {
-    return await Api
-        .post('/admin-portal-user/login/', 
-            initialData
-        )
-        .then((res) => res.data);
-})
+export const loginUser = createAsyncThunk(
+    'user/loginUser',
+    async (initialData) => {
+      try {
+        const response = await Api.post('/admin-portal-user/login/', initialData);
+        return { success: true, data: response.data };
+      } catch (error) {
+        console.log("login res", error)
+        return {success: false, data: error}
+      }
+    }
+);
 
 const headers = {
     'Accept' : 'application/json',
@@ -67,7 +70,9 @@ const initialState = {
     shopAgents: [],
     loginStatus: 'false',
     loadingStatus: 'idle',
-    globalUser: ''
+    loginLoadingStatus: 'idle',
+    globalUser: '',
+    loggedUser: ''
 }
 const userSlice = createSlice({
     name: 'user',
@@ -130,23 +135,20 @@ const userSlice = createSlice({
         [postAsyncUser.rejected]: (state, {payload})=>{
             console.log("rejected")
         },
-        [userLogin.pending]: ()=>{
-            console.log("pending")
+        [loginUser.pending]: (state)=>{
+            state.loginLoadingStatus='pending'
         },
-        [userLogin.fulfilled]: (state, action)=>{
-            console.log("fulfilled")
-            console.log(action.payload)
-            state.loginStatus = true
-            localStorage.setItem('email', action.payload.data.email)
-            localStorage.setItem('firstname', action.payload.data.firstname)
-            localStorage.setItem('surname', action.payload.data.surname)
-            // localStorage.setItem('userId', response.data.data.id)
-            localStorage.setItem('role', action.payload.data.role.role)
-            localStorage.setItem('shopId', action.payload.data.shop.id)
-            console.log(action.payload)
-            // state.users.push(action.payload)
+        [loginUser.fulfilled]: (state, action) => {
+            if (action.payload.success) {
+              const { data } = action.payload;
+              state.loginLoadingStatus = 'fulfilled'
+              state.loggedUser = data
+            } else {
+              console.log('login failed:', action.payload.error);
+            }
         },
-        [userLogin.rejected]: (state, {payload})=>{
+        [loginUser.rejected]: (state, {payload})=>{
+            state.loginLoadingStatus='failed'
             console.log("rejected")
         },
         [updateUser.pending]: (state) =>{
@@ -178,5 +180,7 @@ export const getAllUsers = (state) => state.user.users
 export const getShopAgents = (state) => state.user.shopAgents
 export const getLoginStatus = (state) => state.user.loginStatus
 export const getLoadingStatus = (state) => state.user.loadingStatus
+export const getLoggedUser = (state) => state.user.loggedUser
+export const getLoginLoadingStatus = (state) => state.user.loginLoadingStatus
 export const getGlobalUser = (state) => state.user.globalUser
 export default userSlice

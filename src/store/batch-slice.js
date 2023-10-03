@@ -12,12 +12,32 @@ export const fetchAsyncBatches = createAsyncThunk('batch/fetchAsyncBatches', asy
     return [...response.data.data]
 })
 
+export const fetchMerchandiseVouchers = createAsyncThunk('batch/fetchMerchandiseVouchers', async () => {   
+    const response = await Api
+    .get(`/batches/` )
+    return [...response.data.data]
+})
+
 export const postBatch = createAsyncThunk(
     'cart/postAsyncBatch',
     async (initialData) => {
       console.log(initialData);
       try {
         const response = await Api.post('/batch/', initialData);
+        return { success: true, data: response.data };
+      } catch (error) {
+        console.error('postSale error:', error);
+        throw error;
+      }
+    }
+);
+
+export const postMerchandiseVoucher = createAsyncThunk(
+    'cart/postMerchandiseVoucher',
+    async (initialData) => {
+      console.log(initialData);
+      try {
+        const response = await Api.post('/voucherUniversal/', initialData);
         return { success: true, data: response.data };
       } catch (error) {
         console.error('postSale error:', error);
@@ -215,6 +235,7 @@ const batchSlice = createSlice({
         loading: '',
         posting: '',
         vcode: [],
+        merchandise: [],
         loadingStatus: 'idle',
         postStatus: 'idle',
         soldStatus: '',
@@ -224,6 +245,7 @@ const batchSlice = createSlice({
         verificationResponse: '',
         showMore: false,
         reactivateStatus: 'idle',
+        merchandiseStatus: 'idle',
         blockingStatus: 'idle'
     },
     reducers: {
@@ -309,6 +331,25 @@ const batchSlice = createSlice({
             console.log("rejected")
             state.posting = 'failed'
             state.postStatus = 'rejected'
+        },
+        [postMerchandiseVoucher.pending]: (state)=>{
+            state.merchandisePostStatus='pending'
+            console.log("pending")
+            state.merchandiseStatus = 'pending'
+        },
+        [postMerchandiseVoucher.fulfilled]: (state, action) => {
+            if (action.payload.success) {
+              const { data } = action.payload;
+              console.log("batch response ",data);
+              state.merchandiseStatus = 'fulfilled'
+            } else {
+              console.log('postBatch failed:', action.payload.error);
+            }
+        },
+        [postMerchandiseVoucher.rejected]: (state, {payload})=>{
+            state.batchPostStatus='failed'
+            console.log("rejected")
+            state.merchandiseStatus = 'rejected'
         },
         [voucherVerification.pending]: (state)=>{
             console.log("pending")

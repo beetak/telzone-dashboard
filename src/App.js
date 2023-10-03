@@ -12,8 +12,6 @@ import BusReports from "./pages/busReports";
 import Signup from "./pages/authentication/Signup";
 import { useDispatch, useSelector } from "react-redux";
 import BatchVoucherList from "./pages/batchVouchers";
-import { useEffect } from 'react'
-import { fetchAsyncNetworkReports, fetchAsyncOrganisationReports } from "./store/report-slice";
 import UserLogin from "./pages/authentication/login";
 import SalesAgent from "./pages/dashboard/salesAgent";
 import VoucherVerificationPage from "./pages/sales/voucherVerification";
@@ -26,6 +24,7 @@ import ABMSalesReport from "./pages/areaBusManager/ABMSalesReport";
 import RegionalSalesReport from "./pages/regionalManager/RegionalSalesReport";
 import Customers from "./pages/customers";
 import Commission from "./pages/commission";
+import FinanceReports from "./pages/finReports";
 
 const userRole = localStorage.getItem('role')
 
@@ -66,6 +65,8 @@ function App() {
           <Route path={'/regional-reports'} element={<RegionalSalesReport/>} /> 
           <Route path={'/customers'} element={<Customers/>} /> 
           <Route path={'/commission'} element={<Commission/>} /> 
+          <Route path={'/fin-sales-report'} element={<FinanceReports/>} /> 
+          <Route path={'/accounts-reports'} element={<Commission/>} /> 
         </Routes>
       </div>
       </BrowserRouter>

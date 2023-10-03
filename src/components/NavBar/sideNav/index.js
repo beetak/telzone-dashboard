@@ -6,6 +6,8 @@ import ShopSupervisor from "./ShopSupervisor";
 import HeadRetail from "./HeadRetail";
 import AreaManager from "./AreaManager";
 import RegionalManager from "./RegionalManager";
+import FinanceManager from "./FinanceManager";
+import RegionalFinance from "./RegionalFinance";
 
 const role = localStorage.getItem('role')
 
@@ -37,9 +39,12 @@ class SideNavigation extends Component {
       else if(role === "Regional Manager"){
         user = <RegionalManager/>
       }
-      // else if(role === "Supervisor"){
-      //   user = <ShopSupervisor/>
-      // }
+      else if(role === "Finance Manager"){
+        user = <FinanceManager/>
+      }
+      else if(role === "Regional Accountant"){
+        user = <RegionalFinance/>
+      }
       else{
         window.location="/"
         // user = <SuperAdmin/>
