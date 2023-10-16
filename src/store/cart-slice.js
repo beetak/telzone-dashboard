@@ -153,18 +153,21 @@ const cartSlice = createSlice({
                 }) 
             }
         },
-        changeCart(state, action){
-            const newItem = action.payload 
-            const existingItem = state.itemsList.find((item)=>item.id===newItem.id)
-
-            if(existingItem.quantity<newItem.qty){
-                existingItem.quantity = newItem.qty
-                existingItem.totalPrice = newItem.price*newItem.qty
-            }
-            else{
-                existingItem.quantity = newItem.qty
-                existingItem.totalPrice = newItem.price*newItem.qty
-            }
+        changeCart(state, action) {
+            const { id, quantity } = action.payload;
+      
+            const updatedItemsList = state.itemsList.map((item) => {
+                if (item.id === id) {
+                  return {
+                    ...item,
+                    quantity: quantity,
+                    totalPrice: item.price * quantity
+                  };
+                }
+                return item;
+              });
+            
+              state.itemsList = updatedItemsList;
         },
         removeFromCart(state, action) {
             state.changed = true;

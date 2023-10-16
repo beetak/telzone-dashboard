@@ -25,6 +25,7 @@ import RegionalSalesReport from "./pages/regionalManager/RegionalSalesReport";
 import Customers from "./pages/customers";
 import Commission from "./pages/commission";
 import FinanceReports from "./pages/finReports";
+import FocReports from "./pages/busReports/focReport";
 
 const userRole = localStorage.getItem('role')
 
@@ -67,6 +68,7 @@ function App() {
           <Route path={'/commission'} element={<Commission/>} /> 
           <Route path={'/fin-sales-report'} element={<FinanceReports/>} /> 
           <Route path={'/accounts-reports'} element={<Commission/>} /> 
+          <Route path={'/foc-reports'} element={<Sales page='foc-report'/>} /> 
         </Routes>
       </div>
       </BrowserRouter>

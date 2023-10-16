@@ -6,7 +6,6 @@ import CartItems from "../../components/ShoppingCart/CartItems/CartItems";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAsyncBundles } from "../../store/bundle-slice";
 import { fetchAsyncBusiness } from "../../store/business-slice";
-import { fetchAsyncSales } from "../../store/cart-slice";
 import { fetchAsyncCurrency } from "../../store/currency-slice";
 import FocList from "../../components/ShoppingCart/FocList/FocList";
 import FocItems from "../../components/ShoppingCart/FocItems/FocItems";
@@ -73,6 +72,16 @@ export default function Sales ({page}) {
                             <div className="row">
                                 <CartBundleList pageType="sales"/>
                                 <CartItems/>
+                            </div>
+                        </div>
+                    </div>
+                }
+                { 
+                    page === 'foc-report' &&
+                    <div className="container-fluid py-4">
+                        <div className="container-fluid">
+                            <div className="row">
+                                <FocList/>
                             </div>
                         </div>
                     </div>

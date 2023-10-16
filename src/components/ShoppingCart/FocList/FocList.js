@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import BeatLoader from 'react-spinners/BeatLoader'
 import FocCard from "../FocCard/FocCard";
 import { getAllFocs, getLoadingStatus } from "../../../store/foc-slice";
+const userRole = localStorage.getItem('role')
 
 const FocList = () => {
 
@@ -57,7 +58,9 @@ const FocList = () => {
                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-end opacity-7 ">Current User</th>
                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-center opacity-7 ">Last Modified</th>
                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-center opacity-7 ">Status</th>
-                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-center opacity-7 ">Action</th>
+                                    {
+                                        userRole !== 'Sales Admin' && <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-center opacity-7 ">Action</th>
+                                    }
                                 </tr>
                             </thead>
                             <tbody>

@@ -6,8 +6,9 @@ import { getPaymentMethod } from "../../../store/toggle-slice";
 
 const CartItem = ({ name, quantity, total, discount, price, id, product, rate, vat }) => {
 
-  const [rateStatus, setRateStatus]  = useState('')
-  const [rateId, setRateId] = useState('')
+  const [ rateStatus, setRateStatus ]  = useState('')
+  const [ rateId, setRateId ] = useState('')
+  const [ inputQuantity, setInputQuantity ] = useState(quantity);
 
 
   const dispatch = useDispatch();
@@ -41,17 +42,22 @@ const CartItem = ({ name, quantity, total, discount, price, id, product, rate, v
       })
     );
   };
-  const changeQty = () => {
+  const changeQty = (event) => {
     dispatch(
       cartActions.changeCart({
         name,
         id,
-        price
+        price,
+        quantity: event.target.value
       })
     );
   };
   const decrementCartItems = () => {
     dispatch(cartActions.removeFromCart(id));
+  };
+
+  const handleInputChange = event => {
+    setInputQuantity(event.target.value);
   };
 
   const unitPrice = (Math.round((price - (price*discount/100)) * 10000 * rate / (vat+100)) / 100).toFixed(2)
@@ -64,7 +70,15 @@ const CartItem = ({ name, quantity, total, discount, price, id, product, rate, v
         <button onClick={decrementCartItems} style={CartActionsStyles}>
           -
         </button>
-        <label style={CartLabel}>{quantity}</label>
+        {/*<label style={CartLabel}>{quantity}</label>*/}
+        <input
+          type="text"
+          min="1"
+          value={quantity}
+          onBlur={handleInputChange}
+          onInput={changeQty}
+          style={CartInput}
+        />
         <button onClick={incrementCartItem} style={CartActionsStyles}>
           +
         </button>
@@ -88,4 +102,14 @@ const CartActionsStyles = {
 const CartLabel = {
   width: '40px',
   textAlign: 'center'
+}
+const CartInput = {
+  width: '80px',
+  textAlign: 'center',
+  margin: '0 8px',
+  borderTop: 'none',
+  borderLeft: 'none',
+  borderRight: 'none',
+  borderBottom: '2px solid #1151A2',
+  outline: 'none'
 }
