@@ -18,6 +18,42 @@ export const fetchMerchandiseVouchers = createAsyncThunk('batch/fetchMerchandise
     return [...response.data.data]
 })
 
+export const fetchSoldVouchers = createAsyncThunk(
+    'cart/fetchSoldVouchers',
+    async (invoiceNumber) => {
+      try {
+        const response = await Api.get(`/vouchers/${invoiceNumber}`);
+        return { success: true, data: response.data };
+      } catch (error) {
+        throw error;
+      }
+    }
+);
+
+export const fetchSoldVouchersByDate = createAsyncThunk(
+    'cart/fetchSoldVouchersByDate',
+    async (dateSold) => {
+      try {
+        const response = await Api.get(`/voucher/date${dateSold}`);
+        return { success: true, data: response.data };
+      } catch (error) {
+        throw error;
+      }
+    }
+);
+
+export const fetchSoldVouchersByShopAndDate = createAsyncThunk(
+    'cart/fetchSoldVouchersByShopAndDate',
+    async ({shopId, startDate, endDate, status}) => {
+      try {
+        const response = await Api.get(`/voucher/shop${shopId}/${startDate}/${endDate}/${status}`);
+        return { success: true, data: response.data };
+      } catch (error) {
+        throw error;
+      }
+    }
+);
+
 export const postBatch = createAsyncThunk(
     'cart/postAsyncBatch',
     async (initialData) => {
@@ -26,7 +62,6 @@ export const postBatch = createAsyncThunk(
         const response = await Api.post('/batch/', initialData);
         return { success: true, data: response.data };
       } catch (error) {
-        console.error('postSale error:', error);
         throw error;
       }
     }
@@ -40,7 +75,6 @@ export const postMerchandiseVoucher = createAsyncThunk(
         const response = await Api.post('/voucherUniversal/', initialData);
         return { success: true, data: response.data };
       } catch (error) {
-        console.error('postSale error:', error);
         throw error;
       }
     }
@@ -50,11 +84,13 @@ export const voucherVerification = createAsyncThunk(
     'cart/voucherVerification',
     async (initialData) => {
       console.log(initialData);
-      return await Api
-        .post('/voucher/verify/', 
-          initialData
-        )
-        .then((res) => res.data);
+      try {
+        const response = await Api.post('/voucher/verify/', initialData);
+        return { success: true, data: response };
+      } catch (error) {
+        console.error('Voucher verify error:', error);
+        throw error;
+      }
     }
 );
 
@@ -223,7 +259,9 @@ const batchSlice = createSlice({
         batches: [],
         vouchers: [],
         voucherList: [],
+        soldVouchers: [],
         selectedBatch: [],
+        soldByShop: [],
         batchPostStatus: 'idle', // | 'success'
         voucherPostStatus: '', // | 'success'
         createdBatch: '',
@@ -246,7 +284,8 @@ const batchSlice = createSlice({
         showMore: false,
         reactivateStatus: 'idle',
         merchandiseStatus: 'idle',
-        blockingStatus: 'idle'
+        blockingStatus: 'idle',
+        verifyStatus: false
     },
     reducers: {
         clearVouchers(state, action){
@@ -299,16 +338,6 @@ const batchSlice = createSlice({
             state.postStatus = 'pending'
             state.voucherPostStatus = 'idle'
         },
-        // [postBatch.fulfilled]: (state, action)=>{
-        //     console.log("fulfilled")
-        //     state.batchPostStatus = 'success'
-        //     state.createdBatch = action.payload.data.batch.id
-        //     action.payload.id = action.payload.data.batch.id
-        //     state.batches = state.batches.concat(action.payload)
-        //     state.posting = 'success'
-        //     state.postStatus = 'fulfilled'
-        //     state.getVoucherStatus = 'idle'
-        // },
         [postBatch.fulfilled]: (state, action) => {
             if (action.payload.success) {
               const { data } = action.payload;
@@ -356,22 +385,30 @@ const batchSlice = createSlice({
             state.posting = 'pending'
             state.statusSearch = 'pending'
             state.voucherPostStatus = 'idle'
-            state.message = 'pending'
         },
         [voucherVerification.fulfilled]: (state, action)=>{
-            console.log('fulfilled')
-            console.log(action.payload)
-            if(action.payload.message !== `Voucher doesn't exist`){
-                state.verificationResponse = action.payload
-                state.soldStatus = action.payload.data.sold
-                state.usedStatus = action.payload.data.used
-                state.message = 'found'
+            if (action.payload.success) {
+                const { data } = action.payload;
+                console.log("success", data.data)
+                if(data.data.code !== "NOT_FOUND"){
+                    state.voucherPostStatus = data.data
+                    state.verificationResponse = data.data
+                    state.soldStatus = data.data.data.sold
+                    state.usedStatus = data.data.data.used
+                    state.message = data.data.data.code
+                    state.showMore = true
+                }
+                else{
+                    state.voucherPostStatus = data.data
+                    state.message = data.data.code
+                }
+                state.verifyStatus = true
                 state.statusSearch = 'fulfilled'
                 return
             }
             else{
                 state.message = 'not-found'
-                state.statusSearch = 'fulfilled'
+                state.statusSearch = 'rejected'
                 return
             }
             
@@ -394,6 +431,48 @@ const batchSlice = createSlice({
             })
             state.vouchers = loadedVouchers
         },
+        [fetchAsyncVouchers.rejected]: (state, {payload})=>{
+            console.log("rejected")
+        },
+        [fetchSoldVouchersByShopAndDate.pending]: ()=>{
+            console.log("pending")
+        },
+        [fetchSoldVouchersByShopAndDate.fulfilled]: (state, action)=>{
+            console.log("fulfilled", action.payload)
+            
+            state.soldByShop = action.payload
+        },
+        [fetchSoldVouchersByShopAndDate.rejected]: (state, {payload})=>{
+            console.log("rejected")
+        },
+        [fetchSoldVouchers.pending]: ()=>{
+            console.log("pending")
+        },
+        [fetchSoldVouchers.fulfilled]: (state, action)=>{
+            const { data } = action.payload
+            console.log("fulfilled", data)
+            const loadedVouchers = data.data.map(voucher=>{
+                return voucher
+            })
+            state.soldVouchers = loadedVouchers
+        },
+        [fetchSoldVouchers.rejected]: (state, {payload})=>{
+            console.log("rejected")
+        },
+        [fetchSoldVouchersByDate.pending]: ()=>{
+            console.log("pending")
+        },
+        [fetchSoldVouchersByDate.fulfilled]: (state, action)=>{
+            const { data } = action.payload
+            console.log("fulfilled", data)
+            const loadedVouchers = data.data.map(voucher=>{
+                return voucher
+            })
+            state.soldVouchers = loadedVouchers
+        },
+        [fetchSoldVouchersByDate.rejected]: (state, {payload})=>{
+            console.log("rejected")
+        },
         [fetchAsyncVouchersByBatch.pending]: (state, action)=>{
             state.viewVoucherStatus = 'pending'
         },
@@ -411,9 +490,6 @@ const batchSlice = createSlice({
         },
         [fetchAsyncVouchersByBatch.rejected]: (state, action)=>{
             state.viewVoucherStatus = 'fulfilled'
-        },
-        [fetchAsyncVouchers.rejected]: (state, {payload})=>{
-            console.log("rejected")
         },
         [postVoucher.pending]: ()=>{
             console.log("voucher posting pending")
@@ -543,6 +619,7 @@ export const getVoucherStatus = (state) => state.batch.voucherPostStatus
 export const getVoucherList = (state) => state.batch.voucherList
 export const getCreatedBatch = (state) => state.batch.createdBatch
 export const getVoucherType = (state) => state.batch.createdVoucher
+export const getSoldVouchers = (state) => state.batch.soldVouchers
 export const getSelectedBatch = (state) => state.batch.selectedBatch
 export const viewVouchers = (state) => state.batch.viewVouchers
 export const voucherViewStatus = (state) => state.batch.viewVoucherStatus
@@ -553,10 +630,12 @@ export const getVBSuspended = (state) => state.batch.batchSuspended
 export const getPostLoading = (state) => state.batch.postLoading
 export const getPostSuccess = (state) => state.batch.postSuccess
 export const getSoldStatus = (state) => state.batch.soldStatus
+export const getVouchersSoldByShop = (state) => state.batch.soldByShop
 export const getUsedStatus = (state) => state.batch.usedStatus
 export const getStatusSearch = (state) => state.batch.statusSearch
 export const getSearchMessage = (state) => state.batch.message
 export const getVerified = (state) => state.batch.verificationResponse
+export const getVerifyStatus = (state) => state.batch.verifyStatus
 export const getReactivate = (state) => state.batch.reactivateStatus
 export const getBlockingStatus = (state) => state.batch.blockingStatus
 export const getShow = (state) => state.batch.showMore

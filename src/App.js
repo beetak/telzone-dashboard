@@ -25,7 +25,7 @@ import RegionalSalesReport from "./pages/regionalManager/RegionalSalesReport";
 import Customers from "./pages/customers";
 import Commission from "./pages/commission";
 import FinanceReports from "./pages/finReports";
-import FocReports from "./pages/busReports/focReport";
+import VoucherUsageReport from "./pages/voucherUsageReport";
 
 const userRole = localStorage.getItem('role')
 
@@ -63,6 +63,7 @@ function App() {
           <Route path={'/partners'} element={<SPBusinessPartners/>} />
           <Route path={'/hor-reports'} element={<HORSalesReport/>} />
           <Route path={'/abm-reports'} element={<ABMSalesReport/>} />
+          <Route path={'/voucher-usage-report'} element={<VoucherUsageReport/>} />
           <Route path={'/regional-reports'} element={<RegionalSalesReport/>} /> 
           <Route path={'/customers'} element={<Customers/>} /> 
           <Route path={'/commission'} element={<Commission/>} /> 

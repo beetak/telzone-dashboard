@@ -2,7 +2,7 @@ import {useState, useRef, useEffect} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllBusinessPartners } from "../../../store/business-slice";
 import { 
-  cancelSale,
+  closeSale,
   cartActions,  
   getBtnState, 
   getBundleId, 
@@ -48,8 +48,10 @@ const CartItems = () => {
   const prices  = useSelector(getBasePrice)
   
   const [empty, setEmpty] = useState('')
+  const [error, setError] = useState('')
   const [loadingStatus, setLoadingStatus] = useState(false)
   const [loadingSuccess, setLoadingSuccess] = useState(false)
+  const [loadingFailed, setLoadingFailed] = useState(false)
   const [insufficient, setInsufficient] = useState(false)
 
   const [businessPartnerName, setBusinessPartnerName] = useState(`Client's Name`)
@@ -215,11 +217,27 @@ const CartItems = () => {
           saleByBundle(postBundleId, totalQty, response.payload.data.order.id, printSize);
         } else {
           // Request was not successful
-          console.log('postSale failed');
+          setLoadingFailed(true)
+          setError("Please check your network")
+          setTimeout(() => {
+            setLoadingStatus(false);
+            setLoadingSuccess(false);
+            setBusinessPartnerName(`Client's Name`)
+            setCurrencyState('Currency')
+            dispatch(cartActions.deleteFromCart())
+          }, 5000);
         }
       }).catch(error => {
         // Handle any errors that occurred during postSale dispatch
-        console.error('Error during postSale:', error);
+        setLoadingFailed(true)
+        setError("Error posting")
+        setTimeout(() => {
+          setLoadingStatus(false);
+          setLoadingSuccess(false);
+          setBusinessPartnerName(`Client's Name`)
+          setCurrencyState('Currency')
+          dispatch(cartActions.deleteFromCart())
+        }, 3000);
       })
     }
   };
@@ -253,14 +271,14 @@ const CartItems = () => {
           response.payload.data.data.forEach(function(voucher, i){
             soldId.push(voucher.id)
           })
-          dispatch(cancelSale(
+          dispatch(closeSale(
             {
               orderId: orderID,
               status: true
             }
           )).then((updateResponse)=>{
             if(updateResponse && updateResponse.payload.success ){
-              updateVoucherState(soldId, quantity, orderID, response.payload.data.data, printSize)
+              updateVoucherState(soldId, orderID, response.payload.data.data, printSize)
             }
           })
         }
@@ -274,10 +292,13 @@ const CartItems = () => {
     })
   }
 
-  const updateVoucherState = (soldId, quantity, orderID, data, printSize) => {
+  const updateVoucherState = (soldId, orderID, data, printSize) => {
     console.log("SOLD VOUCHERS",soldId)
     dispatch(updateVoucherStatus(
-      soldId
+      {
+        orderID,
+        soldId
+      }
     )).then((response)=>{
       if(response.payload && response.payload.success === true){
         setLoadingSuccess(true);
@@ -534,7 +555,7 @@ const CartItems = () => {
   let loadingSalesAnimation = 
     <div className='text-center' style={anime}>
         <h5 style={{ color: '#055bb5' }}>
-          {loadingStatus && !loadingSuccess && !insufficient ? 
+          {loadingStatus && !loadingSuccess && !insufficient && !loadingFailed? 
             "Preparing Invoice" :
             loadingStatus && loadingSuccess ? 
               "Successful" :
@@ -544,7 +565,9 @@ const CartItems = () => {
                   <span style={{ color: 'red' }}>There is a shortage of {requested - available} Vouchers. <br /></span>
                   Please contact the administrator.
                 </span>
-              ) : ""}
+              ) : 
+              loadingStatus && loadingFailed ?
+            `Transaction failed: `+ error  : ""}
         </h5>
         <BeatLoader
           color={'#055bb5'}

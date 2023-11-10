@@ -259,7 +259,8 @@ const FocItems = () => {
             id: 1,
             lastModified: today,
             quantity: totalQty,
-            requestDate: today
+            requestDate: today,
+            suspended: false
           },
           requestCreator: userID
         }
@@ -377,7 +378,7 @@ const FocItems = () => {
           </div>
           <div className='row'>
             <div className="col-6">
-              <label className="form-label" style={{marginBottom: '0px'}}>FOC Legible Customer</label>                  
+              <label className="form-label" style={{marginBottom: '0px'}}>FOC Eligible Customer</label>                  
               {renderedBusinessPartner}
               <div style={{ color: 'red', marginBottom: '10px' }}>{empty}</div>
               <div className="dropdown">

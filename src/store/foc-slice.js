@@ -19,6 +19,20 @@ export const postAsyncRequest = createAsyncThunk(
     }
 );
 
+export const updateFocStatus = createAsyncThunk(
+    'foc/updateFocStatus',
+    async (initialData) => {
+      console.log(initialData);
+      try {
+        const response = await Api.put(`/foc/${initialData.id}`, initialData);
+        return { success: true, data: response.data.data };
+      } catch (error) {
+        console.error('Foc Update error:', error);
+        throw error;
+      }
+    }
+);
+
 const focSlice = createSlice({
     name: 'cart',
     initialState: {
@@ -82,6 +96,21 @@ const focSlice = createSlice({
             state.loadingStatus = 'fulfilled'
         },
         [fetchAsyncFoc.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.loadingStatus = 'rejected'
+        },
+        [updateFocStatus.pending]: (state)=>{
+            console.log("pending")
+            state.loadingStatus = 'pending'
+        },
+        [updateFocStatus.fulfilled]: (state, action)=>{
+            console.log("fulfilled", action.payload)
+            // return {...state, sales: payload}
+            const { data } = action.payload
+            // state.foc = action.payload
+            state.loadingStatus = 'fulfilled'
+        },
+        [updateFocStatus.rejected]: (state, {payload})=>{
             console.log("rejected")
             state.loadingStatus = 'rejected'
         },

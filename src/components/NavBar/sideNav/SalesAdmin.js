@@ -21,14 +21,14 @@ export default class SalesAdmin extends Component{
           <span className="nav-link-text ms-1">Sales</span>
         </Link>
       </li>
-      <li className="nav-item">
+      {/* <li className="nav-item">
         <Link className="nav-link text-white " to="/foc-sales">
           <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i className="material-icons opacity-10">add_business</i>
           </div>
           <span className="nav-link-text ms-1">FOC Sales</span>
         </Link>
-        </li>
+      </li> */}
       <li className="nav-item">
         <Link className="nav-link text-white " to="/verify">
           <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">

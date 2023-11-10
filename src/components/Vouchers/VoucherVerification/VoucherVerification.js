@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { batchActions, getSearchMessage, getSoldStatus, getStatusSearch, getUsedStatus, getVerified, voucherVerification } from '../../../store/batch-slice';
+import { batchActions, getSearchMessage, getSoldStatus, getStatusSearch, getUsedStatus, getVerified, getVerifyStatus, voucherVerification } from '../../../store/batch-slice';
 import { BeatLoader } from 'react-spinners';
 import { Button, Modal } from 'react-bootstrap';
 const userRole = localStorage.getItem('role')
@@ -13,6 +13,7 @@ const VoucherVerification = () => {
   const [updateStatus, setUpdateStatus] = useState('')
   const [current, setCurrent] = useState('')
 
+
   const openModal = () => setIsOpen(true);
 
   const closeModal = () => setIsOpen(false);
@@ -20,6 +21,8 @@ const VoucherVerification = () => {
   const soldState = useSelector(getSoldStatus)
   const usedState = useSelector(getUsedStatus)
   const verified = useSelector(getVerified)
+  const verifyStatus = useSelector(getVerifyStatus)
+  const searchStatus = useSelector(getStatusSearch)
 
   const today = new Date()
   const date = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
@@ -29,11 +32,15 @@ const VoucherVerification = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // setIsOpen(true)
     dispatch(voucherVerification(
       {
         voucherCode
       }
-    ))
+    )).then((response)=>{
+        console.log("my respo", response)
+      
+    })
   };
   const message = useSelector(getSearchMessage)
 
@@ -56,7 +63,7 @@ const VoucherVerification = () => {
     </div>
   
   let renderedVouchers = ''
-  if(message==='found'){
+  if(verifyStatus && message !== "NOT_FOUND"){
     renderedVouchers =
     <div className="align-middle text-center">
       {
@@ -76,9 +83,9 @@ const VoucherVerification = () => {
               </span>
             </> : 
             (
-            verified.data.sold && verified.data.used ?
-              <span class="badge badge-sm bg-gradient-secondary w-50 p-2">Sold & used</span> : 
-              ''
+              verified.data.sold && verified.data.used ?
+                <span class="badge badge-sm bg-gradient-secondary w-50 p-2">Sold & used</span> : 
+                ''
             )
         )}
     </div>
@@ -88,6 +95,11 @@ const VoucherVerification = () => {
     <tr>
       <td colspan={7} className='text-center'><h5 style={{ color: '#E91E63' }}>Opps something went wrong. Please refresh page</h5></td>
     </tr>
+
+  const convertDate = (dateCreated) => {
+    const dateString = new Date(dateCreated);
+    return dateString.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
 
   return (
     <>
@@ -109,13 +121,13 @@ const VoucherVerification = () => {
                 </div>
 
                 {
-                  message === 'pending' ?
+                  searchStatus === 'pending' ?
                     loadingAnimation :
-                    message === 'rejected' ?
+                    searchStatus === 'rejected' ?
                       errorMsg :
-                      message === 'found' ?
+                      searchStatus === 'fulfilled' && message !== "NOT_FOUND" ?
                         renderedVouchers : 
-                        message === 'not-found' ?
+                        searchStatus === 'fulfilled' && message === "NOT_FOUND" ?
                           renderedError : ''
                 }
                 <button onClick={handleSubmit} className="btn btn-info my-4">Verify</button>
@@ -139,8 +151,12 @@ const VoucherVerification = () => {
                   <h6 className="mb-1 text-dark text-sm">Voucher Code</h6>
                 </div>
               </div>
-              <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                {"bundleType"}
+              <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold ml-8">
+                {message === 'found' ? (
+                  <>{verified.data.vouchers.bundle.name}</>
+                ) : (
+                  ""
+                )}
               </div>
             </li>
             
@@ -177,7 +193,9 @@ const VoucherVerification = () => {
                 </div>
               </div>
               <div className="d-flex align-items-center text-info text-gradient text-sm font-weight-bold">
-                {"voucherCount - soldCount"}
+                { message==='found'?
+                  <>{verified.data.vouchers.order.adminPortalUsers.firstname} {verified.data.vouchers.order.adminPortalUsers.surname}</>:""
+                }
               </div>
             </li>
             <li className="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
@@ -187,7 +205,9 @@ const VoucherVerification = () => {
                 </div>
               </div>
               <div className="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                {"soldCount"}
+                { message==='found'?
+                  <>{verified.data.vouchers.order.businessPartner.name}</>:""
+                }
               </div>
             </li>
             <li className="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
@@ -197,7 +217,9 @@ const VoucherVerification = () => {
                 </div>
               </div>
               <div className="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                {"soldCount"}
+                { message==='found'?
+                  <>{convertDate(verified.data.vouchers.order.dateCreated)}</>:""
+                }
               </div>
             </li>
             <li className="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
@@ -207,17 +229,31 @@ const VoucherVerification = () => {
                 </div>
               </div>
               <div className="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold">
-                {"usedCount"}
+                { message==='found'?
+                  <>{!verified.data.vouchers.dateUsed?"Not Yet Used":convertDate(verified.data.vouchers.dateUsed)}</>:""
+                }
               </div>
             </li>
             <li className="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
               <div className="d-flex align-items-center">
                 <div className="d-flex flex-column">
-                  <h6 className="mb-1 text-dark text-sm">Usaged By</h6>
+                  <h6 className="mb-1 text-dark text-sm">Used By:</h6>
                 </div>
               </div>
               <div className="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold">
-                {"usedCount"}
+                {"Guest User"}
+              </div>
+            </li>
+            <li className="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+              <div className="d-flex align-items-center">
+                <div className="d-flex flex-column">
+                  <h6 className="mb-1 text-dark text-sm">Mac Address:</h6>
+                </div>
+              </div>
+              <div className="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold">
+                { message==='found'?
+                  <>{!verified.data.vouchers.macAddress?"Not Yet Used":verified.data.vouchers.macAddress}</>:""
+                }
               </div>
             </li>
           </ul>

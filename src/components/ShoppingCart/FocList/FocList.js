@@ -51,8 +51,8 @@ const FocList = () => {
                             <thead>
                                 <tr>
                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Product</th>
-                                    <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Quantity</th>
-                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-end opacity-7 ">Customer Name</th>
+                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style={{padding:0}}>Quantity</th>
+                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7  ">Customer Name</th>
                                     <th className="text-end text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Created By</th>
                                     <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date Created</th>
                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-end opacity-7 ">Current User</th>

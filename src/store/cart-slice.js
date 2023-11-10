@@ -9,17 +9,6 @@ export const fetchAsyncSales = createAsyncThunk('cart/fetchAsyncSales', async ()
     
 })
 
-// export const fetchAsyncSoldVouchers = createAsyncThunk('cart/fetchAsyncSoldVouchers', async () => {
-//     try{
-//         const response = await Api
-//         .get(`/voucher/`)
-//         return [...response.data.data]
-//     }
-//     catch(err){
-//         alert(err)
-//     }
-// })
-
 export const postSale = createAsyncThunk('cart/postSale', async (initialData) => {
     return await Api
       .post('/order/', 
@@ -42,8 +31,8 @@ export const postVoucherSaleByBundleId = createAsyncThunk(
     }
 );
 
-export const cancelSale = createAsyncThunk(
-    'sale/cancelSale',
+export const closeSale = createAsyncThunk(
+    'sale/closeSale',
     async ({
         orderId,
         status
@@ -89,9 +78,9 @@ export const updateVoucherOnSale = createAsyncThunk('cart/updateVoucherOnSale',
 
 export const updateVoucherStatus = createAsyncThunk(
     'cart/updateVoucherStatus',
-    async (soldId) => {
+    async ({orderID,soldId}) => {
         try {
-            const response = await Api.put(`/sales/${soldId}`,
+            const response = await Api.put(`/sales/order${orderID}/${soldId}`,
             {headers})
             return { success: true, data: response.data };
         } catch (error) {
@@ -302,14 +291,14 @@ const cartSlice = createSlice({
             state.stateUpdate = 'rejected'
             state.retrieveStatus = 'rejected'
         },
-        [cancelSale.pending]: (state)=>{
+        [closeSale.pending]: (state)=>{
             console.log("pending")
             state.cancelStatus = 'pending'
         },
-        [cancelSale.fulfilled]: (state, action)=>{         
+        [closeSale.fulfilled]: (state, action)=>{         
             state.cancelStatus = 'fulfilled'
         },
-        [cancelSale.rejected]: (state, {payload})=>{
+        [closeSale.rejected]: (state, {payload})=>{
             console.log("rejected")
             state.cancelStatus = 'rejected'
         }
