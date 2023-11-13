@@ -21,28 +21,36 @@ const CartBundleList = ({pageType}) => {
                     </tr>
                 ))
         ):(
-            shopName === "Glen View"?(
+            shopName === "No Shop"? (
                 bundles.map((bundle, index)=>(
-                    bundle.name === "Glenview Voucher" &&
-                        <tr key={index}>
-                            <CartBundleCard data={bundle} page={pageType} index={index}/>
-                        </tr>
-                    ))
+                    <tr key={index}>
+                        <CartBundleCard data={bundle} page={pageType} index={index}/>
+                    </tr>
+                ))
             ):(
-                shopName === "TCFL"?(
+                shopName === "Glen View"?(
                     bundles.map((bundle, index)=>(
-                        bundle.name === "TCFL STUDENTS" &&
+                        bundle.name === "Glenview Voucher" &&
                             <tr key={index}>
                                 <CartBundleCard data={bundle} page={pageType} index={index}/>
                             </tr>
                         ))
                 ):(
-                    bundles.map((bundle, index)=>(
-                        bundle.name !== "Chitungwiza Voucher" && bundle.name !== "Glenview Voucher" && bundle.name !== "TCFL STUDENTS" &&
-                            <tr key={index}>
-                                <CartBundleCard data={bundle} page={pageType} index={index}/>
-                            </tr>
-                        ))
+                    shopName === "TCFL"?(
+                        bundles.map((bundle, index)=>(
+                            bundle.name === "TCFL STUDENTS" &&
+                                <tr key={index}>
+                                    <CartBundleCard data={bundle} page={pageType} index={index}/>
+                                </tr>
+                            ))
+                    ):(
+                        bundles.map((bundle, index)=>(
+                            bundle.name !== "Chitungwiza Voucher" && bundle.name !== "Glenview Voucher" && bundle.name !== "TCFL STUDENTS" &&
+                                <tr key={index}>
+                                    <CartBundleCard data={bundle} page={pageType} index={index}/>
+                                </tr>
+                            ))
+                    )
                 )
             )
         )
