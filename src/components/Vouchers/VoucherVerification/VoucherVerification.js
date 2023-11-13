@@ -73,14 +73,14 @@ const VoucherVerification = () => {
           verified.data.sold && !verified.data.used ?
             <>
               <span class="badge badge-sm bg-gradient-info w-50 p-2 mb-2">sold & Not Used</span><br/>
-              <span 
+              {/* <span 
                 onClick={
                   userRole ===  'Admin' || userRole ===  'Super Admin'?
                     ()=>openModal():
                     ()=>dispatch(batchActions.showDetails())
                 }
                 class="badge badge-sm bg-gradient-secondary w-30 p-2 cursor-pointer">More details
-              </span>
+              </span> */}
             </> : 
             (
               verified.data.sold && verified.data.used ?

@@ -31,6 +31,7 @@ const userID = localStorage.getItem('userId')
 const regionId = localStorage.getItem('regionId')
 const townId = localStorage.getItem('townId')
 const shopId = localStorage.getItem('shopId')
+const shopName = localStorage.getItem('shopName')
 
 let voucherIdArray = []
 
@@ -96,6 +97,7 @@ const CartItems = () => {
   let unitVat = 0
   let totalVat = 0
   let netTotal = 0
+  let totalValue = 0
 
   const itemsList = useSelector((state) => state.cart.itemsList);
 
@@ -160,9 +162,9 @@ const CartItems = () => {
     totalPrice = (Math.round(unitPrice*item.quantity*100)/100).toFixed(2)
     unitDiscount = item.price*discountPercentage/100 * rate
     totalDiscount = (Math.round(unitDiscount*item.quantity*100)/100).toFixed(2)
-    unitVat = (Math.round((unitPrice*1.15 - unitPrice)*100)/100).toFixed(2)
+    unitVat = (Math.round((item.price - unitPrice)*100)/100).toFixed(2)
     totalVat = (Math.round(unitVat*item.quantity*100)/100).toFixed(2)
-    netTotal = (Math.round((parseFloat(totalVat) + parseFloat(totalPrice))*100)/100).toFixed(2)
+    netTotal = (Math.round((parseFloat(totalVat) + parseFloat(totalPrice)-parseFloat(totalDiscount))*100)/100).toFixed(2)
 
 
   });
@@ -271,16 +273,7 @@ const CartItems = () => {
           response.payload.data.data.forEach(function(voucher, i){
             soldId.push(voucher.id)
           })
-          dispatch(closeSale(
-            {
-              orderId: orderID,
-              status: true
-            }
-          )).then((updateResponse)=>{
-            if(updateResponse && updateResponse.payload.success ){
-              updateVoucherState(soldId, orderID, response.payload.data.data, printSize)
-            }
-          })
+          updateVoucherState(soldId, orderID, response.payload.data.data, printSize)
         }
       } else {
         // Request was not successful
@@ -401,29 +394,16 @@ const CartItems = () => {
     });
 
     doc.save('invoice.pdf')
-    // window.location = '/sales'
+    dispatch(closeSale(
+      {
+        orderId: orderID,
+        status: true
+      }
+    )).finally(()=>{
+      setSoldId([])
+    })
   }
-  const getCurrency =(id, name, symbol)=>{
-    setCurrencyID(id)
-    setCurrencyState(name)
-    setCurrencySymbol(symbol)
-  }
 
-  const currencyData = useSelector(getAllCurrencies)
-
-  let renderedCurrency = ''
-    renderedCurrency = currencyData ? (
-      currencyData.map((currency, index)=>(
-        <tr key={index}>
-          <CurrencyDropdown data={currency} setCurrency={getCurrency}/>
-        </tr>
-      ))
-    ):(<div><h1>Error</h1></div>)
-
-    const deleteCartItem = () => {
-      dispatch(cartActions.deleteFromCart());
-    };
-    
   const printVouchers = (myVouchers, orderID) => {
     console.log("items lis ",itemsList)
     let count = 1
@@ -518,7 +498,7 @@ const CartItems = () => {
     doc.setFont('Times New Roman', 'regular');
     doc.setFontSize(10);
     doc.setTextColor(112, 112, 112);
-    doc.text(360, 140, 'Invoice Date:\nTime:\nInvoice Number:\nBP Number:\nVAT Number:', { align: 'right' });
+    doc.text(350, 140, 'Invoice Date:\nTime:\nInvoice Number:\nBP Number:\nVAT Number:', { align: 'right' });
     doc.text(410, 140, formattedDate + '\n' + curTime + '\n' + orderID + '\n200001412' + '\n10001509', { align: 'right' });
     doc.setFont('Times New Roman', 'bold');
     doc.setFontSize(12);
@@ -544,7 +524,37 @@ const CartItems = () => {
     
     doc.save('invoice.pdf')
     // window.location = '/sales'
+    
+    dispatch(closeSale(
+      {
+        orderId: orderID,
+        status: true
+      }
+    )).finally(()=>{
+      setSoldId([])
+    })
   }
+
+  const getCurrency =(id, name, symbol)=>{
+    setCurrencyID(id)
+    setCurrencyState(name)
+    setCurrencySymbol(symbol)
+  }
+
+  const currencyData = useSelector(getAllCurrencies)
+
+  let renderedCurrency = ''
+    renderedCurrency = currencyData ? (
+      currencyData.map((currency, index)=>(
+        <tr key={index}>
+          <CurrencyDropdown data={currency} setCurrency={getCurrency}/>
+        </tr>
+      ))
+    ):(<div><h1>Error</h1></div>)
+
+    const deleteCartItem = () => {
+      dispatch(cartActions.deleteFromCart());
+    };
 
   const componentRef = useRef()
   const handlePrint = useReactToPrint({
@@ -590,7 +600,7 @@ const CartItems = () => {
           <div className="input-group input-group-dynamic mb-4">
             <table class="table table-borderless">
               <thead>
-                <tr>
+                <tr style={{ borderTop: '1px solid black', borderBottom: '1px solid black' }}>
                   <th scope="col">Bundle Type</th>
                   <th scope="col">Price</th>
                   <th scope="col" style={{textAlign: 'center'}}>Qty</th>
@@ -601,7 +611,7 @@ const CartItems = () => {
                 {renderedItems}
                 {!btnState?
                   <>
-                  <tr>
+                  <tr style={{ borderTop: '1px solid black'}}>
                     <td colSpan={2}></td>
                     <td>Sub Total
                     </td>
@@ -609,14 +619,19 @@ const CartItems = () => {
                   </tr>
                   <tr>
                     <td colSpan={2}></td>
+                    <td>VAT {vatPercentage}%</td>
+                    <td style={{textAlign: 'right'}}> ${totalVat}</td>
+                  </tr>
+                  <tr>
+                    <td colSpan={2}></td>
                     <td>Discount {discountPercentage}%
                     </td>
                     <td style={{textAlign: 'right'}}> ${totalDiscount}</td>
                   </tr>
-                  <tr>
+                  <tr style={{ borderTop: '1px solid black',  borderBottom: '1px solid black' }}>
                     <td colSpan={2}></td>
-                    <td>VAT {vatPercentage}%</td>
-                    <td style={{textAlign: 'right'}}> ${totalVat}</td>
+                    <td>Total inc VAT</td>
+                    <td style={{ textAlign: 'right' }}> ${netTotal}</td>
                   </tr>
                   </>:
                   <></>}

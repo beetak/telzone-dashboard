@@ -4,7 +4,7 @@ import ShopDetails from "./shopDetails/shopDetails";
 import TownDetails from "./townDetails/townDetails";
 import RegionDetails from "./regionDetails/regionDetails";
 import RoleDetails from "./roleDetails/roleDetails";
-import { fetchAsyncRegion, fetchAsyncRole, fetchAsyncShop, fetchAsyncTown } from "../../../store/entities-slice";
+import { fetchAsyncRegion, fetchAsyncRole, fetchAsyncShops, fetchAsyncTown } from "../../../store/entities-slice";
 import { getToggleStatus } from "../../../store/toggle-slice";
 
 const url = "http://localhost:8082/smart-wifi/user/"; // URL variable stores JSON url || API taken from 10 Degrees WordPress Agency
@@ -18,7 +18,7 @@ export default function BusinessEntities(){
     
     useEffect(() => {
       dispatch(fetchAsyncTown())
-      dispatch(fetchAsyncShop())
+      dispatch(fetchAsyncShops())
       dispatch(fetchAsyncRegion())
       dispatch(fetchAsyncRole())
     }, [dispatch, active]);

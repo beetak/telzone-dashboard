@@ -10,6 +10,10 @@ const CartItem = ({ name, quantity, total, discount, price, id, product, rate, v
   const [ rateId, setRateId ] = useState('')
   const [ inputQuantity, setInputQuantity ] = useState(quantity);
 
+  const priceInt = price * 100; // Convert price to integer (e.g., cents)
+  const discountInt = discount * 100; // Convert discount to integer
+  const rateInt = rate * 100; // Convert rate to integer
+  const vatInt = vat + 100; // Convert VAT to integer (e.g., 110 for 10% VAT)
 
   const dispatch = useDispatch();
 

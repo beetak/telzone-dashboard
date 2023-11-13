@@ -2,16 +2,34 @@ import { useState, useEffect } from "react";
 import ShopReportsTab from "./shopReportsTab/shopReportsTab";
 import AgentReportsTab from "./agentReportsTab/agentReportsTab";
 import VoucherReportsTab from "./voucherReportsTab/voucherReportsTab";
+import VoucherVerification from "../../Vouchers/VoucherVerification/VoucherVerification";
+import FurtherDetails from "../../Vouchers/FurtherDetails/FurtherDetails";
+import { useSelector } from "react-redux";
+import { getShow } from "../../../store/batch-slice";
 
  // URL variable stores JSON url || API taken from 10 Degrees WordPress Agency
 
 export default function SupervisorReportDetails(){
     
     const [tabState, setTabState] = useState('')
+    const showMore = useSelector(getShow)
 
     let tabinfo = ""
     if(tabState === "voucherReports"){
       tabinfo = <VoucherReportsTab/>
+    }
+    else if(tabState==='voucher-verify'){
+      tabinfo = <>
+          <div className="container-fluid">
+            <div className="row">
+              <VoucherVerification/>
+              {
+                  showMore?
+                      <FurtherDetails/>:''
+              }
+            </div>
+          </div>
+      </>
     }
     else{
       tabinfo = <AgentReportsTab/>
@@ -43,6 +61,17 @@ export default function SupervisorReportDetails(){
                             </div>
                         </a>
                     </div>
+                </div>
+                <div className="col-3">
+                  <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
+                    <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
+                      onClick={()=>setTabState('voucher-verify')}
+                      style={Style2}>
+                      <div className="col-12 d-flex align-items-center">
+                        <h6 className="text-white text-capitalize ps-3">Voucher Verification</h6>
+                      </div>
+                    </a>
+                  </div>
                 </div>
             </div>
         <div className="card-body px-0 pb-2">

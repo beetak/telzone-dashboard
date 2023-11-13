@@ -16,17 +16,12 @@ const userId = localStorage.getItem('userId')
 const userShop = localStorage.getItem('shopId')
 const img = "assets/img/telonelogo.png"
 
-export default function VoucherReport() {
+export default function VoucherTotalSales() {
 
     const today = new Date()
     const mydate = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
     const dateString = mydate.toString();
-
     const dispatch = useDispatch()
-    useEffect(() => {
-      dispatch(fetchAsyncShops())
-    }, [dispatch]);
-
     const active = useSelector(getToggleStatus)
     const loading = useSelector(getLoadingStatus)
     const soldVouchers = useSelector(getSoldVouchers)
@@ -46,25 +41,6 @@ export default function VoucherReport() {
     const [status, setStatus] = useState(true)
 
     const [invoiceNumber, setInvoiceNumber] = useState("")
-
-    //SHOPS DATA
-    const getShop =(id, name)=>{
-        setShopId(id)
-        setShopName(name)
-        setShopState(name)
-        setSearchLevel("shop")
-        dispatch(saleActions.clearSales())
-    }
-
-    let renderedShop = ''
-    renderedShop = shops ? (
-      shops.map((role, index)=>(
-        role.id!==1&&
-        <tr key={index}>
-          <TelOneShopDropdown data={role} setShop={getShop}/>
-        </tr>
-      ))
-    ):(<div><h1>Error</h1></div>)
   
     let filterButton = <>
         <div className="dropdown" style={{paddingLeft: 10}}>
@@ -101,24 +77,13 @@ export default function VoucherReport() {
             </ul>
         </div>
     </>
-  
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      if(invoiceNumber==='' && date !== ''){
-        dispatch(fetchSoldVouchersByDate(
-          date
-        ));
-      }
-      else if(invoiceNumber !=='' && date === ''){
-        dispatch(fetchSoldVouchers(
-          invoiceNumber
-        ));
-      }
-      else{
-        alert("Please fill in either date or invoice number but not both fields")
-      }
-    };
+    useEffect(() => {
+      dispatch(fetchAsyncBundles(active))
+      dispatch(fetchAsyncShops(active))
+    }, [dispatch, active]);
+  
+    const bundles = useSelector(getAllBundles)
 
     const submitRequest = async (e) => {
       e.preventDefault();
@@ -138,20 +103,6 @@ export default function VoucherReport() {
           dispatch(fetchSoldVouchersByShopAndDate({startDate, endDate, shopId, status}))
         else
           dispatch(fetchSoldVouchersByShopAndDate({startDate, endDate, shopId:userShop, status}))
-      }
-      setTimeout(()=>{
-          setEmpty("")
-          setValidate("")
-      }, 3000)  
-    };
-
-    const submitAgentRequest = async (e) => {
-      e.preventDefault();
-      if(date===''){
-        setValidate("Please select the start date and end date")
-      }
-      else{
-        dispatch(fetchSoldVouchersByAgentAndDate({date, userId}))
       }
       setTimeout(()=>{
           setEmpty("")
@@ -225,88 +176,13 @@ export default function VoucherReport() {
       </tr>
       
     let displayData = ""
-    if(userRole === "Supervisor"){
-      displayData =
-      <div>
-        <div className="row">
-          <h6 className='ms-3'>Please fill in all required fields</h6>
-          <div className="col-9 d-flex align-items-center">
-              {/* Shop Dropdown */}
-              <div className="dropdown"  style={{paddingLeft: 10}}>
-                <div className="input-group input-group-dynamic mb-4">
-                  <div className="mb-3">
-                    <label className="form-label">Start Date</label>
-                    <input
-                      type="date"
-                      style={{ border: 0, marginRight: 10 }}
-                      name="startDate"
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="form-control mt-4"
-                      value={startDate}
-                      max={dateString}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">End Date</label>
-                    <input
-                      type="date"
-                      style={{ border: 0, marginRight: 10 }}
-                      name="endDate"
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="form-control mt-4"
-                      value={endDate}
-                      max={dateString}
-                    />
-                  </div>
-                </div>
-              </div>
-              {filterButton}
-              <button className="btn btn-primary ms-2" onClick={submitRequest}>Search</button>
-          </div> 
-        </div>
-        
-        <table className="table align-items-center mb-0">
-          <thead>
-            <tr>
-              <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Voucher Code</th>
-              <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Bundle Type</th>
-              <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date Sold</th>
-              <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Sold By</th>
-              <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              loading==='pending'?
-                loadingAnimation: 
-                loading ==='rejected'?
-                  errorMsg: renderedBundles
-            }
-          </tbody>
-        </table>
-      </div>
-    }
-    else if(userRole === "Finance Manager"){
+    if(userRole === "Admin"){
       displayData=
       <div className='row'>
             <div className="col-12">
                 <div className="card pb-0 p-3 mb-1">
                     <div className="row">
                         <div className="col-10 d-flex align-items-center">
-                          <div className="dropdown"  style={{paddingLeft: 10}}>
-                            <button 
-                                className="btn bg-gradient-primary dropdown-toggle" 
-                                type="button" 
-                                id="dropdownMenuButton" 
-                                data-bs-toggle="dropdown" 
-                                aria-expanded="false"
-                                >
-                                {shopState}
-                            </button>
-                            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            {renderedShop}
-                            </ul>
-                          </div>
                           {filterButton}
                           <div><sup style={{color: 'red', paddingLeft: 10}}>{empty}</sup></div>
                           <button onClick={submitRequest} className="btn btn-primary">Search</button>
@@ -324,7 +200,7 @@ export default function VoucherReport() {
                             </div>                      
                             <div class="col-6 text-end">
                                 <h6 className="mb-0">SUMMARY NATIONAL VOUCHER USAGE REPORT</h6>
-                                <h6 className="mb-0">Shop Totals</h6>
+                                <h6 className="mb-0">Sales Total</h6>
                             </div>
                         </div>
                         <div className="row">
@@ -332,12 +208,7 @@ export default function VoucherReport() {
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>From Date:</span><input type="date" style={{border: 0}} name="startDate" onChange={(e) => setStartDate(e.target.value)} value={startDate} max={dateString}/></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>To Date:</span><input type="date" style={{border: 0}} name="endDate" onChange={(e) => setEndDate(e.target.value)} value={endDate} max={dateString}/><sup style={{color: 'red', paddingLeft: 10}}>{validate}</sup></h6>
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Usage Status:</span> {status? "Used":"Not Used"}</h6>
-                            </div> 
-                            <div className="col-6 align-items-center">
-                                {/* <h6 className="mb-0 ms-2"><span style={{width:100}}>Region:</span> {region==='No Region'? 'All Regions': region}</h6>
-                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Town:</span> {town==='No Town'? 'All Towns': town}</h6> */}
-                                <h6 className="mb-0 ms-2"><span style={{width:100}}>Shop:</span> {shopState}</h6>
-                            </div> 
+                            </div>
                         </div>
                     </div>
                     <div className="card-body p-3 pb-0">
@@ -365,45 +236,6 @@ export default function VoucherReport() {
                 </div>
             </div>
         </div>
-    }
-    else if(userRole === 'Sales Admin'){
-      displayData =
-      <div>
-        <div className="row">
-          <h6 className='ms-3'>Enter Date</h6>
-          <div className="col-9 d-flex align-items-center">
-              {/* Shop Dropdown */}
-              <div className="dropdown"  style={{paddingLeft: 10}}>
-                <div className="input-group input-group-dynamic mb-4">
-                  <input type="date" style={{border: 0, marginRight: 10}} name="date" onChange={(e) => setDate(e.target.value)} className="form-control" value={date} max={dateString}/>
-                </div>
-              </div>
-              <button className="btn btn-primary" onClick={submitAgentRequest}>Search</button>
-          </div> 
-        </div>
-        
-        <table className="table align-items-center mb-0">
-          <thead>
-            <tr>
-              <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Voucher Code</th>
-              <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Bundle Type</th>
-              <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date Sold</th>
-              <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              loading==='pending'?
-                loadingAnimation: 
-                loading ==='rejected'?
-                  errorMsg: renderedBundles
-            }
-          </tbody>
-        </table>
-      </div>
-    }
-    else if(userRole === "Admin"){
-      displayData = <VoucherUsage/>
     }
 
     return (

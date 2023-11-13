@@ -45,7 +45,7 @@ export const fetchAsyncTown = createAsyncThunk('entity/fetchAsyncTown', async ()
     return [...response.data.data]
 })
 
-export const fetchAsyncShops = createAsyncThunk('entity/fetchAsyncTown', async () => {
+export const fetchAsyncShops = createAsyncThunk('entity/fetchAsyncShops', async () => {
     const response = await Api
     .get(`/shop/`)
     return [...response.data.data]
@@ -65,12 +65,6 @@ export const postTown = createAsyncThunk(
 export const fetchAsyncTownByRegion = createAsyncThunk('entity/fetchAsyncTownByRegion', async (id) => {
     const response = await Api
     .get(`/town/regionId${id}`)
-    return [...response.data.data]
-});
-
-export const fetchAsyncShop = createAsyncThunk('entity/fetchAsyncShop', async () => {
-    const response = await Api
-    .get(`/shop/`)
     return [...response.data.data]
 });
 
@@ -142,11 +136,11 @@ const entitySlice = createSlice({
         [postRole.rejected]: (state, {payload})=>{
             console.log("rejected")
         },
-        [fetchAsyncShop.pending]: (state)=>{
+        [fetchAsyncShops.pending]: (state)=>{
             console.log("pending")
             state.loadingShop = 'pending'
         },
-        [fetchAsyncShop.fulfilled]: (state, action)=>{
+        [fetchAsyncShops.fulfilled]: (state, action)=>{
             console.log('shops: ', action.payload)
             const loadedShops = action.payload.map(shop=>{
                 return shop
@@ -154,7 +148,7 @@ const entitySlice = createSlice({
             state.shops = loadedShops
             state.loadingShop = 'fulfilled'
         },
-        [fetchAsyncShop.rejected]: (state, {payload})=>{
+        [fetchAsyncShops.rejected]: (state, {payload})=>{
             console.log("rejected")
             state.loadingShop = 'rejected'
         },
@@ -193,6 +187,7 @@ const entitySlice = createSlice({
             state.loadingTown = 'pending'
         },
         [fetchAsyncTown.fulfilled]: (state, action)=>{
+            console.log("data found ", action.payload)
             const loadedRoles = action.payload.map(town=>{
                 return town
             })

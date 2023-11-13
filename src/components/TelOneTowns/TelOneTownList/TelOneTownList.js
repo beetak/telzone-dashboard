@@ -25,6 +25,7 @@ export default function TelOneTownList(){
   </tr>
 
   const towns = useSelector(getAllTowns)
+  console.log("my towns", towns)
 
   var count = Object.keys(towns).length
   let renderedTown = ''

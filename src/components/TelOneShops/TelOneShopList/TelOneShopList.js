@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import { useSelector } from 'react-redux';
 import BeatLoader from "react-spinners/BeatLoader";
 import { getAllShops, getLoadingShop } from '../../../store/entities-slice';
-import TelOneShopCard from '../TelOneShopCard/TelOnerShopCard';
+import TelOneShopCard from '../TelOneShopCard/TelOneShopCard';
 
 const userRole = localStorage.getItem('role')
 

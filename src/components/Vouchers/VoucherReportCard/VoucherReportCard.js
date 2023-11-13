@@ -3,6 +3,8 @@ import { useDispatch, useSelector} from 'react-redux';
 import { cartActions, getBtnState } from '../../../store/cart-slice';
 import { focActions } from '../../../store/foc-slice';
 
+const userRole = localStorage.getItem('role')
+
 const VoucherReportCard = (props) => {
 
     const btnState = useSelector(getBtnState)
@@ -37,10 +39,11 @@ const VoucherReportCard = (props) => {
       const day = dateString.toLocaleDateString('en-GB', { day: 'numeric' });
       const month = dateString.toLocaleDateString('en-GB', { month: 'long' });
       const year = dateString.toLocaleDateString('en-GB', { year: 'numeric' });
-      const hours = dateString.getHours().toString().padStart(2, '0');
-      const minutes = dateString.getMinutes().toString().padStart(2, '0');
+      // const hours = dateString.getHours().toString().padStart(2, '0');
+      // const minutes = dateString.getMinutes().toString().padStart(2, '0');
       
-      return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
+      return `${day} ${month} ${year}`;
+      // return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
     };
 
     const TimeDisplay = (dateCreated) => {
@@ -64,11 +67,15 @@ const VoucherReportCard = (props) => {
             <td className="align-middle">
               <h6 className="mb-0 text-sm">{convertDate(data.order.dateCreated)}</h6>                       
             </td>
+            {
+              userRole !== 'Sales Admin' &&
+              <td className="align-middle">
+                <h6 className="mb-0 text-sm">{data.order.adminPortalUsers.firstname} {data.order.adminPortalUsers.surname}</h6>                       
+              </td>
+            }
+            
             <td className="align-middle">
-              <h6 className="mb-0 text-sm">{data.order.adminPortalUsers.firstname}</h6>                       
-            </td>
-            <td className="align-middle">
-              <h6 className="mb-0 text-sm">{data.vouchers.used?"Used":"Not Used"}</h6> 
+              <h6 className={`${data.vouchers.used ?"text-danger ":"text-info "}mb-0 text-sm`}>{data.vouchers.used?"Used":"Not Used"}</h6> 
             </td>
         </>
         

@@ -186,6 +186,9 @@ const cartSlice = createSlice({
         },
         setBundleId(state, action){
             state.bundleId= action.payload
+        },
+        clearSales(state){
+            state.sales = []
         }
     },
     extraReducers: {

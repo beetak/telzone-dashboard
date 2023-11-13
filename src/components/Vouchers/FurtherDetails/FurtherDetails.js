@@ -122,7 +122,8 @@ const FurtherDetails = () => {
     const hours = dateString.getHours().toString().padStart(2, '0');
     const minutes = dateString.getMinutes().toString().padStart(2, '0');
     
-    return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
+    return `${day} ${month} ${year}`;
+    // return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
   }
 
   let renderedUsage = ''
@@ -389,7 +390,9 @@ const FurtherDetails = () => {
                     </>:""
                   }
                 </ul>
-                <button onClick={handleSubmit} className="btn btn-info my-4">View History</button>
+                {
+                  verified.data.used&&<button onClick={handleSubmit} className="btn btn-info my-4">View History</button>
+                }
               </div>
             </div>
           </div>

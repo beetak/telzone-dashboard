@@ -4,6 +4,8 @@ import CartBundleCard from "../CartBundleCard/CartBundleCard";
 import { useSelector } from "react-redux";
 import BeatLoader from 'react-spinners/BeatLoader'
 
+const shopName = localStorage.getItem("shopName")
+
 const CartBundleList = ({pageType}) => {
     console.log("page: ", pageType)
 
@@ -11,11 +13,39 @@ const CartBundleList = ({pageType}) => {
 
     let renderedBundles = ''
     renderedBundles = bundles ? (
-        bundles.map((bundle, index)=>(
-        <tr key={index}>
-            <CartBundleCard data={bundle} page={pageType} index={index}/>
-        </tr>
-        ))
+        shopName === "CZA-Town Centre"?(
+            bundles.map((bundle, index)=>(
+                bundle.name === "Chitungwiza Voucher" &&
+                    <tr key={index}>
+                        <CartBundleCard data={bundle} page={pageType} index={index}/>
+                    </tr>
+                ))
+        ):(
+            shopName === "Glen View"?(
+                bundles.map((bundle, index)=>(
+                    bundle.name === "Glenview Voucher" &&
+                        <tr key={index}>
+                            <CartBundleCard data={bundle} page={pageType} index={index}/>
+                        </tr>
+                    ))
+            ):(
+                shopName === "TCFL"?(
+                    bundles.map((bundle, index)=>(
+                        bundle.name === "TCFL STUDENTS" &&
+                            <tr key={index}>
+                                <CartBundleCard data={bundle} page={pageType} index={index}/>
+                            </tr>
+                        ))
+                ):(
+                    bundles.map((bundle, index)=>(
+                        bundle.name !== "Chitungwiza Voucher" && bundle.name !== "Glenview Voucher" && bundle.name !== "TCFL STUDENTS" &&
+                            <tr key={index}>
+                                <CartBundleCard data={bundle} page={pageType} index={index}/>
+                            </tr>
+                        ))
+                )
+            )
+        )
     ):(<div><h1>Error</h1></div>)
 
     const loading = useSelector(getLoadingStatus)

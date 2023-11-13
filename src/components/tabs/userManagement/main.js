@@ -2,11 +2,10 @@ import { useEffect } from "react";
 import axios from "axios"
 import UserDetails from "./usersDetails/userDetails";
 import { Link } from "react-router-dom";
-import UserList from "../../User/UserList/UserList";
 import { useDispatch } from "react-redux";
 import { fetchAsyncUser } from "../../../store/user-slice";
 import { fetchAsyncRole } from "../../../store/role-slice";
-import { fetchAsyncRegion, fetchAsyncShop, fetchAsyncTown } from "../../../store/entities-slice";
+import { fetchAsyncRegion, fetchAsyncShops, fetchAsyncTown } from "../../../store/entities-slice";
 
  // URL variable stores JSON url || API taken from 10 Degrees WordPress Agency
 
@@ -18,7 +17,7 @@ export default function UserManagement(){
     dispatch(fetchAsyncUser())
     dispatch(fetchAsyncRole())
     dispatch(fetchAsyncTown())
-    dispatch(fetchAsyncShop())
+    dispatch(fetchAsyncShops())
     dispatch(fetchAsyncRegion())
   }, [dispatch]);
     

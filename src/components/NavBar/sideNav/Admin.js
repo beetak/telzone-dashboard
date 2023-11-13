@@ -37,6 +37,14 @@ export default class Admin extends Component{
         </Link>
       </li>
       <li className="nav-item">
+        <Link className="nav-link text-white " to="/voucher-usage-report">
+          <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i className="material-icons opacity-10">menu_open</i>
+          </div>
+          <span className="nav-link-text ms-1">Voucher Report</span>
+        </Link>
+      </li>
+      <li className="nav-item">
         <Link className="nav-link text-white " to="/business-reports">
           <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i className="material-icons opacity-10">groups</i>

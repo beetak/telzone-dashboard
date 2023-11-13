@@ -54,6 +54,30 @@ export const fetchSoldVouchersByShopAndDate = createAsyncThunk(
     }
 );
 
+export const fetchSoldVouchersByAgentAndDate = createAsyncThunk(
+    'cart/fetchSoldVouchersByAgentAndDate',
+    async ({userId, date}) => {
+      try {
+        const response = await Api.get(`/voucher/date${date}/user${userId}`);
+        return { success: true, data: response.data };
+      } catch (error) {
+        throw error;
+      }
+    }
+);
+
+export const fetchSoldVouchersByShopAndPeriodAndState = createAsyncThunk(
+    'cart/fetchSoldVouchersByShopAndPeriodAndState',
+    async ({shopId, startDate, endDate, status}) => {
+      try {
+        const response = await Api.get(`/voucher/shop${shopId}/${startDate}/${endDate}/${status}`);
+        return { success: true, data: response.data };
+      } catch (error) {
+        throw error;
+      }
+    }
+);
+
 export const postBatch = createAsyncThunk(
     'cart/postAsyncBatch',
     async (initialData) => {
@@ -291,6 +315,7 @@ const batchSlice = createSlice({
         clearVouchers(state, action){
             state.viewVouchers = false
             state.viewVoucherStatus = 'idle'
+            state.soldVouchers = ""
         },
         vcodeCreation(state, action){
             state.vcode.push(action.payload)
@@ -445,6 +470,17 @@ const batchSlice = createSlice({
         [fetchSoldVouchersByShopAndDate.rejected]: (state, {payload})=>{
             console.log("rejected")
         },
+        [fetchSoldVouchersByAgentAndDate.pending]: ()=>{
+            console.log("pending")
+        },
+        [fetchSoldVouchersByAgentAndDate.fulfilled]: (state, action)=>{
+            console.log("fulfilled", action.payload)
+            
+            state.soldByShop = action.payload
+        },
+        [fetchSoldVouchersByAgentAndDate.rejected]: (state, {payload})=>{
+            console.log("rejected")
+        },
         [fetchSoldVouchers.pending]: ()=>{
             console.log("pending")
         },
@@ -459,8 +495,8 @@ const batchSlice = createSlice({
         [fetchSoldVouchers.rejected]: (state, {payload})=>{
             console.log("rejected")
         },
-        [fetchSoldVouchersByDate.pending]: ()=>{
-            console.log("pending")
+        [fetchSoldVouchersByDate.pending]: (state)=>{
+            state.loadingStatus = "pending"
         },
         [fetchSoldVouchersByDate.fulfilled]: (state, action)=>{
             const { data } = action.payload
@@ -469,9 +505,10 @@ const batchSlice = createSlice({
                 return voucher
             })
             state.soldVouchers = loadedVouchers
+            state.loadingStatus = "fulfilled"
         },
         [fetchSoldVouchersByDate.rejected]: (state, {payload})=>{
-            console.log("rejected")
+            state.loadingStatus = "rejected"
         },
         [fetchAsyncVouchersByBatch.pending]: (state, action)=>{
             state.viewVoucherStatus = 'pending'
