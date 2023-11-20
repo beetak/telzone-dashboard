@@ -43,6 +43,19 @@ export const fetchAsyncClientUsageReport = createAsyncThunk('report/fetchAsyncCl
     }
 })
 
+export const fetchAsyncSSIDs = createAsyncThunk(
+    'report/fetchAsyncSSIDs',
+    async () => {
+        try {
+            const response = await MerakiApi.get(`/networks/L_575897802350008785/wireless/ssids`)
+            return { success: true, data: [...response.data] };
+        } catch (error) {
+            console.error('network error:', error);
+            throw error;
+        }
+    }
+);
+
 export const fetchAsyncClientDetails = createAsyncThunk('report/fetchAsyncClientDetails', async ({clientId}) => {
     try{
         const response = await MerakiApi

@@ -73,7 +73,7 @@ const VoucherReportCard = (props) => {
             {
               userRole !== 'Sales Admin' &&
               <td className="align-middle">
-                <h6 className="mb-0 text-sm">{data.order.adminPortalUsers.firstname} {data.order.adminPortalUsers.surname}</h6>                       
+                <h6 className="mb-0 text-sm">{data.order.firstName} {data.order.surname}</h6>                       
               </td>
             }
             

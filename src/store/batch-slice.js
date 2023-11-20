@@ -459,16 +459,15 @@ const batchSlice = createSlice({
         [fetchAsyncVouchers.rejected]: (state, {payload})=>{
             console.log("rejected")
         },
-        [fetchSoldVouchersByShopAndDate.pending]: ()=>{
-            console.log("pending")
+        [fetchSoldVouchersByShopAndDate.pending]: (state)=>{
+            state.loadingStatus = "pending"
         },
         [fetchSoldVouchersByShopAndDate.fulfilled]: (state, action)=>{
-            console.log("fulfilled", action.payload)
-            
+            state.loadingStatus = "fulfilled"
             state.soldByShop = action.payload
         },
         [fetchSoldVouchersByShopAndDate.rejected]: (state, {payload})=>{
-            console.log("rejected")
+            state.loadingStatus = "rejected"
         },
         [fetchSoldVouchersByAgentAndDate.pending]: ()=>{
             console.log("pending")

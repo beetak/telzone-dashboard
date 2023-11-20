@@ -21,6 +21,7 @@ export default function VoucherShopReport() {
     const today = new Date()
     const mydate = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
     const dateString = mydate.toString();
+
     const dispatch = useDispatch()
     const active = useSelector(getToggleStatus)
     const loading = useSelector(getLoadingStatus)
@@ -39,8 +40,23 @@ export default function VoucherShopReport() {
     const [searchLevel, setSearchLevel] = useState('')
     const [filterBy, setFilterBy] = useState('Usage Status')
     const [status, setStatus] = useState(true)
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
 
-    const [invoiceNumber, setInvoiceNumber] = useState("")
+    var paginationData = ""
+
+    var c = soldVouchers?.data ? Object.keys(soldVouchers.data.data).length : 0;
+    var c2 = soldByShop?.data? Object.keys(soldByShop.data.data).length:0
+
+    if(c>0) {
+      paginationData = soldVouchers
+    }
+    else if(c2>0){
+      paginationData = soldByShop.data.data
+    }
+    else{
+      paginationData = ""
+    }
 
     //SHOPS DATA
     const getShop =(id, name)=>{
@@ -98,28 +114,8 @@ export default function VoucherShopReport() {
     </>
 
     useEffect(() => {
-      dispatch(fetchAsyncBundles(active))
       dispatch(fetchAsyncShops(active))
     }, [dispatch, active]);
-  
-    const bundles = useSelector(getAllBundles)
-
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      if(invoiceNumber==='' && date !== ''){
-        dispatch(fetchSoldVouchersByDate(
-          date
-        ));
-      }
-      else if(invoiceNumber !=='' && date === ''){
-        dispatch(fetchSoldVouchers(
-          invoiceNumber
-        ));
-      }
-      else{
-        alert("Please fill in either date or invoice number but not both fields")
-      }
-    };
 
     const submitRequest = async (e) => {
       e.preventDefault();
@@ -135,24 +131,10 @@ export default function VoucherShopReport() {
         setValidate("Invalid Time Range")
       }
       else{
-        if(userRole==="Finance Manager")
+        if(userRole==="Finance Manager" || userRole==="Admin")
           dispatch(fetchSoldVouchersByShopAndDate({startDate, endDate, shopId, status}))
         else
           dispatch(fetchSoldVouchersByShopAndDate({startDate, endDate, shopId:userShop, status}))
-      }
-      setTimeout(()=>{
-          setEmpty("")
-          setValidate("")
-      }, 3000)  
-    };
-
-    const submitAgentRequest = async (e) => {
-      e.preventDefault();
-      if(date===''){
-        setValidate("Please select the start date and end date")
-      }
-      else{
-        dispatch(fetchSoldVouchersByAgentAndDate({date, userId}))
       }
       setTimeout(()=>{
           setEmpty("")
@@ -182,37 +164,34 @@ export default function VoucherShopReport() {
     })
     
     let renderedBundles = ''
-  
-    // var count = soldVouchers? (soldVouchers?.data ? Object.keys(soldVouchers.data.data).length : 0):0;
-    // var count2 = soldByShop? (soldByShop?.data? Object.keys(soldByShop.data.data).length:0):0
 
-    var count = soldVouchers?.data ? Object.keys(soldVouchers.data.data).length : 0;
-    var count2 = soldByShop?.data? Object.keys(soldByShop.data.data).length:0
+    const totalPages = Math.ceil(paginationData.length / itemsPerPage);
+
+    const goToPreviousPage = () => {
+      if (currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+    };
+
+    const goToNextPage = () => {
+      if (currentPage < totalPages) {
+        setCurrentPage(currentPage + 1);
+      }
+    };
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedData = paginationData.slice(startIndex, endIndex);
+
+    const count = Object.keys(paginatedData).length;
 
     if(count>0){
-      renderedBundles = (
-        soldVouchers.map((bundle, index)=>(
+      renderedBundles = paginatedData.map((bundle, index)=>(
           <tr key={index}>
             <VoucherReportCard data={bundle} index={index}/>
           </tr>
         ))
-      )
     }
-    else if(count2>0){
-      renderedBundles = (
-        soldByShop.data.data.map((bundle, index)=>(
-          <tr key={index}>
-            <VoucherReportCard data={bundle} index={index}/>
-          </tr>
-        ))
-      )
-    }
-    // else if(count2<1 || count<1){
-    //   renderedBundles = 
-    //   <tr>
-    //     <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>Search</h5></td>
-    //   </tr>
-    // }
     else{
       renderedBundles = 
       <tr>
@@ -281,11 +260,29 @@ export default function VoucherShopReport() {
                         </div>
                     </div>
                     <div className="card-body p-3 pb-0">
+                        <div className="d-flex align-items-center justify-content-between mb-2 mx-2">
+                          <div className="d-flex align-items-center mx-2">
+                            <h6 className="mb-1 text-dark text-sm me-2">Show </h6>
+                            <div className="dropdown">
+                              <button className="btn bg-gradient-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style={{width:100}}>
+                                {itemsPerPage}
+                              </button>
+                              <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a className="dropdown-item" onClick={()=>setItemsPerPage(5)}>5</a></li>
+                                <li><a className="dropdown-item" onClick={()=>setItemsPerPage(10)}>10</a></li>
+                                <li><a className="dropdown-item" onClick={()=>setItemsPerPage(15)}>15</a></li>
+                                <li><a className="dropdown-item" onClick={()=>{setItemsPerPage(soldVouchers.length); setCurrentPage(1)}}>All</a></li>
+                              </ul>
+                            </div>
+                            <h6 className="mb-1 text-dark text-sm ms-2">Entries </h6>
+                          </div> 
+                        </div>
                         <table className="table align-items-center mb-0 p-5">
                           <thead>
                             <tr>
                               <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Voucher Code</th>
                               <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Bundle Type</th>
+                              <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Price</th>
                               <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date Sold</th>
                               <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Sold By</th>
                               <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
@@ -300,6 +297,24 @@ export default function VoucherShopReport() {
                             }
                           </tbody>
                         </table>
+                    </div>
+                    <div className="d-flex align-items-center justify-content-center">
+                        <p>Showing Page {currentPage} of {totalPages}</p>
+                    </div>
+                    <div className="d-flex align-items-center justify-content-center mb-2">
+                      <button 
+                        className="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center"
+                        onClick={goToPreviousPage}
+                        disabled={currentPage === 1}
+                      ><i className="material-icons text-lg">chevron_left</i></button>
+                      <div className="d-flex flex-column" style={{ marginRight: "20px" }}>
+                        <h6 className="mb-1 text-dark text-sm">{currentPage}</h6>
+                      </div>
+                      <button 
+                        className="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center"
+                        onClick={goToNextPage}
+                        disabled={currentPage === totalPages}
+                      ><i className="material-icons text-lg">chevron_right</i></button>
                     </div>
                     {/* <div className="col-12" style={{textAlign: 'center'}}><h6>Disclaimer: To sum up both online and physical shop sales.</h6></div> */}
                 </div>

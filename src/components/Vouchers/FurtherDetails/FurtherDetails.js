@@ -114,6 +114,17 @@ const FurtherDetails = () => {
       <td colspan={7} className='text-center'><h5 style={{ color: '#E91E63' }}>Opps something went wrong. Please refresh page</h5></td>
     </tr>
 
+  const convertDatenTime = (dateCreated) => {
+    const dateString = new Date(dateCreated);
+    const day = dateString.toLocaleDateString('en-GB', { day: 'numeric' });
+    const month = dateString.toLocaleDateString('en-GB', { month: 'long' });
+    const year = dateString.toLocaleDateString('en-GB', { year: 'numeric' });
+    const hours = dateString.getHours().toString().padStart(2, '0');
+    const minutes = dateString.getMinutes().toString().padStart(2, '0');
+    
+    //return `${day} ${month} ${year}`;
+    return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
+  }
   const convertDate = (dateCreated) => {
     const dateString = new Date(dateCreated);
     const day = dateString.toLocaleDateString('en-GB', { day: 'numeric' });
@@ -123,7 +134,14 @@ const FurtherDetails = () => {
     const minutes = dateString.getMinutes().toString().padStart(2, '0');
     
     return `${day} ${month} ${year}`;
-    // return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
+    //return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
+  }
+  const convertTime = (timeCreated) => {
+    const timeArray = timeCreated;
+    const newTime = timeArray.join(':');
+    
+    return newTime;
+    //return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
   }
 
   let renderedUsage = ''
@@ -134,7 +152,7 @@ const FurtherDetails = () => {
         clientUsage.map((usage, index)=>(
           <tr key={index}>
             <td className="align-middle">
-              <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{convertDate(usage.ts)}</p>
+              <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{convertDatenTime(usage.ts)}</p>
             </td>
             <td>
               <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{Math.ceil(usage.received/1024)} mb</p>
@@ -151,6 +169,26 @@ const FurtherDetails = () => {
       <tr>
         <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No Vouchers Found</h5></td>
       </tr>
+    }
+
+    {/*function UnixTimestampConverter(timestamp) {
+      const convertTimestamp = (unixTimestamp) => {
+        const date = new Date(unixTimestamp * 1000); // Convert seconds to milliseconds
+        return date.toUTCString(); // Convert the date to a readable UTC string
+      };
+    
+      return (convertTimestamp(timestamp)
+      );
+    }*/}
+
+    function UnixTimestampConverter(timestamp) {
+      const convertTimestamp = (unixTimestamp) => {
+        const date = new Date(unixTimestamp * 1000); // Convert seconds to milliseconds
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'Africa/Harare' };
+        return date.toLocaleString('en-US', options);
+      };
+    
+      return convertTimestamp(timestamp);
     }
 
   return (
@@ -225,7 +263,7 @@ const FurtherDetails = () => {
                               </div>
                             </div>
                             <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                              {convertDate(verified.data.vouchers.order.dateCreated)}
+                              {convertDate(verified.data.vouchers.order.dateCreated)} {convertTime(verified.data.vouchers.order.timeCreated)}
                             </div>
                           </li>
                         </>:
@@ -272,7 +310,7 @@ const FurtherDetails = () => {
                               </div>
                             </div>
                             <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                              {!verified.data.vouchers.dateUsed?"Not Yet Used":convertDate(verified.data.vouchers.dateUsed)}
+                              {!verified.data.vouchers.dateUsed?"Not Yet Used":convertDatenTime(verified.data.vouchers.dateUsed)}
                             </div>
                           </li>
                           <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
@@ -352,7 +390,7 @@ const FurtherDetails = () => {
                               </div>
                             </div>
                             <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                              {convertDate(clientDetails.firstSeen)}
+                              {UnixTimestampConverter(clientDetails.firstSeen)}
                             </div>
                           </li>
                           <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
@@ -362,7 +400,7 @@ const FurtherDetails = () => {
                               </div>
                             </div>
                             <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                              {convertDate(clientDetails.lastSeen)}
+                              {UnixTimestampConverter(clientDetails.lastSeen)}
                             </div>
                           </li>
                           <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">

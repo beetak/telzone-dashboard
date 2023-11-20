@@ -97,24 +97,21 @@ export default function VoucherDailySales() {
     // var count = Object.keys(soldVouchers).length;
 
     const count = Object.keys(paginatedData).length;
-    if(count>0){
-      if (count > 0) {
-        renderedBundles = paginatedData.map((bundle, index) => (
-          <tr key={index}>
-            <VoucherReportCard data={bundle} index={index}/>
-          </tr>
-        ));
-      } else {
-        renderedBundles = (
-          <tr>
-            <td colspan={7} className='text-center'>
-              <h5 style={{ color: '#0C55AA' }}>Not Found</h5>
-            </td>
-          </tr>
-        );
-      }
+    if (count > 0) {
+      renderedBundles = paginatedData.map((bundle, index) => (
+        <tr key={index}>
+          <VoucherReportCard data={bundle} index={index}/>
+        </tr>
+      ));
+    } else {
+      renderedBundles = (
+        <tr>
+          <td colspan={7} className='text-center'>
+            <h5 style={{ color: '#0C55AA' }}>Not Found</h5>
+          </td>
+        </tr>
+      );
     }
-  
     let errorMsg =  
       <tr>
         <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>

@@ -11,6 +11,18 @@ export const fetchAsyncBasePrice = createAsyncThunk('price/fetchAsyncBasePrice',
 
 })
 
+export const fetchPrice = createAsyncThunk('price/fetchPrice',
+    async ()=>{
+        try{
+            const response = await Api.get(`/base_price/`)
+            return {success: true, data: [...response.data.data]}
+        }
+        catch(error){
+            return {success: false}
+        }
+    }
+)
+
 export const postAsyncBasePrice = createAsyncThunk('price/postAsyncBasePrice', async (initialData) => {
     return await Api
       .post('/base_price/', 

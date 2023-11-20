@@ -5,6 +5,7 @@ import { fetchAsyncPortalLogins } from "../../store/portal-slice";
 import { fetchAsyncNetworkUsageStatistics } from "../../store/statistics-slice";
 import FeaturedStats from "./FeaturedStats/FeaturedStats";
 import SalesStats from "./SalesStats/SalesStats";
+import ConnectivityStatsStats from "./ConnectivityStats/ConnectivityStats";
 
 export default function Statistics(){
 
@@ -19,6 +20,8 @@ export default function Statistics(){
             <FeaturedStats/>
             <br/>
             <SalesStats/>
+            <br/>
+            <ConnectivityStatsStats/>
         </>
     )
 }
