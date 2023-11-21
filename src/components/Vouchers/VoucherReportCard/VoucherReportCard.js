@@ -46,11 +46,12 @@ const VoucherReportCard = (props) => {
       // return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
     };
 
-    const TimeDisplay = (dateCreated) => {
-      const formattedTime = new Date(dateCreated).toUTCString();
-    
-      return formattedTime
-    };
+    const convertTime = (timeCreated) => {
+      const timeArray = timeCreated;
+      const newTime = timeArray.join(':');
+      
+      return newTime;
+    }
 
     return (
         <>
@@ -68,7 +69,7 @@ const VoucherReportCard = (props) => {
               <h6 className="mb-0 text-sm">$ {(Math.round(data.bundles.price*100) / 100).toFixed(2)}</h6>                       
             </td>
             <td className="align-middle">
-              <h6 className="mb-0 text-sm">{convertDate(data.order.dateCreated)}</h6>                       
+              <h6 className="mb-0 text-sm">{convertDate(data.order.dateCreated)} {convertTime(data.order.timeCreated)}</h6>                       
             </td>
             {
               userRole !== 'Sales Admin' &&

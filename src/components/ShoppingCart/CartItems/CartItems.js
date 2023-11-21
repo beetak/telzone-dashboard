@@ -43,7 +43,7 @@ const CartItems = () => {
 
   const today = new Date()
   const date = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()}`;
-  const timeCreated = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+  const timeNow = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
   console.log("date: ", date)
 
   const dispatch  = useDispatch()
@@ -200,11 +200,11 @@ const CartItems = () => {
           amount: netTotal,
           dateCreated: today,
           discount: totalDiscount,
+          id:'',
           payingAccountNumber: "TelOne",
           quantity: totalQty,
           vat: totalVat,
-          status: false,
-          timeCreated
+          status: false
         },
         regionId,
         shopId,
