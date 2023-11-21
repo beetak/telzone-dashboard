@@ -43,8 +43,6 @@ const CartItems = () => {
 
   const today = new Date()
   const date = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()}`;
-  const timeNow = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
-  console.log("date: ", date)
 
   const dispatch  = useDispatch()
   const prices  = useSelector(getBasePrice)
@@ -186,6 +184,8 @@ const CartItems = () => {
   ))
 
   const makeSale = (printSize) => {
+    const t = new Date()
+    const timeCreated = t.toLocaleTimeString('en-US', { hour12: false });
     if (currencyId === '') {
       setEmpty("Please select currency");
     } else {
@@ -204,19 +204,14 @@ const CartItems = () => {
           payingAccountNumber: "TelOne",
           quantity: totalQty,
           vat: totalVat,
-          status: false
+          status: false,
+          timeCreated
         },
         regionId,
         shopId,
         townId
       })).then(response => {
-        console.log("post sale response ", response);
-        if (response.payload && response.payload.code === "SUCCESS") {
-          // Request was successful
-          var todayDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
-          console.log(todayDate);
-          // setPrintState(true);
-  
+        if (response.payload && response.payload.code === "SUCCESS") {  
           // Execute postVoucherSaleByBundleId
           saleByBundle(postBundleId, totalQty, response.payload.data.order.id, printSize);
         } else {

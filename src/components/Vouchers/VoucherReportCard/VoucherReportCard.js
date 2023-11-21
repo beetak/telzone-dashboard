@@ -69,7 +69,7 @@ const VoucherReportCard = (props) => {
               <h6 className="mb-0 text-sm">$ {(Math.round(data.bundles.price*100) / 100).toFixed(2)}</h6>                       
             </td>
             <td className="align-middle">
-              <h6 className="mb-0 text-sm">{convertDate(data.order.dateCreated)} {convertTime(data.order.timeCreated)}</h6>                       
+              <h6 className="mb-0 text-sm">{convertDate(data.order.dateCreated)} {convertTime(data.order.timeCreated?data.order.timeCreated:[0,0,0])}</h6>                       
             </td>
             {
               userRole !== 'Sales Admin' &&
