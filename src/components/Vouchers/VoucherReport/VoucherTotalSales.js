@@ -1,19 +1,16 @@
 import React, {useEffect, useState, useRef} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getToggleStatus } from '../../../store/toggle-slice';
-import { fetchSoldVouchers, fetchSoldVouchersByAgentAndDate, fetchSoldVouchersByDate, fetchSoldVouchersByShopAndDate, getLoadingStatus, getSoldByShop, getSoldVouchers, getVouchersSoldByShop } from '../../../store/batch-slice';
-import { fetchAsyncBundles, getAllBundles } from '../../../store/bundle-slice';
+import { fetchAsyncSoldVouchers, getLoadingStatus, getSoldUsedVouchers, getVouchersSoldByShop } from '../../../store/batch-slice';
 import { useReactToPrint } from "react-to-print";
 import { BeatLoader } from 'react-spinners';
 import VoucherReportCard from '../VoucherReportCard/VoucherReportCard';
-import { fetchAsyncShops, getAllShops } from '../../../store/entities-slice';
-import { saleActions } from '../../../store/sales-slice';
-import TelOneShopDropdown from '../../TelOneShops/TelOneShopDropdown/TelOneShopDropdown';
-import VoucherUsage from '../../tabs/voucherUsage/main';
+import { getAllShops } from '../../../store/entities-slice';
+import * as FileSaver from 'file-saver'
+import XLSX from 'sheetjs-style'
+const fileName = "Sold Vouchers_"
 
 const userRole = localStorage.getItem("role")
-const userId = localStorage.getItem('userId')
-const userShop = localStorage.getItem('shopId')
 const img = "assets/img/telonelogo.png"
 
 export default function VoucherTotalSales() {
@@ -24,7 +21,7 @@ export default function VoucherTotalSales() {
     const dispatch = useDispatch()
     const active = useSelector(getToggleStatus)
     const loading = useSelector(getLoadingStatus)
-    const soldVouchers = useSelector(getSoldVouchers)
+    const soldVouchers = useSelector(getSoldUsedVouchers)
     const shops = useSelector(getAllShops)
     const soldByShop = useSelector(getVouchersSoldByShop)
 
@@ -39,8 +36,8 @@ export default function VoucherTotalSales() {
     const [searchLevel, setSearchLevel] = useState('')
     const [filterBy, setFilterBy] = useState('Usage Status')
     const [status, setStatus] = useState(true)
-
-    const [invoiceNumber, setInvoiceNumber] = useState("")
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
   
     let filterButton = <>
         <div className="dropdown" style={{paddingLeft: 10}}>
@@ -59,9 +56,9 @@ export default function VoucherTotalSales() {
                         onClick={(e)=>{
                             e.preventDefault()
                             setStatus(true)
-                            setFilterBy("Successful")
+                            setFilterBy("Used")
                         }}>
-                        Successful
+                        Used Vouchers
                     </a>
                 </li>
                 <li>
@@ -78,31 +75,13 @@ export default function VoucherTotalSales() {
         </div>
     </>
 
-    useEffect(() => {
-      dispatch(fetchAsyncBundles(active))
-      dispatch(fetchAsyncShops(active))
-    }, [dispatch, active]);
-  
-    const bundles = useSelector(getAllBundles)
-
     const submitRequest = async (e) => {
       e.preventDefault();
-      if(shopState===''||startDate==='' || endDate===''){
-        if(startDate==='' || endDate===''){
-          setValidate("Please select the start date and end date")
-        }
-        if(shopState===''){
-          setEmpty("Please select the shop")
-        }
-      }
-      else if(startDate>endDate){
-        setValidate("Invalid Time Range")
+      if(status===''){
+        setValidate("Please select the start date and end date")
       }
       else{
-        if(userRole==="Finance Manager")
-          dispatch(fetchSoldVouchersByShopAndDate({startDate, endDate, shopId, status}))
-        else
-          dispatch(fetchSoldVouchersByShopAndDate({startDate, endDate, shopId:userShop, status}))
+        dispatch(fetchAsyncSoldVouchers({status}))
       }
       setTimeout(()=>{
           setEmpty("")
@@ -130,39 +109,34 @@ export default function VoucherTotalSales() {
       documentTitle: 'TelOne SmartWiFi National Sales Summary Report',
       // onAfterPrint: ()=> alert('Printing Completed')
     })
-    
+    const totalPages = Math.ceil(soldVouchers.length / itemsPerPage);
+
+    const goToPreviousPage = () => {
+      if (currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+    };
+
+    const goToNextPage = () => {
+      if (currentPage < totalPages) {
+        setCurrentPage(currentPage + 1);
+      }
+    };
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedData = soldVouchers.slice(startIndex, endIndex);
+
+    const count = Object.keys(paginatedData).length;
+
     let renderedBundles = ''
-  
-    // var count = soldVouchers? (soldVouchers?.data ? Object.keys(soldVouchers.data.data).length : 0):0;
-    // var count2 = soldByShop? (soldByShop?.data? Object.keys(soldByShop.data.data).length:0):0
-
-    var count = soldVouchers?.data ? Object.keys(soldVouchers.data.data).length : 0;
-    var count2 = soldByShop?.data? Object.keys(soldByShop.data.data).length:0
-
     if(count>0){
-      renderedBundles = (
-        soldVouchers.map((bundle, index)=>(
+      renderedBundles = paginatedData.map((bundle, index)=>(
           <tr key={index}>
             <VoucherReportCard data={bundle} index={index}/>
           </tr>
         ))
-      )
     }
-    else if(count2>0){
-      renderedBundles = (
-        soldByShop.data.data.map((bundle, index)=>(
-          <tr key={index}>
-            <VoucherReportCard data={bundle} index={index}/>
-          </tr>
-        ))
-      )
-    }
-    // else if(count2<1 || count<1){
-    //   renderedBundles = 
-    //   <tr>
-    //     <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>Search</h5></td>
-    //   </tr>
-    // }
     else{
       renderedBundles = 
       <tr>
@@ -174,6 +148,64 @@ export default function VoucherTotalSales() {
       <tr>
         <td colspan={7} className='text-center'><h5 style={{color: '#E91E63'}}>Opps something went wrong. Please refresh page</h5></td>
       </tr>
+    
+    let newObj = [];
+
+    const convertDate = (dateCreated) => {
+      const dateString = new Date(dateCreated);
+      const day = dateString.toLocaleDateString('en-GB', { day: 'numeric' });
+      const month = dateString.toLocaleDateString('en-GB', { month: 'long' });
+      const year = dateString.toLocaleDateString('en-GB', { year: 'numeric' });
+      // const hours = dateString.getHours().toString().padStart(2, '0');
+      // const minutes = dateString.getMinutes().toString().padStart(2, '0');
+      
+      return `${day} ${month} ${year}`;
+      // return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
+    };
+
+    const convertDateTime = (dateUsed) => {
+      const dateString = new Date(dateUsed);
+      const day = dateString.toLocaleDateString('en-GB', { day: 'numeric' });
+      const month = dateString.toLocaleDateString('en-GB', { month: 'long' });
+      const year = dateString.toLocaleDateString('en-GB', { year: 'numeric' });
+      const hours = dateString.getHours().toString().padStart(2, '0');
+      const minutes = dateString.getMinutes().toString().padStart(2, '0');
+      
+      // return `${day} ${month} ${year}`;
+      return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
+    };
+
+    const convertTime = (timeCreated) => {
+      const timeArray = timeCreated;
+      const newTime = timeArray.join(':');
+      
+      return newTime;
+    }
+
+    if (soldVouchers.length > 0) {
+      soldVouchers.map((item, i) => {
+        newObj.push({
+          voucherCode: item.vouchers.voucherCode,
+          usageDate: convertDateTime(item.vouchers.dateUsed),
+          product: item.bundles.name,
+          dateSold: `${convertDate(item.order.dateCreated)} ${convertTime(item.order.timeCreated?item.order.timeCreated:[0,0,0])}`,
+          status: item.vouchers.used?"Used":"Not Used"
+        });
+      });
+    }
+    const newArray = newObj
+    console.log("new: ",newArray)
+
+    const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8';
+    const fileExtension = '.xlsx'
+
+    const exportToExcel = async () => {
+      const ws = XLSX.utils.json_to_sheet(newArray);
+      const wb = { Sheets: {'data': ws}, SheetNames: ['data']};
+      const excelBuffer = XLSX.write(wb, {bookType: 'xlsx', type: 'array'});
+      const data = new Blob([excelBuffer], {type: fileType});
+      FileSaver.saveAs(data, fileName + dateString + fileExtension)
+    }
       
     let displayData = ""
     if(userRole === "Admin"){
@@ -182,13 +214,31 @@ export default function VoucherTotalSales() {
             <div className="col-12">
                 <div className="card pb-0 p-3 mb-1">
                     <div className="row">
-                        <div className="col-10 d-flex align-items-center">
+                        <div className="col-8 d-flex align-items-center">
                           {filterButton}
                           <div><sup style={{color: 'red', paddingLeft: 10}}>{empty}</sup></div>
                           <button onClick={submitRequest} className="btn btn-primary">Search</button>
+                          <div className="d-flex align-items-center justify-content-between mx-2">
+                            <div className="d-flex align-items-center mx-2">
+                              <h6 className="mb-1 text-dark text-sm me-2">Show </h6>
+                              <div className="dropdown">
+                                <button className="btn bg-gradient-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style={{width:100}}>
+                                  {itemsPerPage}
+                                </button>
+                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                  <li><a className="dropdown-item" onClick={()=>setItemsPerPage(5)}>5</a></li>
+                                  <li><a className="dropdown-item" onClick={()=>setItemsPerPage(10)}>10</a></li>
+                                  <li><a className="dropdown-item" onClick={()=>setItemsPerPage(15)}>15</a></li>
+                                  <li><a className="dropdown-item" onClick={()=>{setItemsPerPage(soldVouchers.length); setCurrentPage(1)}}>All</a></li>
+                                </ul>
+                              </div>
+                              <h6 className="mb-1 text-dark text-sm ms-2">Entries </h6>
+                            </div> 
+                          </div>
                         </div>
-                        <div className="col-2 text-end">
-                            <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" onClick={()=>handlePrint()}><i class="material-icons text-lg position-relative me-1">picture_as_pdf</i> DOWNLOAD PDF</button>
+                        <div className="col-4 text-end">
+                          <button class="btn btn-link text-success text-sm mb-0 px-0 ms-4"  onClick={(e)=>exportToExcel(fileName)}><i class="material-icons text-lg position-relative me-1">download</i> DOWNLOAD EXCELL</button>
+                          <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" onClick={()=>handlePrint()}><i class="material-icons text-lg position-relative me-1">picture_as_pdf</i> DOWNLOAD PDF</button>
                         </div> 
                     </div>
                 </div>
@@ -205,8 +255,9 @@ export default function VoucherTotalSales() {
                         </div>
                         <div className="row">
                             <div className="col-6 align-items-center">
-                                <h6 className="mb-0 ms-2"><span style={{width:100}}>From Date:</span><input type="date" style={{border: 0}} name="startDate" onChange={(e) => setStartDate(e.target.value)} value={startDate} max={dateString}/></h6>
-                                <h6 className="mb-0 ms-2"><span style={{width:100}}>To Date:</span><input type="date" style={{border: 0}} name="endDate" onChange={(e) => setEndDate(e.target.value)} value={endDate} max={dateString}/><sup style={{color: 'red', paddingLeft: 10}}>{validate}</sup></h6>
+                                <h6 className="mb-0 ms-2"><span style={{width:100}}>NB: Reporting Voucher Usage from Start Date (14 April 2023)</span></h6>
+                                {/* <h6 className="mb-0 ms-2"><span style={{width:100}}>NB:</span><input type="date" style={{border: 0}} name="startDate" onChange={(e) => setStartDate(e.target.value)} value={startDate} max={dateString}/></h6> */}
+                                {/* <h6 className="mb-0 ms-2"><span style={{width:100}}>To Date:</span><input type="date" style={{border: 0}} name="endDate" onChange={(e) => setEndDate(e.target.value)} value={endDate} max={dateString}/><sup style={{color: 'red', paddingLeft: 10}}>{validate}</sup></h6> */}
                                 <h6 className="mb-0 ms-2"><span style={{width:100}}>Usage Status:</span> {status? "Used":"Not Used"}</h6>
                             </div>
                         </div>
@@ -217,7 +268,9 @@ export default function VoucherTotalSales() {
                             <tr>
                               <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Voucher Code</th>
                               <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Bundle Type</th>
+                              <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Price</th>
                               <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date Sold</th>
+                              <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date Used</th>
                               <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Sold By</th>
                               <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
                             </tr>
@@ -232,7 +285,25 @@ export default function VoucherTotalSales() {
                           </tbody>
                         </table>
                     </div>
-                    <div className="col-12" style={{textAlign: 'center'}}><h6>Disclaimer: To sum up both online and physical shop sales.</h6></div>
+                    <div className="d-flex align-items-center justify-content-center">
+                        <p>Showing Page {currentPage} of {totalPages}</p>
+                    </div>
+                    <div className="d-flex align-items-center justify-content-center mb-2">
+                      <button 
+                        className="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center"
+                        onClick={goToPreviousPage}
+                        disabled={currentPage === 1}
+                      ><i className="material-icons text-lg">chevron_left</i></button>
+                      <div className="d-flex flex-column" style={{ marginRight: "20px" }}>
+                        <h6 className="mb-1 text-dark text-sm">{currentPage}</h6>
+                      </div>
+                      <button 
+                        className="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center"
+                        onClick={goToNextPage}
+                        disabled={currentPage === totalPages}
+                      ><i className="material-icons text-lg">chevron_right</i></button>
+                    </div>
+                    {/* <div className="col-12" style={{textAlign: 'center'}}><h6>Disclaimer: To sum up both online and physical shop sales.</h6></div> */}
                 </div>
             </div>
         </div>

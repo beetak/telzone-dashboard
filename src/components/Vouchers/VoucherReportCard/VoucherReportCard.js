@@ -46,6 +46,18 @@ const VoucherReportCard = (props) => {
       // return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
     };
 
+    const convertDateTime = (dateUsed) => {
+      const dateString = new Date(dateUsed);
+      const day = dateString.toLocaleDateString('en-GB', { day: 'numeric' });
+      const month = dateString.toLocaleDateString('en-GB', { month: 'long' });
+      const year = dateString.toLocaleDateString('en-GB', { year: 'numeric' });
+      const hours = dateString.getHours().toString().padStart(2, '0');
+      const minutes = dateString.getMinutes().toString().padStart(2, '0');
+      
+      // return `${day} ${month} ${year}`;
+      return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
+    };
+
     const convertTime = (timeCreated) => {
       const timeArray = timeCreated;
       const newTime = timeArray.join(':');
@@ -71,10 +83,13 @@ const VoucherReportCard = (props) => {
             <td className="align-middle">
               <h6 className="mb-0 text-sm">{convertDate(data.order.dateCreated)} {convertTime(data.order.timeCreated?data.order.timeCreated:[0,0,0])}</h6>                       
             </td>
+            <td className="align-middle">
+              <h6 className="mb-0 text-sm">{convertDateTime(data.vouchers.dateUsed)}</h6>                       
+            </td>
             {
               userRole !== 'Sales Admin' &&
               <td className="align-middle">
-                <h6 className="mb-0 text-sm">{data.order.firstName} {data.order.surname}</h6>                       
+                <h6 className="mb-0 text-sm">{ data.order.adminPortalUsersId === 1?"Not Defined":<>{data.order.firstName} {data.order.surname}</> }</h6>                       
               </td>
             }
             

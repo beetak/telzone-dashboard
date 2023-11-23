@@ -54,6 +54,18 @@ export const fetchSoldVouchersByShopAndDate = createAsyncThunk(
     }
 );
 
+export const fetchAsyncSoldVouchers = createAsyncThunk(
+    'cart/fetchAsyncSoldVouchers',
+    async ({status}) => {
+      try {
+        const response = await Api.get(`/voucher/${status}/true`);
+        return { success: true, data: response.data };
+      } catch (error) {
+        throw error;
+      }
+    }
+);
+
 export const fetchSoldVouchersByAgentAndDate = createAsyncThunk(
     'cart/fetchSoldVouchersByAgentAndDate',
     async ({userId, date}) => {
@@ -284,6 +296,7 @@ const batchSlice = createSlice({
         vouchers: [],
         voucherList: [],
         soldVouchers: [],
+        soldUsedVouchers: [],
         selectedBatch: [],
         soldByShop: [],
         batchPostStatus: 'idle', // | 'success'
@@ -494,6 +507,21 @@ const batchSlice = createSlice({
         [fetchSoldVouchers.rejected]: (state, {payload})=>{
             console.log("rejected")
         },
+        [fetchAsyncSoldVouchers.pending]: (state)=>{
+            state.loadingStatus = 'pending'
+        },
+        [fetchAsyncSoldVouchers.fulfilled]: (state, action)=>{
+            const { data } = action.payload
+            console.log("fulfilled", data)
+            const loadedVouchers = data.data.map(voucher=>{
+                return voucher
+            })
+            state.soldUsedVouchers = loadedVouchers
+            state.loadingStatus = "fulfilled"
+        },
+        [fetchAsyncSoldVouchers.rejected]: (state, {payload})=>{
+            state.loadingStatus =  "rejected"
+        },
         [fetchSoldVouchersByDate.pending]: (state)=>{
             state.loadingStatus = "pending"
         },
@@ -656,6 +684,7 @@ export const getVoucherList = (state) => state.batch.voucherList
 export const getCreatedBatch = (state) => state.batch.createdBatch
 export const getVoucherType = (state) => state.batch.createdVoucher
 export const getSoldVouchers = (state) => state.batch.soldVouchers
+export const getSoldUsedVouchers = (state) => state.batch.soldUsedVouchers
 export const getSelectedBatch = (state) => state.batch.selectedBatch
 export const viewVouchers = (state) => state.batch.viewVouchers
 export const voucherViewStatus = (state) => state.batch.viewVoucherStatus

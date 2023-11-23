@@ -84,6 +84,18 @@ export default function VoucherUsage(){
                                 </a>
                             </div>
                         </div>
+                        <div className="col-3">
+                            <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
+                                <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
+                                    onClick={()=>setTabState('sales')}
+                                    style={Style2}
+                                    >
+                                    <div className="col-12 d-flex align-items-center">
+                                        <h6 className="text-white text-capitalize ps-3">Total Sales</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 <div className="card-body px-0 pb-2">
                     <div className="table-responsive p-0">

@@ -50,7 +50,7 @@ export default function ConnectivityStatsStats(){
         }
 
         checkMerakiApiStatus();
-    },15000)
+    },300000)
 
     
       
