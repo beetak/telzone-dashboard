@@ -151,29 +151,37 @@ export default function VoucherTotalSales() {
     
     let newObj = [];
 
+    // const convertDate = (dateCreated) => {
+    //   const dateString = new Date(dateCreated);
+    //   const day = dateString.toLocaleDateString('en-GB', { day: 'numeric' });
+    //   const month = dateString.toLocaleDateString('en-GB', { month: 'long' });
+    //   const year = dateString.toLocaleDateString('en-GB', { year: 'numeric' });
+    //   // const hours = dateString.getHours().toString().padStart(2, '0');
+    //   // const minutes = dateString.getMinutes().toString().padStart(2, '0');
+      
+    //   return `${day} ${month} ${year}`;
+    //   // return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
+    // };
+
     const convertDate = (dateCreated) => {
       const dateString = new Date(dateCreated);
-      const day = dateString.toLocaleDateString('en-GB', { day: 'numeric' });
-      const month = dateString.toLocaleDateString('en-GB', { month: 'long' });
-      const year = dateString.toLocaleDateString('en-GB', { year: 'numeric' });
-      // const hours = dateString.getHours().toString().padStart(2, '0');
-      // const minutes = dateString.getMinutes().toString().padStart(2, '0');
+      const day = dateString.getDate().toString().padStart(2, '0');
+      const month = (dateString.getMonth() + 1).toString().padStart(2, '0');
+      const year = dateString.getFullYear().toString().slice(-2);
       
-      return `${day} ${month} ${year}`;
-      // return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
-    };
-
-    const convertDateTime = (dateUsed) => {
-      const dateString = new Date(dateUsed);
-      const day = dateString.toLocaleDateString('en-GB', { day: 'numeric' });
-      const month = dateString.toLocaleDateString('en-GB', { month: 'long' });
-      const year = dateString.toLocaleDateString('en-GB', { year: 'numeric' });
+      return `${day}/${month}/${year}`;
+    }
+    const convertDateTime = (dateCreated) => {
+      const dateString = new Date(dateCreated);
+      const day = dateString.toLocaleDateString('en-GB', { day: '2-digit' });
+      const month = dateString.toLocaleDateString('en-GB', { month: '2-digit' });
+      const year = dateString.toLocaleDateString('en-GB', { year: '2-digit' });
       const hours = dateString.getHours().toString().padStart(2, '0');
       const minutes = dateString.getMinutes().toString().padStart(2, '0');
+      const seconds = dateString.getSeconds().toString().padStart(2, '0');
       
-      // return `${day} ${month} ${year}`;
-      return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
-    };
+      return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    }
 
     const convertTime = (timeCreated) => {
       const timeArray = timeCreated;
@@ -186,9 +194,10 @@ export default function VoucherTotalSales() {
       soldVouchers.map((item, i) => {
         newObj.push({
           voucherCode: item.vouchers.voucherCode,
-          usageDate: convertDateTime(item.vouchers.dateUsed),
+          usageDate: item.order.dateCreated > new Date('2023-04-14') ? convertDate(item.order.dateCreated) + " " + convertTime(item.order.timeCreated ? item.order.timeCreated : [0, 0, 0]):"",
           product: item.bundles.name,
-          dateSold: `${convertDate(item.order.dateCreated)} ${convertTime(item.order.timeCreated?item.order.timeCreated:[0,0,0])}`,
+          soldBy: `${item.order.adminPortalUsersId === 1?"Unavailable": item.order.firstName + " " + item.order.surname }`,
+          dateSold: `${item.vouchers.dateUsed?convertDateTime(item.vouchers.dateUsed):"Unavailbale"}`,
           status: item.vouchers.used?"Used":"Not Used"
         });
       });

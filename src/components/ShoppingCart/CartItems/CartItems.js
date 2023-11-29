@@ -161,9 +161,9 @@ const CartItems = () => {
     totalPrice = (Math.round(unitPrice*item.quantity*100)/100).toFixed(2)
     unitDiscount = item.price*discountPercentage/100 * rate
     totalDiscount = (Math.round(unitDiscount*item.quantity*100)/100).toFixed(2)
-    unitVat = (Math.round((item.price - unitPrice)*100)/100).toFixed(2)
+    unitVat = (Math.round((item.price* rate - unitPrice-unitDiscount)*100)/100).toFixed(2)
     totalVat = (Math.round(unitVat*item.quantity*100)/100).toFixed(2)
-    netTotal = (Math.round((parseFloat(totalVat) + parseFloat(totalPrice)-parseFloat(totalDiscount))*100)/100).toFixed(2)
+    netTotal = (Math.round((parseFloat(totalVat) + parseFloat(totalPrice))*100)/100).toFixed(2)
 
 
   });
