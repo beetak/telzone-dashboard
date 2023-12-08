@@ -91,9 +91,9 @@ const BatchPostResponse = () => {
               <p className="mb-0 text-sm" style={Style1}>Use the form to create batches of vouchers</p>
             </div>
         </div>
-        {/*<div className="table-responsive p-0">
+        <div className="table-responsive p-0">
           <VoucherReactivate/>
-        </div>*/}
+        </div>
       </div>
     </>
   );
