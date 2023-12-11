@@ -38,10 +38,20 @@ const CartBundleList = ({pageType}) => {
                 ):(
                     shopName === "TCFL"?(
                         bundles.map((bundle, index)=>(
-                            bundle.name === "TCFL STUDENTS" &&
-                                <tr key={index}>
+                            bundle.name === "TCFL STUDENTS" ?
+                                (<tr key={index}>
                                     <CartBundleCard data={bundle} page={pageType} index={index}/>
-                                </tr>
+                                </tr>): (
+                                    bundle.name === "TCFL Weekly" ?
+                                    (<tr key={index}>
+                                        <CartBundleCard data={bundle} page={pageType} index={index}/>
+                                    </tr>):(
+                                        bundle.name === "TCFL Daily" &&
+                                        <tr key={index}>
+                                            <CartBundleCard data={bundle} page={pageType} index={index}/>
+                                        </tr>
+                                    )
+                                )
                             ))
                     ):(
                         bundles.map((bundle, index)=>(
