@@ -149,17 +149,29 @@ export const fetchAsyncVouchersByBatch = createAsyncThunk('batch/fetchAsyncVouch
     return {data, status, suspended}
 })
 
+// export const postVoucher = createAsyncThunk(
+//     'cart/postAsyncVoucher',
+//     async (initialData) => {
+//       console.log(initialData);
+//       return await Api
+//         .post(`/voucher/?numberOfVouchers=${num}`, 
+//           initialData
+//         )
+//         .then((res) => res.data);
+//     }
+// );
+
 export const postVoucher = createAsyncThunk(
     'cart/postAsyncVoucher',
     async (initialData) => {
+      const { num, ...postData } = initialData;
+  
       console.log(initialData);
       return await Api
-        .post('/voucher/', 
-          initialData
-        )
+        .post(`/voucher/?numberOfVouchers=${num}`, postData)
         .then((res) => res.data);
     }
-);
+  );
 
 
 export const updateBatch = createAsyncThunk('batch/updateBatch', 
@@ -304,6 +316,7 @@ const batchSlice = createSlice({
         createdBatch: '',
         postLoading: false,
         postSuccess: false,
+        postFail: false,
         createdVoucher: '',
         viewVouchers: '',
         viewVoucherStatus: 'idle',
@@ -344,6 +357,9 @@ const batchSlice = createSlice({
         },
         successStatus(state, action){
             state.postSuccess = action.payload
+        },
+        failStatus(state, action){
+            state.postFail = action.payload
         }
     },
     extraReducers: {
@@ -694,6 +710,7 @@ export const getVBActive = (state) => state.batch.batchActive
 export const getVBSuspended = (state) => state.batch.batchSuspended
 export const getPostLoading = (state) => state.batch.postLoading
 export const getPostSuccess = (state) => state.batch.postSuccess
+export const getPostFail = (state) => state.batch.postFail
 export const getSoldStatus = (state) => state.batch.soldStatus
 export const getVouchersSoldByShop = (state) => state.batch.soldByShop
 export const getUsedStatus = (state) => state.batch.usedStatus

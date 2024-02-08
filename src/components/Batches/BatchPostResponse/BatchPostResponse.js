@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getBatchStatus, getCreatedBatch, getPostLoading, getPostSuccess, getPostingStatus, getVoucherStatus, getVoucherType, postBatch } from '../../../store/batch-slice';
+import { getBatchStatus, getCreatedBatch, getPostFail, getPostLoading, getPostSuccess, getPostingStatus, getVoucherStatus, getVoucherType, postBatch } from '../../../store/batch-slice';
 import { getAllBundles } from '../../../store/bundle-slice';
 import voucher_codes from 'voucher-code-generator'
 import BeatLoader from 'react-spinners/BeatLoader'
@@ -16,6 +16,7 @@ const BatchPostResponse = () => {
     const dispatch = useDispatch()
 
     const postSuccess = useSelector(getPostSuccess)
+    const postFailure = useSelector(getPostFail)
     const postLoading = useSelector(getPostLoading)
 
     let info
@@ -52,7 +53,7 @@ const BatchPostResponse = () => {
   let loadingBatchAnimation = 
     <div className='text-center' style={anime}>
         <h5 style={{color: '#055bb5'}}>{
-          postLoading?"Generating Vouchers. Please wait a moment":postSuccess&&"Voucher Generation Completed"}</h5>
+          postLoading&&!postFailure?"Generating Vouchers. Please wait a moment":postFailure?"Voucher Generation Failed":postSuccess&&"Voucher Generation Completed"}</h5>
         {
           postLoading&&
           <BeatLoader
