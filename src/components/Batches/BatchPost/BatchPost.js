@@ -60,7 +60,7 @@ const BatchPost = () => {
       vouchers: {
         dateUsed: "2024-01-18T13:00:49.368Z"
       },
-      num: 1000
+      num: 3000
     }))
     // setLoadingStatus(false);
     // setLoadingSuccess(true);
