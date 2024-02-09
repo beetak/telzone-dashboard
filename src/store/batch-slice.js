@@ -149,27 +149,17 @@ export const fetchAsyncVouchersByBatch = createAsyncThunk('batch/fetchAsyncVouch
     return {data, status, suspended}
 })
 
-// export const postVoucher = createAsyncThunk(
-//     'cart/postAsyncVoucher',
-//     async (initialData) => {
-//       console.log(initialData);
-//       return await Api
-//         .post(`/voucher/?numberOfVouchers=${num}`, 
-//           initialData
-//         )
-//         .then((res) => res.data);
-//     }
-// );
-
 export const postVoucher = createAsyncThunk(
     'cart/postAsyncVoucher',
     async (initialData) => {
       const { num, ...postData } = initialData;
-  
-      console.log(initialData);
-      return await Api
-        .post(`/voucher/?numberOfVouchers=${num}`, postData)
-        .then((res) => res.data);
+      try {
+        const response = await Api
+        .post(`/voucher/?numberOfVouchers=${num}`, postData);
+        return { success: true, data: response.data };
+      } catch (error) {
+        throw error;
+      }
     }
   );
 
@@ -578,13 +568,12 @@ const batchSlice = createSlice({
             console.log(action.payload)
             state.batchPostStatus = 'idle'
             state.voucherPostStatus = 'success'
-            state.createdVoucher = action.payload.data.bundles.name
+            state.createdVoucher = action.payload
         },
         [postVoucher.rejected]: (state, action)=>{
             console.log("rejected")
             state.batchPostStatus = 'idle'
             state.voucherPostStatus = 'failed'
-            state.createdVoucher = action.payload.data.bundles.name
         },
         [updateBatch.fulfilled]: (state, action) =>{
             console.log("Update Successful")

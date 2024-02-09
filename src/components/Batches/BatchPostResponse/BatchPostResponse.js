@@ -5,6 +5,8 @@ import { getAllBundles } from '../../../store/bundle-slice';
 import voucher_codes from 'voucher-code-generator'
 import BeatLoader from 'react-spinners/BeatLoader'
 import VoucherReactivate from '../../Vouchers/VoucherReactivate/VoucherReactivate';
+import TickAnimation from '../../TickAnimation/TickAnimation';
+import FailedAnimation from '../../FailedAnimation/FailedAnimation';
 
 const BatchPostResponse = () => {
 
@@ -13,27 +15,12 @@ const BatchPostResponse = () => {
   const[count, setCount] = useState('')
   const[batches, setBatches] = useState([])
 
-    const dispatch = useDispatch()
-
     const postSuccess = useSelector(getPostSuccess)
     const postFailure = useSelector(getPostFail)
     const postLoading = useSelector(getPostLoading)
 
     let info
     let batchNumber
-    let loadingAnimation = 
-    <tr className='' style={anime}>
-      <td colspan={6}>
-        <BeatLoader
-          color={'#055bb5'}
-          loading={postLoading}
-          cssOverride={override}
-          size={15}
-          aria-label="Loading Spinner"
-          data-testid="loader"
-        />
-      </td>
-    </tr>
 
   let renderedBatches = ''
   if(count>0){
@@ -52,8 +39,8 @@ const BatchPostResponse = () => {
 
   let loadingBatchAnimation = 
     <div className='text-center' style={anime}>
-        <h5 style={{color: '#055bb5'}}>{
-          postLoading&&!postFailure?"Generating Vouchers. Please wait a moment":postFailure?"Voucher Generation Failed":postSuccess&&"Voucher Generation Completed"}</h5>
+        <h5 style={{color: '#055bb5', overflow: 'hidden'}}>{
+          postLoading&&!postFailure&&!postSuccess?"Generating Vouchers. Please wait a moment":postFailure?<FailedAnimation/>:postSuccess&&<TickAnimation/>}</h5>
         {
           postLoading&&
           <BeatLoader
@@ -81,7 +68,7 @@ const BatchPostResponse = () => {
             <p className="text-sm ">Voucher Creation</p>
             <div className="">
                 {
-                  postLoading || postSuccess?
+                  postLoading || postSuccess || postFailure?
                     loadingBatchAnimation:''
                 }
                 {info}
@@ -92,7 +79,7 @@ const BatchPostResponse = () => {
               <p className="mb-0 text-sm" style={Style1}>Use the form to create batches of vouchers</p>
             </div>
         </div>
-        <div className="table-responsive p-0">
+        <div className="table-responsive p-0" style={{overflow: 'hidden'}}>
           <VoucherReactivate/>
         </div>
       </div>

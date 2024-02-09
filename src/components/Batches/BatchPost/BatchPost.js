@@ -31,26 +31,23 @@ const BatchPost = () => {
       userID,
       bundleId: bundleID
     })).then((response)=>{
-      console.log("batch resp: ", response)
       if(response.payload && response.payload.success){
         handlePost(response.payload.data.data.batch.id)
       }
       else{
         //code to undo batch
-        console.log("batch failed")
         dispatch(batchActions.failStatus(true))
+        dispatch(batchActions.postStatus(false))
         // Clear the loading state after 5 seconds
         setTimeout(() => {
           // setLoadingStatus(false);
           dispatch(batchActions.failStatus(false))
-          dispatch(batchActions.postStatus(false))
         }, 5000);
       }
     })
   }
 
   const handlePost = async (batchID) =>{
-    dispatch(batchActions.successStatus(true))
     dispatch(
       postVoucher({
       batchID: batchID,
@@ -61,18 +58,30 @@ const BatchPost = () => {
         dateUsed: "2024-01-18T13:00:49.368Z"
       },
       num: 3000
-    }))
-    // setLoadingStatus(false);
-    // setLoadingSuccess(true);
-    dispatch(batchActions.postStatus(false))
-    dispatch(batchActions.successStatus(true))
-    setBundleID('')
-    setTimeout(() => {
-      // setLoadingSuccess(false);
-      dispatch(batchActions.successStatus(false))
-    }, 2000);
-  // alert("Done")
-  // window.location = "/batch"
+    })).then((response)=>{
+      console.log("batch resp: ", response)
+      if(response.payload && response.payload.success){
+        dispatch(batchActions.postStatus(false))
+        dispatch(batchActions.successStatus(true))
+        setBundleID('')
+      }
+      else{
+        //code to undo batch
+        console.log("batch failed")
+        dispatch(batchActions.failStatus(true))
+        dispatch(batchActions.postStatus(false))
+        // Clear the loading state after 5 seconds
+      }
+    })
+    .finally(()=>{
+      setTimeout(() => {
+        // setLoadingSuccess(false);
+        setCurrentState('Product')
+        dispatch(batchActions.successStatus(false))
+        dispatch(batchActions.failStatus(false))
+        dispatch(batchActions.postStatus(false))
+      }, 2000);
+    })
 }
     
   const bundles = useSelector(getAllBundles)
