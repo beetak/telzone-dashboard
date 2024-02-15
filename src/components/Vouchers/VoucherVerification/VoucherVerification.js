@@ -108,7 +108,7 @@ const VoucherVerification = () => {
           <div className="card-header px-3">
             <div className="row">
               <div className="col-md-12">
-                <h6 className="mb-0">Voucher Status Verification</h6>
+                <h6 className="mb-0">Voucher Status Query</h6>
               </div>
             </div>
           </div>
