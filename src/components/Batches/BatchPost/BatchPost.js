@@ -74,13 +74,10 @@ const BatchPost = () => {
       }
     })
     .finally(()=>{
-      setTimeout(() => {
-        // setLoadingSuccess(false);
-        setCurrentState('Product')
-        dispatch(batchActions.successStatus(false))
-        dispatch(batchActions.failStatus(false))
+      setTimeout(()=>{
         dispatch(batchActions.postStatus(false))
-      }, 2000);
+        dispatch(batchActions.successStatus(false))
+      }, 5000)
     })
 }
     

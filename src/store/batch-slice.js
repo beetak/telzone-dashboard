@@ -116,6 +116,19 @@ export const postMerchandiseVoucher = createAsyncThunk(
     }
 );
 
+export const postBulkSMSVouchers = createAsyncThunk(
+    'cart/postBulkSMSVouchers',
+    async (initialData) => {
+      console.log(initialData);
+      try {
+        const response = await Api.post('/upload', initialData);
+        return { success: true, data: response.data };
+      } catch (error) {
+        throw error;
+      }
+    }
+);
+
 export const voucherVerification = createAsyncThunk(
     'cart/voucherVerification',
     async (initialData) => {
@@ -306,6 +319,7 @@ const batchSlice = createSlice({
         createdBatch: '',
         postLoading: false,
         postSuccess: false,
+        postSuccessMessage: {},
         postFail: false,
         createdVoucher: '',
         viewVouchers: '',
@@ -347,6 +361,10 @@ const batchSlice = createSlice({
         },
         successStatus(state, action){
             state.postSuccess = action.payload
+        },
+        successMessage(state, action){
+            console.log("message: ", action.payload)
+            state.postSuccessMessage = action.payload
         },
         failStatus(state, action){
             state.postFail = action.payload
@@ -400,6 +418,27 @@ const batchSlice = createSlice({
             }
         },
         [postBatch.rejected]: (state, {payload})=>{
+            state.batchPostStatus='failed'
+            console.log("rejected")
+            state.posting = 'failed'
+            state.postStatus = 'rejected'
+        },
+        [postBulkSMSVouchers.pending]: (state)=>{
+            state.batchPostStatus='pending'
+            console.log("pending")
+            state.posting = 'pending'
+            state.postStatus = 'pending'
+            state.voucherPostStatus = 'idle'
+        },
+        [postBulkSMSVouchers.fulfilled]: (state, action) => {
+            if (action.payload.success) {
+                state.posting = 'success'
+                state.postStatus = 'success'
+            } else {
+              console.log('postBulkSMSVouchers failed:', action.payload.error);
+            }
+        },
+        [postBulkSMSVouchers.rejected]: (state, {payload})=>{
             state.batchPostStatus='failed'
             console.log("rejected")
             state.posting = 'failed'
@@ -699,6 +738,7 @@ export const getVBActive = (state) => state.batch.batchActive
 export const getVBSuspended = (state) => state.batch.batchSuspended
 export const getPostLoading = (state) => state.batch.postLoading
 export const getPostSuccess = (state) => state.batch.postSuccess
+export const getPostSuccessMessage = (state) => state.batch.postSuccessMessage
 export const getPostFail = (state) => state.batch.postFail
 export const getSoldStatus = (state) => state.batch.soldStatus
 export const getVouchersSoldByShop = (state) => state.batch.soldByShop

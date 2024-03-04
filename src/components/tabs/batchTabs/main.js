@@ -6,6 +6,7 @@ import { fetchAsyncBatches, fetchAsyncVouchers } from "../../../store/batch-slic
 import { fetchAsyncBundles } from "../../../store/bundle-slice";
 import BlockedVouchers from "./blockedVouchers/blocedVouchers";
 import MerchandiseVouchers from "./merchandiseVouchers/merchandiseVouchers";
+import BulkySMS from "./bulkSMS/bulkSMS";
 
 const url = "http://localhost:8082/smart-wifi/user/"; // URL variable stores JSON url || API taken from 10 Degrees WordPress Agency
 
@@ -43,8 +44,8 @@ export default function BundleDetails(){
                 tabinfo = <BlockedVouchers/>;
                   // tabinfo = <VouchersTable/>
               }
-              else if(tabState === 'merchandise') {
-                tabinfo = <MerchandiseVouchers/>;
+              else if(tabState === 'bulky') {
+                tabinfo = <BulkySMS/>;
                   // tabinfo = <VouchersTable/>
               }
               else{
@@ -100,11 +101,11 @@ export default function BundleDetails(){
                         <div className="col-3">
                             <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
                                 <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
-                                    onClick={()=>setTabState('merchandise')}
+                                    onClick={()=>setTabState('bulky')}
                                     style={Style2}
                                     >
                                     <div className="col-12 d-flex align-items-center">
-                                        <h6 className="text-white text-capitalize ps-3">Merchandise Vouchers</h6>
+                                        <h6 className="text-white text-capitalize ps-3">Bulk Distribution</h6>
                                     </div>
                                 </a>
                             </div>

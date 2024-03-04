@@ -18,11 +18,33 @@ export const postSale = createAsyncThunk('cart/postSale', async (initialData) =>
   }
 );
 
+export const postBulkSale = createAsyncThunk('cart/postSale', async (initialData) => {
+    return await Api
+      .post('/tcfl-students/077777777/5/12', 
+        initialData
+      )
+      .then((res) => res.data);
+  }
+);
+
 export const postVoucherSaleByBundleId = createAsyncThunk(
     'cart/postVoucherSaleByBundleId',
     async ({bundleId, quantity}) => {
         try {
             const response = await Api.post(`/sales/${bundleId}?quantity=${quantity}&sold=${false}&used=${false}`)
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error('postVoucher error:', error);
+            throw error;
+        }
+    }
+);
+
+export const postBulkSMS = createAsyncThunk(
+    'cart/postBulkSMS',
+    async ({phoneNumber, bundleId, orderId}) => {
+        try {
+            const response = await Api.post(`/tcfl-students/${phoneNumber}/${bundleId}/${orderId}`)
             return { success: true, data: response.data };
         } catch (error) {
             console.error('postVoucher error:', error);
@@ -242,7 +264,6 @@ const cartSlice = createSlice({
             state.retrieveStatus = 'pending'
         },
         [postVoucherSaleByBundleId.fulfilled]: (state, action)=>{
-            const voucherData = action.payload
             state.retrieveStatus = 'fulfilled'
             // console.log("the voucher",action.payload)
 

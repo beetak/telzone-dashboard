@@ -9,6 +9,14 @@ export const fetchAsyncClients = createAsyncThunk('client/fetchAsyncClients', as
    
 })
 
+export const fetchAsyncClientCpnnections = createAsyncThunk('client/fetchAsyncClientConnections', async () => {
+    
+    const response = await Api
+    .get(`/splash_page_connections/`)
+    return [...response.data.data]
+   
+})
+
 const headers = {
     'Accept' : 'application/json',
     'Content-Type' : 'application/json'

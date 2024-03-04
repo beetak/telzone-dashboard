@@ -26,8 +26,6 @@
     "react-router-dom": "^6.3.0",
     "react-scripts": "^5.0.1",
     "react-spinners": "^0.13.8",
-    "react-table": "^7.8.0",
-    "react-table-6": "^6.11.0",
     "react-thermal-printer": "^0.11.0",
     "react-to-print": "^2.14.11",
     "redux": "^4.2.0",

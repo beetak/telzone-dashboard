@@ -58,10 +58,21 @@ const bundleSlice = createSlice({
     initialState: {
         bundles: [],
         updateBundle: '',
-        loadingStatus: 'idle'
+        loadingStatus: 'idle',
+        postLoading: false,
+        postStatus: false,
+        postFail: false
     },
     reducers: {
-        
+        postStatus(state, action){
+            state.postLoading = action.payload
+        },
+        successStatus(state, action){
+            state.postSuccess = action.payload
+        },
+        failStatus(state, action){
+            state.postFail = action.payload
+        }
     },
     extraReducers: {
         [fetchAsyncBundles.pending]: (state)=>{
@@ -130,21 +141,6 @@ const bundleSlice = createSlice({
         [updateBundle.fulfilled]: (state, action) =>{
             console.log("Update Successful")
             console.log(action.payload)
-            // state.isLoading = false;
-            // state.isSuccess = true;
-            // state.bundles.map((bundle) => {
-            //     if (bundle.id === action.payload.id) {
-            //         bundle.name = action.payload.name;
-            //         bundle.price = action.payload.price;
-            //         bundle.description = action.payload.description;
-            //         bundle.groupPolicyId = action.payload.groupPolicyId;
-            //         bundle.currency.symbol = "action.payload.currencyId";
-            //         // bundle.bundleCategory.name = "action.payload.bundleCategoryId";
-            //     }
-            // });
-            // state.updateBundle = 'success'
-            // state.bundles.push(action.payload)
-            // state.bundles = state.bundles.filter(bundle => bundle.id !== action.payload)
             return { 
                 ...state, 
                 bundles: state.bundles.map(
@@ -166,4 +162,7 @@ export const bundleActions = bundleSlice.actions
 export const getAllBundles = (state) => state.bundle.bundles
 export const getUpdateStatus = (state) => state.bundle.updateBundle
 export const getLoadingStatus = (state) => state.bundle.loadingStatus
+export const getPostLoading = (state) => state.bundle.postLoading
+export const getPostSuccess = (state) => state.bundle.postSuccess
+export const getPostFail = (state) => state.bundle.postFail
 export default bundleSlice

@@ -263,7 +263,27 @@ const FurtherDetails = () => {
                               </div>
                             </div>
                             <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                              {convertDate(verified.data.vouchers.order.dateCreated)} {convertTime(verified.data.vouchers.order.timeCreated)}
+                              {convertDate(verified.data.vouchers.order.dateCreated)} {verified.data.vouchers.order.timeCreated&&convertTime(verified.data.vouchers.order.timeCreated)}
+                            </div>
+                          </li>
+                          <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
+                            <div className="d-flex align-items-center">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-1 text-dark text-sm">Policy ID Passed</h6>
+                              </div>
+                            </div>
+                            <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
+                              {verified.data.vouchers.groupPolicyId?verified.data.vouchers.groupPolicyId:'Undefined'}
+                            </div>
+                          </li>
+                          <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
+                            <div className="d-flex align-items-center">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-1 text-dark text-sm">Duration Passed</h6>
+                              </div>
+                            </div>
+                            <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
+                            {verified.data.vouchers.duration?verified.data.vouchers.duration:'Undefined'}
                             </div>
                           </li>
                         </>:
@@ -310,7 +330,7 @@ const FurtherDetails = () => {
                               </div>
                             </div>
                             <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                              {!verified.data.vouchers.dateUsed?"Not Yet Used":convertDatenTime(verified.data.vouchers.dateUsed)}
+                              {!verified.data.vouchers.dateUsed?"Date Not Provided":convertDatenTime(verified.data.vouchers.dateUsed)}
                             </div>
                           </li>
                           <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">

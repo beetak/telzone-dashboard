@@ -40,7 +40,7 @@ const BatchPostResponse = () => {
   let loadingBatchAnimation = 
     <div className='text-center' style={anime}>
         <h5 style={{color: '#055bb5', overflow: 'hidden'}}>{
-          postLoading&&!postFailure&&!postSuccess?"Generating Vouchers. Please wait a moment":postFailure?<FailedAnimation/>:postSuccess&&<TickAnimation/>}</h5>
+          postLoading&&!postFailure&&!postSuccess?"Generating Vouchers. Please wait a moment":postFailure?<FailedAnimation message="Voucher Generation Failed"/>:postSuccess&&<TickAnimation message="Voucher Generation Completed"/>}</h5>
         {
           postLoading&&
           <BeatLoader

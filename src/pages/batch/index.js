@@ -19,12 +19,12 @@ export default function BatchList () {
     <div className='text-center' style={anime}>
         <h5 style={{color: '#055bb5'}}>Loading Vouchers</h5>
         <BeatLoader
-        color={'#055bb5'}
-        loading={voucherView}
-        cssOverride={override}
-        size={15}
-        aria-label="Loading Spinner"
-        data-testid="loader"
+            color={'#055bb5'}
+            loading={voucherView}
+            cssOverride={override}
+            size={15}
+            aria-label="Loading Spinner"
+            data-testid="loader"
         />
     </div>
 
@@ -49,13 +49,9 @@ export default function BatchList () {
                                 <BatchVoucherDetails/>
                                 :(voucherView === 'rejected' && userRole === 'Admin'?
                                     errorMsg:''
-                            )
+                                )
                             ))
                     }
-                    {/*
-                          userRole === 'Admin' && batchVouchers?
-                            <BatchVoucherDetails/>:<BatchDetails/>      
-                    */}
                 </div>
             </main>
         </div>

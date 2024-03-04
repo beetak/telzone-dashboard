@@ -3,7 +3,7 @@ import SideNavigation from "../../components/NavBar/sideNav";
 import TopNavigation from "../../components/NavBar/topNav";
 import CartBundleList from "../../components/ShoppingCart/CartBundleList/CartBundleList";
 import CartItems from "../../components/ShoppingCart/CartItems/CartItems";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { fetchAsyncBundles } from "../../store/bundle-slice";
 import { fetchAsyncBusiness } from "../../store/business-slice";
 import { fetchAsyncCurrency } from "../../store/currency-slice";
@@ -11,6 +11,10 @@ import FocList from "../../components/ShoppingCart/FocList/FocList";
 import FocItems from "../../components/ShoppingCart/FocItems/FocItems";
 import { fetchAsyncFoc } from "../../store/foc-slice";
 import { fetchAsyncUser } from "../../store/user-slice";
+import BulkVoucherPost from "../../components/Vouchers/BulkVoucherPost/BulkVoucherPost";
+import BulkPostResponse from "../../components/Batches/BatchPostResponse/BulkPostResponse";
+
+const userShop = localStorage.getItem('shopName')
 
 export default function Sales ({page}) {
     // return(
@@ -66,12 +70,54 @@ export default function Sales ({page}) {
             <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
                 {<TopNavigation title={"Sales"}/>}
                 { 
-                    page === 'sales' &&
+                    page === 'sales' && userShop !== "TCFL" ?
                     <div className="container-fluid py-4">
                         <div className="container-fluid">
                             <div className="row">
                                 <CartBundleList pageType="sales"/>
-                                <CartItems/>
+                                <CartItems/>      
+                            </div>
+                        </div>
+                    </div>:
+                    <div className="container-fluid py-4">
+                        <div className="container-fluid">
+                            <div className="row">
+                                <div class="col-lg-6 py-4">                
+                                    <div className="row">
+                                        <div className="col-12">
+                                            <div className="card my-4">
+                                                <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
+                                                    <div className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" style={Style2}>
+                                                        <h6 className="text-white text-capitalize ps-3">Voucher Distribution Response</h6>
+                                                    </div>
+                                                </div>
+                                                <div className="card-body px-0 pb-2">
+                                                    <div className="table-responsive p-0">
+                                                        <BulkPostResponse/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 py-4">                
+                                    <div className="row">
+                                        <div className="col-12">
+                                            <div className="card my-4">
+                                                <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
+                                                    <div className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" style={Style2}>
+                                                        <h6 className="text-white text-capitalize ps-3">Bulk SMS Voucher Distribution</h6>
+                                                    </div>
+                                                </div>
+                                                <div className="card-body px-0 pb-2">
+                                                    <div className="p-0">
+                                                        <BulkVoucherPost/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>          
                             </div>
                         </div>
                     </div>
