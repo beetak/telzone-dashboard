@@ -185,7 +185,7 @@ const CartItems = () => {
 
   const makeSale = (printSize) => {
     const t = new Date()
-    const timeCreated = t.toLocaleTimeString('en-US', { hour12: false });
+    const timeCreated = t.getTime();
     if (currencyId === '') {
       setEmpty("Please select currency");
     } else {

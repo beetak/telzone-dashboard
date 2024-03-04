@@ -46,6 +46,10 @@ const VoucherReportCard = (props) => {
     //   // return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
     // };
 
+    const padZero = (value) => {
+      return value.toString().padStart(2, '0');
+    };
+    
     const convertDate = (dateCreated) => {
       const dateString = new Date(dateCreated);
       const day = dateString.getDate().toString().padStart(2, '0');
@@ -66,12 +70,46 @@ const VoucherReportCard = (props) => {
       return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
     }
 
-    const convertTime = (timeCreated) => {
-      const timeArray = timeCreated;
-      const newTime = timeArray.join(':');
+    // const convertTime = (timeCreated) => {
+    //   const timeArray = timeCreated;
+    //   const newTime = timeArray.join(':');
       
-      return newTime;
-    }
+    //   return newTime;
+    // }
+
+    const convertTime = (timeCreated) => {
+      // Convert milliseconds to seconds
+      let seconds = Math.floor(timeCreated / 1000);
+    
+      // Calculate hours, minutes, and remaining seconds
+      const hours = Math.floor(seconds / 3600);
+      seconds %= 3600;
+      const minutes = Math.floor(seconds / 60);
+      seconds %= 60;
+    
+      const formattedTime = `${hours}:${padZero(minutes)}:${padZero(seconds)}`;
+      return formattedTime;
+    };
+
+    const convertDuration = (duration) => {
+      // Define durations in seconds
+      const secondsPerMinute = 60;
+      const secondsPerHour = 60 * secondsPerMinute;
+      const secondsPerDay = 24 * secondsPerHour;
+      const secondsPerMonth = 30 * secondsPerDay;
+    
+      // Calculate months, days, hours, and remaining minutes
+      const months = Math.floor(duration / secondsPerMonth);
+      duration %= secondsPerMonth;
+      const days = Math.floor(duration / secondsPerDay);
+      duration %= secondsPerDay;
+      const hours = Math.floor(duration / secondsPerHour);
+      duration %= secondsPerHour;
+      const minutes = Math.floor(duration / secondsPerMinute);
+
+      const formattedDate = `${months} months, ${days} days, ${hours} hours, ${minutes} munites`;
+      return formattedDate;
+    };
 
     return (
         <>
@@ -91,7 +129,7 @@ const VoucherReportCard = (props) => {
             <td className="align-middle">
               {data.order.dateCreated > new Date('2023-04-14') ? (
                 <h6 className="mb-0 text-sm">
-                  {convertDate(data.order.dateCreated)} {convertTime(data.order.timeCreated ? data.order.timeCreated : [0, 0, 0])}
+                  {convertDate(data.order.dateCreated)} {data.order.timeCreated?convertTime(data.order.timeCreated):""}
                 </h6>
               ):<h6 className="mb-0 text-sm">Unavailable</h6>}                       
             </td>

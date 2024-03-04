@@ -47,7 +47,7 @@ const BulkVoucherPost = () => {
     e.preventDefault();
     dispatch(batchActions.postStatus(true));
     const t = new Date()
-    const timeCreated = t.toLocaleTimeString('en-US', { hour12: false });
+    const timeCreated = t.getTime();
     const date = new Date()
     const today = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
 

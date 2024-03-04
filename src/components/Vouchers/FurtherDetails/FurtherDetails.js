@@ -136,13 +136,31 @@ const FurtherDetails = () => {
     return `${day} ${month} ${year}`;
     //return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
   }
-  const convertTime = (timeCreated) => {
-    const timeArray = timeCreated;
-    const newTime = timeArray.join(':');
+  // const convertTime = (timeCreated) => {
+  //   const timeArray = 31355000;
+  //   const newTime = timeArray.join(':');
     
-    return newTime;
-    //return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
-  }
+  //   return newTime;
+  //   //return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
+  // }
+
+  const padZero = (value) => {
+    return value.toString().padStart(2, '0');
+  };
+
+  const convertTime = (timeCreated) => {
+    // Convert milliseconds to seconds
+    let seconds = Math.floor(timeCreated / 1000);
+  
+    // Calculate hours, minutes, and remaining seconds
+    const hours = Math.floor(seconds / 3600);
+    seconds %= 3600;
+    const minutes = Math.floor(seconds / 60);
+    seconds %= 60;
+  
+    const formattedTime = `${hours}:${padZero(minutes)}:${padZero(seconds)}`;
+    return formattedTime;
+  };
 
   let renderedUsage = ''
   
@@ -190,6 +208,26 @@ const FurtherDetails = () => {
     
       return convertTimestamp(timestamp);
     }
+
+    const convertDuration = (duration) => {
+      // Define durations in seconds
+      const secondsPerMinute = 60;
+      const secondsPerHour = 60 * secondsPerMinute;
+      const secondsPerDay = 24 * secondsPerHour;
+      const secondsPerMonth = 30 * secondsPerDay;
+    
+      // Calculate months, days, hours, and remaining minutes
+      const months = Math.floor(duration / secondsPerMonth);
+      duration %= secondsPerMonth;
+      const days = Math.floor(duration / secondsPerDay);
+      duration %= secondsPerDay;
+      const hours = Math.floor(duration / secondsPerHour);
+      duration %= secondsPerHour;
+      const minutes = Math.floor(duration / secondsPerMinute);
+
+      const formattedDate = `${months} months, ${days} days, ${hours} hours, ${minutes} munites`;
+      return formattedDate;
+    };
 
   return (
     <>
@@ -263,7 +301,7 @@ const FurtherDetails = () => {
                               </div>
                             </div>
                             <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                              {convertDate(verified.data.vouchers.order.dateCreated)} {verified.data.vouchers.order.timeCreated&&convertTime(verified.data.vouchers.order.timeCreated)}
+                              {convertDate(verified.data.vouchers.order.dateCreated)} {verified.data.vouchers.order.timeCreated?convertTime(verified.data.vouchers.order.timeCreated):""}
                             </div>
                           </li>
                           <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
@@ -283,7 +321,7 @@ const FurtherDetails = () => {
                               </div>
                             </div>
                             <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                            {verified.data.vouchers.duration?verified.data.vouchers.duration:'Undefined'}
+                            {verified.data.vouchers.duration?convertDuration(verified.data.vouchers.duration):'Undefined'}
                             </div>
                           </li>
                         </>:
