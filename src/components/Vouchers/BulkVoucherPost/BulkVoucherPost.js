@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { batchActions, postBulkSMSVouchers } from '../../../store/batch-slice';
+import { batchActions } from '../../../store/batch-slice';
 import BundleDropdown from '../../Bundles/BundleDropdown/BundleDropdown';
 import { fetchAsyncBundles, getAllBundles } from '../../../store/bundle-slice';
-import { postBulkSMS, postSale } from '../../../store/cart-slice';
+import { closeSale, postBulkSMS, postSale } from '../../../store/cart-slice';
 
 const userID = localStorage.getItem("userId")
 const regionId = localStorage.getItem("regionId")
@@ -17,7 +17,6 @@ const BulkVoucherPost = () => {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [bundleId, setBundleId] = useState('')
   const [bundlePrice, setBundlePrice] = useState('')
-  const [message, setMessage] = useState('')
 
 
   const dispatch = useDispatch()
@@ -25,7 +24,7 @@ const BulkVoucherPost = () => {
 
   useEffect(() => {
     dispatch(fetchAsyncBundles(active))
-  }, [dispatch]);
+  }, [dispatch, active]);
 
   const getBundle = (id, name, price) => {
     setBundleId(id)
@@ -46,10 +45,7 @@ const BulkVoucherPost = () => {
   const makeSale = async (e) => {
     e.preventDefault();
     dispatch(batchActions.postStatus(true));
-    const t = new Date()
-    const timeCreated = t.getTime();
     const date = new Date()
-    const today = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
 
     const unitPrice = (Math.round(bundlePrice * 10000 / (115)) / 100).toFixed(2)
     const totalPrice = (Math.round(unitPrice * 200)/100).toFixed(2)
@@ -125,6 +121,12 @@ const BulkVoucherPost = () => {
           else if(response.payload.data.code==="SUCCESS"){
             console.log(`Two(2) Vouchers sent to student with phone number ${phoneNumber}`)
             dispatch(batchActions.successMessage({status: true, message: `Two(2) Vouchers sent to student with phone number ${phoneNumber}`}));
+            dispatch(closeSale(
+              {
+                orderId,
+                status: true
+              }
+            ))
           }
           dispatch(batchActions.postStatus(false));
           dispatch(batchActions.successStatus(true));
@@ -189,7 +191,7 @@ const BulkVoucherPost = () => {
 
 export default BulkVoucherPost;
 
-const Style2 = {
-  paddingTop: "1rem",
-  paddinBottom: "0.5rem"
-}
+// const Style2 = {
+//   paddingTop: "1rem",
+//   paddinBottom: "0.5rem"
+// }
