@@ -9,9 +9,6 @@ const VoucherVerification = () => {
 
   const [voucherCode, setVoucherCode] = useState('');
   const [isOpen, setIsOpen] = useState(false)
-  const [isUpdateOpen, setIsUpdateOpen] = useState(false)
-  const [updateStatus, setUpdateStatus] = useState('')
-  const [current, setCurrent] = useState('')
 
 
   const openModal = () => setIsOpen(true);

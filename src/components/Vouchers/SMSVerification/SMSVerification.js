@@ -6,6 +6,7 @@ import { fetchAsyncSMSVoucher, getAllSales, getLoadingStatus } from '../../../st
 import FailedAnimation from '../../FailedAnimation/FailedAnimation';
 import TickAnimation from '../../TickAnimation/TickAnimation';
 import { isEmpty } from 'lodash';
+import { voucherVerification } from '../../../store/batch-slice';
 const userRole = localStorage.getItem('role')
 
 const SMSVerification = () => {
@@ -72,10 +73,17 @@ const SMSVerification = () => {
     </div>
 
 
-  let renderedError = 
-    <div className="align-middle text-center">
-      <span class="badge badge-sm bg-gradient-danger w-50 p-2">Voucher Not Found</span>
-    </div>
+const handleVerification = async (item) => {
+  // setIsOpen(true)
+  dispatch(voucherVerification(
+    {
+      voucherCode: item
+    }
+  )).then((response)=>{
+      console.log("my respo", response)
+    
+  })
+};
   
   let renderedVouchers = ''
   if(voucherCodes.length > 0){
@@ -84,7 +92,7 @@ const SMSVerification = () => {
         {
             voucherCodes.map((item, index)=>{
               return <>
-                <span class="badge badge-sm bg-gradient-success w-50 p-2 mt-2">{item}</span><br/>
+                <span class="badge badge-sm bg-gradient-success w-50 p-2 mt-2" style={{cursor: 'pointer'}} onClick={()=>handleVerification(item)}>{item}</span><br/>
               </>
             })          
         }
