@@ -118,11 +118,11 @@ const BulkVoucherPost = () => {
       .then((response) => {
         console.log("My response: ", response.payload)
         if (response.payload && response.payload.success) {
-          if(response.payload.data.message==="Student already has a voucher code."){
+          if(response.payload.data.code==="FAILED"){
             console.log("Student already has vouchers")
             dispatch(batchActions.successMessage({status: false, message: `Student with phone number ${phoneNumber} already has vouchers`}));
           }
-          else if(response.payload.data.message==="Vouchers attached to TcflStudent."){
+          else if(response.payload.data.code==="SUCCESS"){
             console.log(`Two(2) Vouchers sent to student with phone number ${phoneNumber}`)
             dispatch(batchActions.successMessage({status: true, message: `Two(2) Vouchers sent to student with phone number ${phoneNumber}`}));
           }

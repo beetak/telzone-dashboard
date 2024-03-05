@@ -13,6 +13,12 @@ export const fetchAsyncSalesByPartnerId = createAsyncThunk('sale/fetchAsyncSales
     return [...response.data.data]
 })
 
+export const fetchAsyncSMSVoucher = createAsyncThunk('sale/fetchAsyncSMSVoucher', async (phoneNumber) => {
+    const response = await Api
+    .get(`/tcfl-students/vouchers/${phoneNumber}`)
+    return response.data
+})
+
 export const fetchAsyncSalesByCurrencyId = createAsyncThunk('sale/fetchAsyncSalesByCurrencyId', async ({startDate, endDate, curId, status}) => {
     const response = await Api
     .get(`/order/currency/${startDate}/${endDate}/${curId}/${status}`)
@@ -159,6 +165,19 @@ const saleSlice = createSlice({
         [fetchAsyncSalesByPartnerId.rejected]: (state, {payload})=>{
             console.log("rejected")
             state.loadingByCurIdStatus = 'rejected'
+        },
+        [fetchAsyncSMSVoucher.pending]: (state)=>{
+            console.log("pending")
+            state.loadingStatus = 'pending'
+        },
+        [fetchAsyncSMSVoucher.fulfilled]: (state, action)=>{
+            console.log("fulfilled")
+            state.partnerSales = action.payload
+            state.loadingStatus = 'fulfilled'
+        },
+        [fetchAsyncSMSVoucher.rejected]: (state, {payload})=>{
+            console.log("rejected")
+            state.loadingStatus = 'rejected'
         },
         [fetchAsyncSalesByCurrencyId.pending]: (state)=>{
             console.log("pending")

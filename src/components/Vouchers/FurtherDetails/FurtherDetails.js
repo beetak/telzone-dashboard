@@ -304,26 +304,6 @@ const FurtherDetails = () => {
                               {convertDate(verified.data.vouchers.order.dateCreated)} {verified.data.vouchers.order.timeCreated?convertTime(verified.data.vouchers.order.timeCreated):""}
                             </div>
                           </li>
-                          <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
-                            <div className="d-flex align-items-center">
-                              <div className="d-flex flex-column">
-                                <h6 className="mb-1 text-dark text-sm">Policy ID Passed</h6>
-                              </div>
-                            </div>
-                            <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                              {verified.data.vouchers.groupPolicyId?verified.data.vouchers.groupPolicyId:'Undefined'}
-                            </div>
-                          </li>
-                          <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
-                            <div className="d-flex align-items-center">
-                              <div className="d-flex flex-column">
-                                <h6 className="mb-1 text-dark text-sm">Duration Passed</h6>
-                              </div>
-                            </div>
-                            <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                            {verified.data.vouchers.duration?convertDuration(verified.data.vouchers.duration):'Undefined'}
-                            </div>
-                          </li>
                         </>:
                         <>
                           <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
@@ -369,6 +349,46 @@ const FurtherDetails = () => {
                             </div>
                             <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
                               {!verified.data.vouchers.dateUsed?"Date Not Provided":convertDatenTime(verified.data.vouchers.dateUsed)}
+                            </div>
+                          </li>
+                          <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
+                            <div className="d-flex align-items-center">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-1 text-dark text-sm">First Seen:</h6>
+                              </div>
+                            </div>
+                            <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
+                              {UnixTimestampConverter(clientDetails.firstSeen)}
+                            </div>
+                          </li>
+                          <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
+                            <div className="d-flex align-items-center">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-1 text-dark text-sm">Last Seen:</h6>
+                              </div>
+                            </div>
+                            <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
+                              {UnixTimestampConverter(clientDetails.lastSeen)}
+                            </div>
+                          </li>
+                          <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
+                            <div className="d-flex align-items-center">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-1 text-dark text-sm">Policy ID Passed</h6>
+                              </div>
+                            </div>
+                            <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
+                              {verified.data.vouchers.groupPolicyId?verified.data.vouchers.groupPolicyId:'Undefined'}
+                            </div>
+                          </li>
+                          <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
+                            <div className="d-flex align-items-center">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-1 text-dark text-sm">Duration Passed</h6>
+                              </div>
+                            </div>
+                            <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
+                            {verified.data.vouchers.duration?convertDuration(verified.data.vouchers.duration):'Undefined'}
                             </div>
                           </li>
                           <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
@@ -439,26 +459,6 @@ const FurtherDetails = () => {
                             </div>
                             <div className={`${clientDetails.description? "text-dark " : "text-danger "}d-flex align-items-center text-gradient text-sm font-weight-bold`}>
                               {clientDetails.description?clientDetails.description:"null"}
-                            </div>
-                          </li>
-                          <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
-                            <div className="d-flex align-items-center">
-                              <div className="d-flex flex-column">
-                                <h6 className="mb-1 text-dark text-sm">First Seen:</h6>
-                              </div>
-                            </div>
-                            <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                              {UnixTimestampConverter(clientDetails.firstSeen)}
-                            </div>
-                          </li>
-                          <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
-                            <div className="d-flex align-items-center">
-                              <div className="d-flex flex-column">
-                                <h6 className="mb-1 text-dark text-sm">Last Seen:</h6>
-                              </div>
-                            </div>
-                            <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                              {UnixTimestampConverter(clientDetails.lastSeen)}
                             </div>
                           </li>
                           <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">

@@ -12,6 +12,7 @@ import VoucherVerificationPage from '../sales/voucherVerification';
 import VoucherVerification from '../../components/Vouchers/VoucherVerification/VoucherVerification';
 import FurtherDetails from '../../components/Vouchers/FurtherDetails/FurtherDetails';
 import { getShow } from '../../store/batch-slice';
+import SMSVerification from '../../components/Vouchers/SMSVerification/SMSVerification';
 
 const userID = localStorage.getItem('userId')
 
@@ -28,6 +29,19 @@ export default function SalesAgent() {
   }
   else if(tabState === "voucher"){ 
     tabinfo = <VoucherReport/>
+  }
+  else if(tabState === "sms"){ 
+    tabinfo = <>
+        <div className="container-fluid">
+          <div className="row">
+            <SMSVerification/>
+            {
+                showMore?
+                    <FurtherDetails/>:''
+            }
+          </div>
+        </div>
+    </>
   }
   else{
     tabinfo = <>
@@ -93,6 +107,17 @@ export default function SalesAgent() {
                               style={Style2}>
                               <div className="col-12 d-flex align-items-center">
                                 <h6 className="text-white text-capitalize ps-3">Vouchers Report</h6>
+                              </div>
+                            </a>
+                          </div>
+                        </div>
+                        <div className="col-3">
+                          <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
+                            <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
+                              onClick={()=>setTabState('sms')}
+                              style={Style2}>
+                              <div className="col-12 d-flex align-items-center">
+                                <h6 className="text-white text-capitalize ps-3">SMS Report</h6>
                               </div>
                             </a>
                           </div>
