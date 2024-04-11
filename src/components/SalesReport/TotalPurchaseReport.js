@@ -69,7 +69,7 @@ export default function TotalPurchaseReport() {
                     setFilter('USD')
                   }
                 }
-              >ZWL
+              >ZiG
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>

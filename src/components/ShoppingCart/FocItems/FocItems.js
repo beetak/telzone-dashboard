@@ -110,7 +110,7 @@ const FocItems = () => {
       }
       else{
         setRateStatus(true)
-        currencySymbol === 'ZWL'?setRate(prices[0].price):setRate(1)
+        currencySymbol === 'ZiG'?setRate(prices[0].price):setRate(1)
         setRateId(prices[0].id)
       }
   }, [dispatch, currencySymbol, postBundleId]);

@@ -404,7 +404,7 @@ export default function SummarySales() {
     else{
         agentSalesData = 
         <tr>
-        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Agent Sales Found</h5></td>
+        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZiG'&&'ZiG'} Agent Sales Found</h5></td>
         </tr>
     }
 
@@ -426,7 +426,7 @@ export default function SummarySales() {
     else{
         onlineSalesData = 
         <tr>
-        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Online Sales Found</h5></td>
+        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZiG'&&'ZiG'} Online Sales Found</h5></td>
         </tr>
     }
 

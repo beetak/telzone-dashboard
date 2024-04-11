@@ -183,7 +183,7 @@ export default function DailyReport() {
     else{
         agentSalesData = 
         <tr>
-        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Sales Record Found</h5></td>
+        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZiG'&&'ZiG'} Sales Record Found</h5></td>
         </tr>
     }
 

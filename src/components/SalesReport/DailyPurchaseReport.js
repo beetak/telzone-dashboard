@@ -67,7 +67,7 @@ export default function DailyPurchaseReport() {
                     setFilter('USD')
                   }
                 }
-              >ZWL
+              >ZiG
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>

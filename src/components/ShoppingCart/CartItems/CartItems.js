@@ -84,7 +84,7 @@ const CartItems = () => {
       if(priceCount<=0){   
       }
       else{
-        currencySymbol === 'ZWL'?setRate(prices[0].price):setRate(1)
+        currencySymbol === 'ZiG'?setRate(prices[0].price):setRate(1)
       }
   }, [dispatch, currencySymbol, postBundleId]);
 
@@ -343,7 +343,7 @@ const CartItems = () => {
     const pageHeight = 260 + (voucherDetails.length * 12); // Calculate the required height based on voucherDetails length
     var doc = new jsPDF('portrait', 'px', [pageHeight, 160], 'false');
     // var doc = new jsPDF('potrait', 'px', [280,160], 'false')
-    doc.addImage(img, 'PNG', 15, 5, 70, 25)
+    // doc.addImage(img, 'PNG', 15, 5, 70, 25)
     doc.setFont('Times New Roman', 'bold')
     doc.setFontSize(12)
     doc.text(15, 40, 'Headquarters: Runhare House')
@@ -465,8 +465,6 @@ const CartItems = () => {
 
     const fiveDaysAgo = new Date(formattedDate);
     fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
-
-    const formattedFiveDaysAgo = fiveDaysAgo.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
     var doc = new jsPDF('potrait', 'px', 'a4', 'false')
     

@@ -91,7 +91,7 @@ export default function SummaryTaxes() {
         else{
             setRateStatus(true)
             setRateId(prices[0].id)
-            currencyState === 'ZWL'?setBaseRate(prices[0].price):setBaseRate(1)
+            currencyState === 'ZiG'?setBaseRate(prices[0].price):setBaseRate(1)
         }
         if(userRole==="Area Manager"){
             setSearchLevel("town")
@@ -446,7 +446,7 @@ export default function SummaryTaxes() {
     else{
         agentSalesData = 
         <tr>
-        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Taxes Found</h5></td>
+        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZiG'&&'ZiG'} Taxes Found</h5></td>
         </tr>
     }
 
@@ -468,7 +468,7 @@ export default function SummaryTaxes() {
     else{
         onlineSalesData = 
         <tr>
-        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZWL'&&'ZWL'} Taxes Found</h5></td>
+        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No {currencyState ==='Currency'?'':currencyState ==='USD'?'USD':currencyState ==='ZiG'&&'ZiG'} Taxes Found</h5></td>
         </tr>
     }
 

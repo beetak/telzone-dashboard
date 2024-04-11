@@ -69,7 +69,7 @@ export default function SummarySalesCustomer() {
                     setFilter('USD')
                   }
                 }
-              >ZWL
+              >ZiG
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
