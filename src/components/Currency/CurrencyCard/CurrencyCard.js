@@ -2,6 +2,7 @@ import {useState, useEffect} from 'react';
 import { Button, ButtonGroup, Dropdown, FormControl, InputGroup, Modal } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { fetchAsyncCurrency, updateCurrency } from '../../../store/currency-slice';
+import { BeatLoader } from 'react-spinners';
 
 const userRole = localStorage.getItem('role')
 
@@ -16,6 +17,9 @@ const CurrencyCard = (props) => {
   const [current, setCurrent] = useState('')
   const [actioned, setActioned] = useState('')
   const [currencyId, setCurrencyId] = useState('')
+  const [success, setSuccess] = useState(false)
+  const [failed, setFailed] = useState(false)
+  const [loadingStatus, setLoadingStatus] = useState(false)
 
 
   const openModal = () => setIsOpen(true);
@@ -23,18 +27,66 @@ const CurrencyCard = (props) => {
 
   const dispatch = useDispatch()
 
-  const handleUpdate = () => {
-    dispatch(updateCurrency(
-      {
-        active,
-        id,
-        name,
-        symbol,
-        currencyId
+  const handleUpdate = async (e) => {
+    e.preventDefault();      
+    setLoadingStatus(true);    
+    try {
+      const response = await dispatch(
+        updateCurrency(
+          {
+            active,
+            id,
+            name,
+            symbol,
+            currencyId
+          }
+        )
+      );
+  
+      if (response.payload) {
+        console.log(response)
+        if (response.payload.data.code === 'SUCCESS') {
+          setSuccess(true);
+        } else {
+          setFailed(true);
+        }
+      } else {
+        setFailed(true);
       }
-    ))
-    closeModal()
-  }
+    } catch (error) {
+        setFailed(true);
+    } finally {
+      setTimeout(() => {
+        setSuccess(false);
+        setLoadingStatus(false);
+        setFailed(false);
+        closeModal()
+      }, 2000);
+    }
+  };
+    
+  let loadingAnimation = 
+  <div className='text-center' style={anime}>
+      <h5 style={{ color: '#155bb5' }}>
+        {loadingStatus && !success  && !failed? 
+          "Updating Category, Please wait" :
+          loadingStatus && success  && !failed ? 
+            "Update Successful" :
+            loadingStatus && !success  && failed ? "Update Failed" : ""}
+      </h5>
+      {
+        loadingStatus ? 
+        <BeatLoader
+          color={'#055bb5'}
+          loading={loadingStatus}
+          cssOverride={override}
+          size={15}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />: ""
+      }      
+  </div>
+
   const {data, index} = props 
   return (
     <>
@@ -141,6 +193,7 @@ const CurrencyCard = (props) => {
           <Button variant="secondary" onClick={closeModal}>
             Close
           </Button>
+          {loadingAnimation}
         </Modal.Footer>
       </Modal>
     </>
@@ -148,3 +201,16 @@ const CurrencyCard = (props) => {
 }
 
 export default CurrencyCard;
+
+const override = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "blue",
+};
+
+const anime = {
+  textAlign: 'center', 
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  width: '100%', 
+}

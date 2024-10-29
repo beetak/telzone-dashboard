@@ -98,6 +98,24 @@ const VoucherVerification = () => {
     return dateString.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
+  const padZero = (value) => {
+    return value.toString().padStart(2, '0');
+  };
+
+  const convertTime = (timeCreated) => {
+    // Convert milliseconds to seconds
+    let seconds = Math.floor(timeCreated / 1000);
+  
+    // Calculate hours, minutes, and remaining seconds
+    const hours = Math.floor(seconds / 3600);
+    seconds %= 3600;
+    const minutes = Math.floor(seconds / 60);
+    seconds %= 60;
+  
+    const formattedTime = `${hours}:${padZero(minutes)}:${padZero(seconds)}`;
+    return formattedTime;
+  };
+
   return (
     <>
       <div className="col-md-6 pb-2">
@@ -138,7 +156,7 @@ const VoucherVerification = () => {
 
       <Modal show={isOpen} onHide={closeModal} style={{ marginTop: 100 }}>
         <Modal.Header closeButton closeVariant='black'>            
-          <Modal.Title>Advert Update</Modal.Title>   
+          <Modal.Title>Voucher Modal</Modal.Title>   
         </Modal.Header>
         <Modal.Body>
           <ul className="list-group">
@@ -216,6 +234,7 @@ const VoucherVerification = () => {
               <div className="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
                 { message==='found'?
                   <>{convertDate(verified.data.vouchers.order.dateCreated)}</>:""
+                  // <>{convertDate(verified.data.vouchers.order.dateCreated)} {convertTime(verified.data.vouchers.order.timeCreated)}</>:""
                 }
               </div>
             </li>

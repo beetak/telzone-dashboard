@@ -251,7 +251,6 @@ const CartItems = () => {
         quantity
       }
     )).then(response => {
-      console.log("voucher response ", response);
       if (response.payload && response.payload.success === true) {
         if(response.payload.data.data.length < quantity){
           setAvailable(response.payload.data.data.length)
@@ -283,7 +282,6 @@ const CartItems = () => {
   }
 
   const updateVoucherState = (soldId, orderID, data, printSize) => {
-    console.log("SOLD VOUCHERS",soldId)
     dispatch(updateVoucherStatus(
       {
         orderID,
@@ -402,7 +400,6 @@ const CartItems = () => {
   }
 
   const printVouchers = (myVouchers, orderID) => {
-    console.log("items lis ",itemsList)
     let count = 1
     const data = Object.values(myVouchers).map(elt=> [count++, elt.bundle.name, elt.voucherCode]);
     const totals = Object.values(myVouchers).map(elt=> [count++, elt.bundle.name, elt.voucherCode]);

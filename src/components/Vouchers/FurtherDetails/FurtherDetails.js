@@ -4,22 +4,18 @@ import { getSearchMessage, getSoldStatus, getStatusSearch, getUsedStatus, getVer
 import { BeatLoader } from 'react-spinners';
 import { fetchAsyncClientDetails, fetchAsyncClientUsageReport, getAllClientDetails, getAllClientUsage } from '../../../store/report-slice';
 import { Button, Modal } from 'react-bootstrap';
+import MerakiApi from '../../Api/MerakiApi';
 
 const FurtherDetails = () => {
 
-  const [voucherCode, setVoucherCode] = useState('');
-  const [macAddress, setMacAddress] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [loadingDetails, setLoadingDetails] = useState(false)
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
-  const soldState = useSelector(getSoldStatus)
-  const usedState = useSelector(getUsedStatus)
   const verified = useSelector(getVerified)
   const verifyStatus = useSelector(getVerifyStatus)
-  const searchStatus = useSelector(getStatusSearch)
   const clientUsage = useSelector(getAllClientUsage)
   const clientDetails = useSelector(getAllClientDetails)
 
@@ -48,6 +44,41 @@ const FurtherDetails = () => {
       setLoadingDetails(false)
     })
   },[verified])
+
+  // const fetchGroupPolicies = async () => {
+  //   const response = await MerakiApi.get(`/networks/L_575897802350008785/groupPolicies`)
+  //   console.log("Group policies",response.data)
+  // }
+
+  const [policyName, setPolicyName] = useState('Loading...');
+    
+  const fetchGroupPolicies = async (groupPolicyId) => {
+      try {
+          const response = await MerakiApi.get(`/networks/L_575897802350008785/groupPolicies`);
+          console.log("Group policies", response.data);
+          for (const policy of response.data) {
+              if (policy.groupPolicyId === groupPolicyId) {
+                  return policy.name;
+              }
+          }
+          return "No Policy";
+      } catch (error) {
+          console.error("Error fetching group policies", error);
+          return "Error fetching policy"; // Return a message for error
+      }
+  };
+
+  useEffect(() => {
+    const groupPolicyId = verified.data.vouchers.groupPolicyId;
+    if (groupPolicyId) {
+      fetchGroupPolicies(groupPolicyId)
+          .then(name => {
+              setPolicyName(name);
+          });
+    } else {
+        setPolicyName('Not Assigned');
+    }
+  }, [verified.data.vouchers.groupPolicyId]);
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,12 +110,6 @@ const FurtherDetails = () => {
         aria-label="Loading Spinner"
         data-testid="loader"
       />
-    </div>
-
-
-  let renderedError = 
-    <div className="align-middle text-center">
-      <span class="badge badge-sm bg-gradient-secondary w-50 p-2">Voucher Not Found</span>
     </div>
   
   let renderedVouchers = ''
@@ -136,29 +161,21 @@ const FurtherDetails = () => {
     return `${day} ${month} ${year}`;
     //return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
   }
-  // const convertTime = (timeCreated) => {
-  //   const timeArray = 31355000;
-  //   const newTime = timeArray.join(':');
-    
-  //   return newTime;
-  //   //return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
-  // }
 
   const padZero = (value) => {
     return value.toString().padStart(2, '0');
   };
 
   const convertTime = (timeCreated) => {
-    // Convert milliseconds to seconds
     let seconds = Math.floor(timeCreated / 1000);
-  
-    // Calculate hours, minutes, and remaining seconds
+    seconds += 2 * 3600; //to compansate for the 2 hours difference from backend
     const hours = Math.floor(seconds / 3600);
     seconds %= 3600;
     const minutes = Math.floor(seconds / 60);
     seconds %= 60;
   
-    const formattedTime = `${hours}:${padZero(minutes)}:${padZero(seconds)}`;
+    // const formattedTime = `${hours}:${padZero(minutes)}:${padZero(seconds)}`;
+    const formattedTime = `${hours}:${padZero(minutes)}`;
     return formattedTime;
   };
 
@@ -185,38 +202,52 @@ const FurtherDetails = () => {
     else{
       renderedUsage = 
       <tr>
-        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No Vouchers Found</h5></td>
+        <td colspan={7} className='text-center'><h5 style={{color: '#0C55AA'}}>No Usage Data Found</h5></td>
       </tr>
     }
 
-    {/*function UnixTimestampConverter(timestamp) {
-      const convertTimestamp = (unixTimestamp) => {
-        const date = new Date(unixTimestamp * 1000); // Convert seconds to milliseconds
-        return date.toUTCString(); // Convert the date to a readable UTC string
-      };
-    
-      return (convertTimestamp(timestamp)
-      );
-    }*/}
-
     function UnixTimestampConverter(timestamp) {
       const convertTimestamp = (unixTimestamp) => {
-        const date = new Date(unixTimestamp * 1000); // Convert seconds to milliseconds
-        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'Africa/Harare' };
-        return date.toLocaleString('en-US', options);
+          const date = new Date(unixTimestamp * 1000);
+          const now = new Date();
+
+          const diffInMs = now - date;
+
+          // Calculating time differences
+          const seconds = Math.floor(diffInMs / 1000);
+          const minutes = Math.floor(seconds / 60);
+          const hours = Math.floor(minutes / 60);
+          const days = Math.floor(hours / 24);
+          const weeks = Math.floor(days / 7);
+          const months = Math.floor(days / 30); // Approximation
+          const years = Math.floor(days / 365); // Approximation
+
+          if (days >= 365) {
+              return `${years} year${years > 1 ? 's' : ''} ago`;
+          } else if (days >= 30) {
+              return `${months} month${months > 1 ? 's' : ''} ago`;
+          } else if (days >= 7) {
+              return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+          } else {
+              const day = date.toLocaleDateString('en-GB', { day: 'numeric' });
+              const month = date.toLocaleDateString('en-GB', { month: 'long' });
+              const year = date.toLocaleDateString('en-GB', { year: 'numeric' });
+              const hours = date.getHours().toString().padStart(2, '0');
+              const minutes = date.getMinutes().toString().padStart(2, '0');
+
+              return `${day} ${month} ${year} \t\t ${hours}:${minutes}`;
+          }
       };
-    
+
       return convertTimestamp(timestamp);
-    }
+  }
 
     const convertDuration = (duration) => {
-      // Define durations in seconds
       const secondsPerMinute = 60;
       const secondsPerHour = 60 * secondsPerMinute;
       const secondsPerDay = 24 * secondsPerHour;
       const secondsPerMonth = 30 * secondsPerDay;
     
-      // Calculate months, days, hours, and remaining minutes
       const months = Math.floor(duration / secondsPerMonth);
       duration %= secondsPerMonth;
       const days = Math.floor(duration / secondsPerDay);
@@ -302,6 +333,7 @@ const FurtherDetails = () => {
                             </div>
                             <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
                               {convertDate(verified.data.vouchers.order.dateCreated)} {verified.data.vouchers.order.timeCreated?convertTime(verified.data.vouchers.order.timeCreated):""}
+                              {/* {verified.data.vouchers.order.timeCreated?convertDatenTime(verified.data.vouchers.order.timeCreated):""} */}
                             </div>
                           </li>
                         </>:
@@ -374,11 +406,11 @@ const FurtherDetails = () => {
                           <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
                             <div className="d-flex align-items-center">
                               <div className="d-flex flex-column">
-                                <h6 className="mb-1 text-dark text-sm">Policy ID Passed</h6>
+                                <h6 className="mb-1 text-dark text-sm">Assigned Policy</h6>
                               </div>
                             </div>
                             <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                              {verified.data.vouchers.groupPolicyId?verified.data.vouchers.groupPolicyId:'Undefined'}
+                              {policyName}
                             </div>
                           </li>
                           <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">

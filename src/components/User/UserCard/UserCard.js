@@ -8,6 +8,7 @@ import { getAllRegions, getAllShops, getAllTowns } from '../../../store/entities
 import TelOneTownDropdown from '../../TelOneTowns/TelOneTownDropdown/TelOneTownDropdown';
 import TelOneRegionDropdown from '../../TelOneRegions/TelOneRegionDropdown/TelOneRegionDropdown';
 import TelOneShopDropdown from '../../TelOneShops/TelOneShopDropdown/TelOneShopDropdown';
+import { BeatLoader } from 'react-spinners';
 
 const UserCard = (props) => {
   const [emailAddress, setEmailAddress] = useState('')
@@ -134,14 +135,18 @@ const UserCard = (props) => {
       </td>
       <td className="align-middle">
         <a className="btn btn-link text-dark px-3 mb-0" onClick={() => {
+          alert("modal")
             setEmailAddress(data.emailAddress)
             setFirstname(data.firstname)
             setId(data.id)
             setSurname(data.surname)
             setRole(data.roleId.role)
             setRegion(data.regionId.name)
-            setTown(data.townId.name)
+            setRegionId(data.regionId.id)
+            setTown(data.userTownId.name)
+            setTownId(data.userTownId.id)
             setShopName(data.shopId.name)
+            setShopId(data.shopId.id)
             setPassword(data.password)
             setActive(data.active)
             setActiveState(data.active?'Deactivate':'Activate')

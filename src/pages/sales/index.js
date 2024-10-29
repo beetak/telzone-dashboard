@@ -115,7 +115,7 @@ export default function Sales ({page}) {
             <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
                 {<TopNavigation title={"Sales"}/>}
                 { 
-                    page === 'sales' && userShop !== "TCFL" ?
+                    page === 'sales' && userShop !== "TCFL" && userShop !== "BSAC" ?
                     <div className="container-fluid py-4">
                         <div className="container-fluid">
                             <div className="row">

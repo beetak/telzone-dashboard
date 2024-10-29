@@ -1,30 +1,22 @@
 import React, {useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllBusinessRoles } from '../../../store/business-role-slice';
-import { postAsyncBusiness } from '../../../store/business-slice';
-import { getAllRegions, getAllTowns, postShop } from '../../../store/entities-slice';
-import BusinessRoleDropdown from '../../BusinessRole/BusinessRoleDropdown/BusinessRoleDropdown';
-import TelOneRegionDropdown from '../../TelOneRegions/TelOneRegionDropdown/TelOneRegionDropdown';
+import { getAllTowns, postShop } from '../../../store/entities-slice';
 import TelOneTownDropdown from '../../TelOneTowns/TelOneTownDropdown/TelOneTownDropdown';
-import TelOneShopDropdown from '../TelOneShopDropdown/TelOneShopDropdown';
+import { BeatLoader } from 'react-spinners';
 
 export default function TelOneShopPost(){
 
   const dateCreated = new Date()
 
-  const[empty, setEmpty] = useState('')
-  const[name, setName] = useState('')
-  const[active, setActive] = useState('true')
-  const [email, setEmail] = useState('')
+  const [empty, setEmpty] = useState('')
+  const [name, setName] = useState('')
   const [address, setAddress] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
-  const [dis, setDiscount] = useState('')
-  const [vat, setVat] = useState('')
   const [townId, setTownId] = useState('')
   const [town, setTown] = useState('Town')
-  const [region, setRegion] = useState('Region')
-  const [roleID, setRoleID] = useState('')
-
+  const [success, setSuccess] = useState(false)
+  const [failed, setFailed] = useState(false)
+  const [loadingStatus, setLoadingStatus] = useState(false)
 
   const dispatch = useDispatch()
 
@@ -34,24 +26,67 @@ export default function TelOneShopPost(){
       setEmpty("Please fill in all the fields")
     }
     else{
-      dispatch(postShop({ 
-        shop: {
-          address,
-          dateCreated,
-          name,
-          phoneNumber
-        },
-        townId
-        })
-      );
-      setName('')
-      setEmpty('')
+      setLoadingStatus(true);    
+          try {
+              const response = await dispatch(
+                postShop({ 
+                  shop: {
+                    address,
+                    dateCreated,
+                    name,
+                    phoneNumber
+                  },
+                  townId
+                })
+              );
+      
+              if (response.payload) {
+                  if (response.payload.code === 'SUCCESS') {
+                      setSuccess(true);
+                  } else {
+                      setFailed(true);
+                  }
+              } else {
+                  setFailed(true);
+              }
+              } catch (error) {
+                  setFailed(true);
+              } finally {
+              setTimeout(() => {
+                  setSuccess(false);
+                  setLoadingStatus(false);
+                  setFailed(false);
+                  setName('')
+                  setAddress('')
+                  setPhoneNumber('')
+                  setTown('')
+                  setEmpty('')
+              }, 2000);
+        }
     }
-  };
+  }
 
-  const roleData = useSelector(getAllBusinessRoles)
-
-  console.log("roles: ", roleData)
+  let loadingAnimation = 
+  <div className='text-center' style={anime}>
+      <h5 style={{ color: '#155bb5' }}>
+        {loadingStatus && !success  && !failed? 
+          "Creating Shop, Please wait" :
+          loadingStatus && success  && !failed ? 
+            "Shop Creation Successful" :
+            loadingStatus && !success  && failed ? "Shop Creation Failed" : ""}
+      </h5>
+      {
+        loadingStatus ? 
+        <BeatLoader
+          color={'#055bb5'}
+          loading={loadingStatus}
+          cssOverride={override}
+          size={15}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />: ""
+      }      
+  </div>
 
   const getTown =(id, name)=>{
     setTownId(id)
@@ -78,15 +113,15 @@ export default function TelOneShopPost(){
                 <div style={{color: 'red', marginBottom: '10px'}}>{empty}</div>
                 <label className="form-label" style={{padding: 0}}>Shop Name</label>
                 <div className="input-group input-group-dynamic">
-                    <input type="text" name="name" onChange={(e)=>setName(e.target.value)} className="form-control" />
+                    <input type="text" name="name" onChange={(e)=>{setName(e.target.value);setEmpty('')}} value={name} className="form-control" />
                 </div>
                 <label className="form-label" style={{padding: 0}}>Address</label>
                 <div className="input-group input-group-dynamic">
-                    <input type="text" name="address" onChange={(e)=>setAddress(e.target.value)} className="form-control" />
+                    <input type="text" name="address" onChange={(e)=>{setAddress(e.target.value);setEmpty('')}} value={address} className="form-control" />
                 </div>
                 <label className="form-label" style={{padding: 0}}>Phone Number</label>
                 <div className="input-group input-group-dynamic mb-4">
-                    <input type="text" name="phone" onChange={(e)=>setPhoneNumber(e.target.value)} className="form-control" />
+                    <input type="text" name="phoneNumber" onChange={(e)=>{setPhoneNumber(e.target.value);setEmpty('')}} value={phoneNumber} className="form-control" />
                 </div>
                 {/* Towns dropdown */}
                 <div className="dropdown">
@@ -103,6 +138,7 @@ export default function TelOneShopPost(){
                       {renderedTowns}
                     </ul>
                 </div>
+                {loadingAnimation}
                 <button onClick={handleSubmit} className="btn btn-primary">Submit</button>
               </form>
             </div>
@@ -113,8 +149,15 @@ export default function TelOneShopPost(){
   );
 }
 
+const override = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "blue",
+};
 
-const Style2={
-    paddingTop: "1rem",
-    paddinBottom: "0.5rem"
+const anime = {
+  textAlign: 'center', 
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  width: '100%', 
 }

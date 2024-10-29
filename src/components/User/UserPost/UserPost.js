@@ -7,6 +7,7 @@ import RoleDropdown from '../../Role/RoleDropdown/RoleDropdown';
 import TelOneRegionDropdown from '../../TelOneRegions/TelOneRegionDropdown/TelOneRegionDropdown';
 import TelOneShopDropdown from '../../TelOneShops/TelOneShopDropdown/TelOneShopDropdown';
 import TelOneTownDropdown from '../../TelOneTowns/TelOneTownDropdown/TelOneTownDropdown';
+import { BeatLoader } from 'react-spinners';
 
 const UserPost = () => {
 
@@ -16,10 +17,11 @@ const UserPost = () => {
     const [role, setRole] = useState('Role')
     const [townId, setTownId] = useState('')
     const [password, setPassword] = useState('')
-    const [id, setId] = useState('')
     const [roleId, setRoleId] = useState('')
     const [town, setTown] = useState('Select Town')
-    const [isOpen, setIsOpen] = useState(false)
+    const [success, setSuccess] = useState(false)
+    const [failed, setFailed] = useState(false)
+    const [loadingStatus, setLoadingStatus] = useState(false)
     const [shopId, setShopId] = useState('')
     const [regionId, setRegionId] = useState('')
     const [region, setRegion] = useState('Select Region')
@@ -29,25 +31,69 @@ const UserPost = () => {
     const dispatch = useDispatch()
 
     const handleSubmit = async (e) => {
-      e.preventDefault();
-      dispatch(postAsyncUser({ 
-        adminPortalUsersDTO: {
-          email_address,
-          firstname,
-          surname,
-          password
-        },
-        regionId,
-        roleId,
-        shopId,
-        townId
-       })
-      );
-      setEmailAddress('')
-      setFirstname('')
-      setSurname('')
-      setPassword('')
+      e.preventDefault();      
+      setLoadingStatus(true);    
+      try {
+        const response = await dispatch(
+          postAsyncUser({ 
+            adminPortalUsersDTO: {
+              email_address,
+              firstname,
+              surname,
+              password
+            },
+            regionId,
+            roleId,
+            shopId,
+            townId
+            })
+          );
+    
+        if (response.payload) {
+          if (response.payload.code === 'SUCCESS') {
+            setSuccess(true);
+          } else {
+            setFailed(true);
+          }
+        } else {
+          setFailed(true);
+        }
+      } catch (error) {
+          setFailed(true);
+      } finally {
+        setTimeout(() => {
+          setSuccess(false);
+          setLoadingStatus(false);
+          setFailed(false);
+          setEmailAddress('')
+          setFirstname('')
+          setSurname('')
+          setPassword('')
+        }, 2000);
+      }
     };
+    
+    let loadingAnimation = 
+    <div className='text-center' style={anime}>
+      <h5 style={{ color: '#155bb5' }}>
+        {loadingStatus && !success  && !failed? 
+          "Creating User Record, Please wait" :
+          loadingStatus && success  && !failed ? 
+            "User Creation Successful" :
+            loadingStatus && !success  && failed ? "User Creation Failed" : ""}
+      </h5>
+      {
+        loadingStatus ? 
+        <BeatLoader
+          color={'#055bb5'}
+          loading={loadingStatus}
+          cssOverride={override}
+          size={15}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />: ""
+      }      
+    </div>
 
     //role data
     const roleData = useSelector(getAllRoles)
@@ -195,6 +241,7 @@ const UserPost = () => {
                       {renderedRegions}
                     </ul>
                 </div>
+                {loadingAnimation}
                 <button onClick={handleSubmit} className="btn btn-primary my-4">Submit</button>
               </form>
             </div>
@@ -206,7 +253,15 @@ const UserPost = () => {
 
 export default UserPost;
 
-const Style2={
-    paddingTop: "1rem",
-    paddinBottom: "0.5rem"
+const override = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "blue",
+};
+
+const anime = {
+  textAlign: 'center', 
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  width: '100%', 
 }

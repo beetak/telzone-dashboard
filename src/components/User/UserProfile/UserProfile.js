@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { updateUser } from "../../../store/user-slice";
+import { BeatLoader } from "react-spinners";
 
 const firstname = localStorage.getItem('firstname')
 const surname = localStorage.getItem('surname')
@@ -13,14 +14,29 @@ export default function UserProfile(){
 
   const [empty, setEmpty] = useState('')
     const [password, setPassword] = useState('')
+    const [success, setSuccess] = useState(false)
+    const [failed, setFailed] = useState(false)
+    const [loadingStatus, setLoadingStatus] = useState(false)
     const dispatch = useDispatch()
 
     function containsUppercase(str) {
-      return /[A-Z]/.test(str);
+      return /[A-Z]/.test(str); // Checks for at least one uppercase letter
+    }
+    
+    function passwordLength(str) {
+      return str.length >= 8 && str.length <= 14; // Checks if length is between 8 to 14 characters
     }
 
-    function passwordLength(str) {
-      return  /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]\w{7,14}$/.test(str);
+    function containsDigit(str) {
+      return /\d/.test(str);
+    }
+    
+    function containsSpecialChar(str) {
+      return /[!@#$%^&*(),.?":{}|<>]/.test(str);
+    }
+    
+    function containsLowercase(str) {
+      return /[a-z]/.test(str);
     }
 
     const handleSubmit = async (e) => {
@@ -29,24 +45,74 @@ export default function UserProfile(){
         setEmpty("Please provide the new password")
       }
       else{
-        if(!containsUppercase(password) || !passwordLength(password)){
-          setEmpty("Weak Password")
+        if (!containsUppercase(password) || 
+            !containsLowercase(password) || 
+            !containsDigit(password) || 
+            !containsSpecialChar(password) || 
+            !passwordLength(password)) {
+          setEmpty("Weak Password");
         }
         else{
-          dispatch(updateUser({ 
-            active: true,
-            emailAddress,
-            firstname,
-            id,
-            surname,
-            password
-          })
-          );
-          setPassword('')
-          setEmpty('')
+          setLoadingStatus(true);    
+          try {
+            const response = await dispatch(
+              updateUser({ 
+                active: true,
+                emailAddress,
+                firstname,
+                id,
+                surname,
+                password
+              })
+            );
+        
+            if (response.payload) {
+              console.log(response)
+              if (response.payload.data.code === 'SUCCESS') {
+                setSuccess(true);
+              } else {
+                setFailed(true);
+              }
+            } else {
+              setFailed(true);
+            }
+          } catch (error) {
+              setFailed(true);
+          } finally {
+            setTimeout(() => {
+              setSuccess(false);
+              setLoadingStatus(false);
+              setFailed(false);
+              setPassword('')
+              setEmpty('')
+            }, 2000);
+          }
         }
       }
     };
+    
+    let loadingAnimation = 
+    <div className='text-center' style={anime}>
+      <h5 style={{ color: '#155bb5' }}>
+        {loadingStatus && !success  && !failed? 
+          "Updating Password, Please wait" :
+          loadingStatus && success  && !failed ? 
+            "Update Successful" :
+            loadingStatus && !success  && failed ? "Update Failed" : ""}
+      </h5>
+      {
+        loadingStatus ? 
+        <BeatLoader
+          color={'#055bb5'}
+          loading={loadingStatus}
+          cssOverride={override}
+          size={15}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />: ""
+      }      
+    </div>
+
       let user
 
       if(role === "Super Admin"){
@@ -124,8 +190,17 @@ export default function UserProfile(){
                     <div style={{ color: 'red', marginBottom: '10px' }}>{empty}</div>
                     <label className="form-label" style={{padding: 0}}>Enter New Password</label>
                     <div className="input-group input-group-dynamic">
-                        <input type="text" name="password" onChange={(e)=>setPassword(e.target.value)} value={password} className="form-control" style={{padding: 0}} placeholder='Enter at least 8 characters'/>
+                        <input type="text" name="password" 
+                          onChange={(e) => {
+                            setPassword(e.target.value);
+                            setEmpty("");
+                          }} 
+                          value={password} 
+                          className="form-control" 
+                          style={{padding: 0}} 
+                          placeholder='Enter at least 8 characters'/>
                     </div>
+                    {loadingAnimation}
                   <button onClick={handleSubmit} className="btn btn-primary mt-1">Reset</button>
                   </form>
                 </li>
@@ -139,4 +214,17 @@ export default function UserProfile(){
   </div>
     </div>
   )
+}
+
+const override = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "blue",
+};
+
+const anime = {
+  textAlign: 'center', 
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  width: '100%', 
 }

@@ -7,6 +7,7 @@ import { fetchAsyncGroupPolicy, getAllPolicies } from '../../../store/policy-sli
 import CategoryDropdown from '../../Category/CategoryDropdown/CategoryDropdown';
 import CurrencyDropdown from '../../Currency/CurrencyDropdown/CurrencyDropdown';
 import GroupPolicyCard from '../../GroupPolicy/GroupPolicyCard/GroupPolicyCard';
+import { BeatLoader } from 'react-spinners';
 
 const BundlePost = () => {
 
@@ -24,6 +25,9 @@ const BundlePost = () => {
   const [groupPolicyState, setGroupPolicyState] = useState('Policy Type')
   const [groupPolicyActioned, setGroupPolicyActioned] = useState('')
   const [currencyActioned, setCurrencyActioned] = useState('')
+  const [success, setSuccess] = useState(false)
+  const [failed, setFailed] = useState(false)
+  const [loadingStatus, setLoadingStatus] = useState(false)
 
 
   const dispatch = useDispatch()
@@ -44,33 +48,78 @@ const BundlePost = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(name==='' || description==='' || image==='' || price==='' || bundleCategoryID==='' || currencyID===''){
-      setEmpty("Please fill in all the fields")
+    if(name==='' || description==='' || price==='' || bundleCategoryID==='' || currencyID===''){
+        setEmpty("Please fill in all the fields")
     }
     else{
-      dispatch(postBundle({
-        bundle: {
-          description,
-          groupPolicyId,
-          id: 1,
-          image,
-          name,
-          price
-        },
-        bundleCategoryID,
-        currencyID,
-        userID: 1
-      })
-      );
-      setName('')
-      setDescription('')
-      setPrice('')
-      setCategoryState('Product Type')
-      setCurrencyState('Currency')
-      setGroupPolicyState('Policy Type')
-      setImage('')
+        setLoadingStatus(true);    
+        try {
+            const response = await dispatch(
+              postBundle({
+                bundle: {
+                  description,
+                  groupPolicyId,
+                  id: 1,
+                  image: "",
+                  name,
+                  price
+                },
+                bundleCategoryID,
+                currencyID,
+                userID: 1
+              })
+            );
+    
+            if (response.payload) {
+                console.log(response)
+                if (response.payload.code === 'SUCCESS') {
+                    setSuccess(true);
+                } else {
+                    setFailed(true);
+                }
+            } else {
+                setFailed(true);
+            }
+            } catch (error) {
+                setFailed(true);
+            } finally {
+            setTimeout(() => {
+                setSuccess(false);
+                setLoadingStatus(false);
+                setFailed(false);
+                setName('')
+                setDescription('')
+                setPrice('')
+                setCategoryState('Product Type')
+                setCurrencyState('Currency')
+                setGroupPolicyState('Policy Type')
+                setImage('')
+            }, 2000);
+        }
     }
   };
+  
+  let loadingAnimation = 
+  <div className='text-center' style={anime}>
+    <h5 style={{ color: '#155bb5' }}>
+      {loadingStatus && !success  && !failed? 
+        "Creating Bundle, Please wait" :
+        loadingStatus && success  && !failed ? 
+          "Bundle Creation Successful" :
+          loadingStatus && !success  && failed ? "Bundle Creation Failed" : ""}
+    </h5>
+    {
+      loadingStatus ? 
+      <BeatLoader
+        color={'#055bb5'}
+        loading={loadingStatus}
+        cssOverride={override}
+        size={15}
+        aria-label="Loading Spinner"
+        data-testid="loader"
+      />: ""
+    }      
+  </div>
 
   const getPolicy = (id, name) => {
     setGroupPolicyId(id)
@@ -136,15 +185,15 @@ const BundlePost = () => {
                 <div style={{ color: 'red', marginBottom: '10px' }}>{empty}</div>
                 <label className="form-label" style={{ padding: 0 }}>Bundle Name</label>
                 <div className="input-group input-group-dynamic">
-                  <input type="text" name="name" onChange={(e) => setName(e.target.value)} value={name} className="form-control" style={{ padding: 0 }} />
+                  <input type="text" name="name" onChange={(e) => {setName(e.target.value);setEmpty('')}} value={name} className="form-control" style={{ padding: 0 }} />
                 </div>
                 <label className="form-label" style={{ padding: 0 }}>Price</label>
                 <div className="input-group input-group-dynamic">
-                  <input type="text" name="price" onChange={(e) => setPrice(e.target.value)} value={price} className="form-control" style={{ padding: 0 }} />
+                  <input type="text" name="price" onChange={(e) => {setPrice(e.target.value);setEmpty('')}} value={price} className="form-control" style={{ padding: 0 }} />
                 </div>
                 <label className="form-label" style={{ padding: 0 }}>Description</label>
                 <div className="input-group input-group-dynamic" style={{ marginBottom: '10px' }}>
-                  <input type="text" name="description" onChange={(e) => setDescription(e.target.value)} value={description} className="form-control" style={{ padding: 0 }} />
+                  <input type="text" name="description" onChange={(e) => {setDescription(e.target.value);setEmpty('')}} value={description} className="form-control" style={{ padding: 0 }} />
                 </div>
 
                 {/* Currency dropdown */}
@@ -194,17 +243,7 @@ const BundlePost = () => {
                     {renderedCategory}
                   </ul>
                 </div>
-
-                <div className="form-group form-file-upload form-file-multiple">
-                  <input type="file" name="image" onChange={onImageChange} className="inputFileHidden" />
-                  <div className="input-group">
-                    <input type="text" className="form-control inputFileVisible" placeholder="Package Image" />
-                    <span className="input-group-btn">
-                    </span>
-                  </div>
-                </div>
-
-
+                {loadingAnimation}
                 <button onClick={handleSubmit} className="btn btn-primary">Submit</button>
               </form>
             </div>
@@ -220,4 +259,17 @@ export default BundlePost;
 const Style2 = {
   paddingTop: "1rem",
   paddinBottom: "0.5rem"
+}
+
+const override = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "blue",
+};
+
+const anime = {
+  textAlign: 'center', 
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  width: '100%', 
 }

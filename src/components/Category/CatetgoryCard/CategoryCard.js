@@ -2,6 +2,7 @@ import React,{useState, useEffect} from 'react';
 import { Button, ButtonGroup, Dropdown, FormControl, InputGroup, Modal } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { updateCategory } from '../../../store/category-slice';
+import { BeatLoader } from 'react-spinners';
 
 const CategoryCard = (props) => {
   const [active, setActive] = useState('')
@@ -11,10 +12,13 @@ const CategoryCard = (props) => {
   const [isOpen, setIsOpen] = useState(false)
   const [actioned, setActioned] = useState('Duration')
   const [categoryId, setCategoryId] = useState('')
-  const[duration, setDuration] = useState('')
-  const[durationLength, setDurationLength] = useState('')
-  const[description, setDescription] = useState('')
-  const[time, setTime] = useState('Bundle Life Span')
+  const [duration, setDuration] = useState('')
+  const [durationLength, setDurationLength] = useState('')
+  const [description, setDescription] = useState('')
+  const [time, setTime] = useState('Bundle Life Span')
+  const [success, setSuccess] = useState(false)
+  const [failed, setFailed] = useState(false)
+  const [loadingStatus, setLoadingStatus] = useState(false)
 
 
   const openModal = () => setIsOpen(true);
@@ -22,19 +26,67 @@ const CategoryCard = (props) => {
 
   const dispatch = useDispatch()
 
-  const handleUpdate = () => {
-    dispatch(updateCategory(
-      {
-        active,
-        id,
-        name,
-        duration,
-        description,
-        categoryId
+  const handleUpdate = async (e) => {
+    e.preventDefault();      
+    setLoadingStatus(true);    
+    try {
+      const response = await dispatch(
+        updateCategory(
+          {
+            active,
+            id,
+            name,
+            duration,
+            description,
+            categoryId
+          }
+        )
+      );
+  
+      if (response.payload) {
+        console.log(response)
+        if (response.payload.data.code === 'SUCCESS') {
+          setSuccess(true);
+        } else {
+          setFailed(true);
+        }
+      } else {
+        setFailed(true);
       }
-    ))
-    closeModal()
-  }
+    } catch (error) {
+        setFailed(true);
+    } finally {
+      setTimeout(() => {
+        setSuccess(false);
+        setLoadingStatus(false);
+        setFailed(false);
+        closeModal()
+      }, 2000);
+    }
+  };
+    
+  let loadingAnimation = 
+  <div className='text-center' style={anime}>
+      <h5 style={{ color: '#155bb5' }}>
+        {loadingStatus && !success  && !failed? 
+          "Updating Category, Please wait" :
+          loadingStatus && success  && !failed ? 
+            "Update Successful" :
+            loadingStatus && !success  && failed ? "Update Failed" : ""}
+      </h5>
+      {
+        loadingStatus ? 
+        <BeatLoader
+          color={'#055bb5'}
+          loading={loadingStatus}
+          cssOverride={override}
+          size={15}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />: ""
+      }      
+  </div>
+
   const {data, index} = props 
   useEffect(() => {
     setCategoryId(index)
@@ -214,6 +266,7 @@ const CategoryCard = (props) => {
           <Button variant="secondary" onClick={closeModal}>
             Close
           </Button>
+          {loadingAnimation}
         </Modal.Footer>
       </Modal>
     </>
@@ -222,8 +275,15 @@ const CategoryCard = (props) => {
 
 export default CategoryCard;
 
-const customCont = {
-  '.customFormControl::placeholder': {
-    color: 'rgba(0, 0, 0, 0.9)'
-  }
+const override = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "blue",
+};
+
+const anime = {
+  textAlign: 'center', 
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  width: '100%', 
 }

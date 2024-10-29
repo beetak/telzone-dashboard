@@ -271,7 +271,7 @@ export default function VoucherShopReport() {
                                 <li><a className="dropdown-item" onClick={()=>setItemsPerPage(5)}>5</a></li>
                                 <li><a className="dropdown-item" onClick={()=>setItemsPerPage(10)}>10</a></li>
                                 <li><a className="dropdown-item" onClick={()=>setItemsPerPage(15)}>15</a></li>
-                                <li><a className="dropdown-item" onClick={()=>{setItemsPerPage(soldVouchers.length); setCurrentPage(1)}}>All</a></li>
+                                <li><a className="dropdown-item" onClick={()=>{setItemsPerPage(soldByShop.data.data.length); setCurrentPage(1)}}>All</a></li>
                               </ul>
                             </div>
                             <h6 className="mb-1 text-dark text-sm ms-2">Entries </h6>

@@ -45,8 +45,6 @@ export default function VoucherReport() {
     const [filterBy, setFilterBy] = useState('Usage Status')
     const [status, setStatus] = useState(true)
 
-    const [invoiceNumber, setInvoiceNumber] = useState("")
-
     //SHOPS DATA
     const getShop =(id, name)=>{
         setShopId(id)
@@ -101,24 +99,6 @@ export default function VoucherReport() {
             </ul>
         </div>
     </>
-  
-
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      if(invoiceNumber==='' && date !== ''){
-        dispatch(fetchSoldVouchersByDate(
-          date
-        ));
-      }
-      else if(invoiceNumber !=='' && date === ''){
-        dispatch(fetchSoldVouchers(
-          invoiceNumber
-        ));
-      }
-      else{
-        alert("Please fill in either date or invoice number but not both fields")
-      }
-    };
 
     const submitRequest = async (e) => {
       e.preventDefault();

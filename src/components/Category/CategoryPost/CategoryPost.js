@@ -2,15 +2,19 @@
 import React, {useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { postCategory } from '../../../store/category-slice';
+import { BeatLoader } from 'react-spinners';
 
 const CategoryPost = () => {
 
-  const[empty, setEmpty] = useState('')
-  const[name, setName] = useState('')
-  const[duration, setDuration] = useState('')
-  const[durationLength, setDurationLength] = useState('')
-  const[description, setDescription] = useState('')
-  const[time, setTime] = useState('Bundle Life Span')
+    const [empty, setEmpty] = useState('')
+    const [name, setName] = useState('')
+    const [duration, setDuration] = useState('')
+    const [durationLength, setDurationLength] = useState('')
+    const [description, setDescription] = useState('')
+    const [time, setTime] = useState('Bundle Life Span')
+    const [success, setSuccess] = useState(false)
+    const [failed, setFailed] = useState(false)
+    const [loadingStatus, setLoadingStatus] = useState(false)
 
     const dispatch = useDispatch()
 
@@ -20,21 +24,68 @@ const CategoryPost = () => {
             setEmpty("Please fill in all the fields")
         }
         else{
-            dispatch(postCategory({ 
-                bundleCategory: {
-                dateCreated: "2022-11-25T08:06:39.395Z",
-                description,
-                duration,
-                name,
-                },
-                userID: 1
-            })
-            );
-            setDescription('')
-            setDuration('Bundle Life Span')
-            setName('')
+            setLoadingStatus(true);    
+            try {
+                const response = await dispatch(
+                    postCategory({ 
+                        bundleCategory: {
+                            dateCreated: "2022-11-25T08:06:39.395Z",
+                            description,
+                            duration,
+                            name,
+                        },
+                        userID: 1
+                    })
+                );
+        
+                if (response.payload) {
+                    console.log(response)
+                    if (response.payload.code === 'SUCCESS') {
+                        setSuccess(true);
+                    } else {
+                        setFailed(true);
+                    }
+                } else {
+                    setFailed(true);
+                }
+                } catch (error) {
+                    setFailed(true);
+                } finally {
+                setTimeout(() => {
+                    setSuccess(false);
+                    setLoadingStatus(false);
+                    setFailed(false);
+                    setDescription('')
+                    setDuration('Bundle Life Span')
+                    setDurationLength("")
+                    setTime('Bundle Life Span')
+                    setName('')
+                }, 2000);
+            }
         }
     };
+      
+    let loadingAnimation = 
+    <div className='text-center' style={anime}>
+        <h5 style={{ color: '#155bb5' }}>
+          {loadingStatus && !success  && !failed? 
+            "Creating Category, Please wait" :
+            loadingStatus && success  && !failed ? 
+              "Category Creation Successful" :
+              loadingStatus && !success  && failed ? "Category Creation Failed" : ""}
+        </h5>
+        {
+          loadingStatus ? 
+          <BeatLoader
+            color={'#055bb5'}
+            loading={loadingStatus}
+            cssOverride={override}
+            size={15}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />: ""
+        }      
+    </div>
     
   return (
     <>
@@ -52,7 +103,7 @@ const CategoryPost = () => {
                         </div>
                         <label className="form-label" style={{padding: 0}}>Description</label>
                         <div className="input-group input-group-dynamic mb-0">
-                            <input type="text" name="description" value={durationLength} onChange={(e)=>setDurationLength(e.target.value)} className="form-control" style={{lineHeight: 1}}/>
+                            <input type="text" name="duration" value={durationLength} onChange={(e)=>setDurationLength(e.target.value)} className="form-control" style={{lineHeight: 1}}/>
                         </div>
                         <label className="form-label" style={{padding: 0}}>Duration</label>
                         {/* Currency dropdown */}
@@ -119,6 +170,7 @@ const CategoryPost = () => {
                                 </li>
                             </ul>
                         </div>
+                        {loadingAnimation}
                         <button onClick={handleSubmit} className="btn btn-primary my-4">Submit</button>
                     </form>
                 </div>
@@ -130,7 +182,15 @@ const CategoryPost = () => {
 
 export default CategoryPost;
 
-const Style2={
-    paddingTop: "1rem",
-    paddinBottom: "0.5rem"
+const override = {
+    display: "block",
+    margin: "0 auto",
+    borderColor: "blue",
+};
+  
+const anime = {
+    textAlign: 'center', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    width: '100%', 
 }

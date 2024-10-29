@@ -60,61 +60,7 @@ export default function TelOneRegionCard(props){
     <td>
       <p className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">{data.name}</p>
     </td> 
-  {/*
-    userRole==='Admin'? (
-      <td>
-        <a className="btn btn-link text-dark px-3 text-center mb-0" onClick={() => {
-          let currentStatus = ''
-          if(data.active === true){
-            currentStatus = 'Active'
-          }
-          else {
-            currentStatus = 'Deactivated'
-          }
-          
-          setBusinessPartnerName(data.name)
-          setBusinessPartnerAddress(data.businessAddress)
-          setBusinessPartnerEmail(data.email)
-          setBusinessPartnerPhone(data.phoneNumber)
-          setId(data.id)
-          setActive(data.active)
-
-          openModal() //opens the modal
-
-          }}><i className="material-icons text-sm me-2">edit</i>Edit
-        </a>
-      </td>  
-    ):("")
-        } 
-  {
-    userRole==='Super Admin'? (
-      <td className="align-middle text-center">
-        <a className="btn btn-link text-dark px-3 mb-0" onClick={() => {
-          let currentStatus = ''
-          if(data.active === true){
-            currentStatus = 'Active'
-          }
-          else {
-            currentStatus = 'Deactivated'
-          }
-         
-          setBusinessPartnerName(data.name)
-          setBusinessPartnerAddress(data.businessAddress)
-          setBusinessPartnerEmail(data.email)
-          setBusinessPartnerPhone(data.phoneNumber)
-          setId(data.id)
-          setCurrent(data.active)
-          setActive(data.active?false:true)
-         
-          openUpdateModal() //opens the modal
-
-          }}><i className="material-icons text-sm me-2">edit</i>{
-            data.active === true ?"Deactivate":"Activate"
-          }
-        </a>
-      </td>  
-    ):("")
-        */}       
+    
     {/* Update Modal */}
 
     <Modal show={isOpen} onHide={closeModal}>

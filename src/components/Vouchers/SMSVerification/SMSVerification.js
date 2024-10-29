@@ -94,15 +94,6 @@ const SMSVerification = () => {
     doc.setFontSize(10)
     doc.setTextColor(0,0,0);
     doc.text(15, 115, 'Assignee:  '+phoneNumber)
-    // doc.setFont('Times New Roman', 'bold')
-    // doc.setFontSize(12)
-    // doc.setTextColor(0,0,0);
-    // doc.text(15, 125, 'Receipt Details')
-    // doc.setFont('Times New Roman', 'medium')
-    // doc.setFontSize(10)
-    // doc.setTextColor(0,0,0);
-    // // doc.text(15, 160, 'Receipt Number: ' + orderID )
-    // doc.text(15, 150, 'Date: '+ formattedDate )
     doc.setFont('Times New Roman', 'bold')
     doc.setFontSize(12)
     doc.setTextColor(0,0,0);

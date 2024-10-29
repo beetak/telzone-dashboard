@@ -124,10 +124,10 @@ const userSlice = createSlice({
         [postAsyncUser.fulfilled]: (state, action)=>{
             console.log("fulfilled")
             console.log(action.payload)
-            action.payload.active = action.payload.data.adminPortalUsers.active
+            action.payload.active = false
             action.payload.surname = action.payload.data.adminPortalUsers.surname
             action.payload.emailAddress = action.payload.data.adminPortalUsers.email_address
-            action.payload.role = action.payload.data.role
+            action.payload.roleId = action.payload.data.role
             action.payload.firstname = action.payload.data.adminPortalUsers.firstname
             console.log(action.payload)
             state.users.push(action.payload)

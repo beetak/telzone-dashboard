@@ -10,9 +10,8 @@ export const fetchAsyncRole = createAsyncThunk('entity/fetchAsyncRole', async ()
 })
 
 export const postRole = createAsyncThunk(
-    'entity/postAsyncRole',
+    'entity/postRole',
     async (initialData) => {
-      console.log(initialData);
       return await Api
         .post('/role/', 
           initialData
@@ -30,7 +29,6 @@ export const fetchAsyncRegion = createAsyncThunk('entity/fetchAsyncRegion', asyn
 export const postRegion = createAsyncThunk(
     'entity/postAsyncRole',
     async (initialData) => {
-      console.log(initialData);
       return await Api
         .post('/region/', 
           initialData
@@ -52,9 +50,8 @@ export const fetchAsyncShops = createAsyncThunk('entity/fetchAsyncShops', async 
 })
 
 export const postTown = createAsyncThunk(
-    'entity/postAsyncRole',
+    'entity/postTown',
     async (initialData) => {
-      console.log(initialData);
       return await Api
         .post('/town/', 
           initialData
@@ -62,6 +59,18 @@ export const postTown = createAsyncThunk(
         .then((res) => res.data);
     }
 );
+
+export const updateRole = createAsyncThunk(
+    'entity/updateRole',
+    async (initialData) => {
+      return await Api
+        .put(`/Role/${initialData.id}`, 
+          initialData
+        )
+        .then((res) => res.data);
+    }
+);
+
 export const fetchAsyncTownByRegion = createAsyncThunk('entity/fetchAsyncTownByRegion', async (id) => {
     const response = await Api
     .get(`/town/regionId${id}`)
@@ -75,9 +84,8 @@ export const fetchAsyncShopByTown = createAsyncThunk('entity/fetchAsyncShopByTow
 });
 
 export const postShop = createAsyncThunk(
-    'entity/postAsyncRole',
+    'entity/postShop',
     async (initialData) => {
-      console.log(initialData);
       return await Api
         .post('/shop/', 
           initialData
@@ -130,18 +138,34 @@ const entitySlice = createSlice({
         [postRole.fulfilled]: (state, action)=>{
             console.log("fulfilled")
             action.payload.role = action.payload.data.role.role
-            console.log(action.payload)
             state.roles.push(action.payload)
         },
         [postRole.rejected]: (state, {payload})=>{
             console.log("rejected")
         },
-        [fetchAsyncShops.pending]: (state)=>{
+        [updateRole.pending]: ()=>{
             console.log("pending")
+        },
+        [updateRole.fulfilled]: (state, action)=>{
+            // action.payload.role = action.payload.data.role.role
+            console.log(action.payload)
+            return { 
+                ...state, 
+                roles: state.roles.map(
+                    (role, i) => i === action.payload.id ? {
+                        ...role,
+                        role: action.payload.data.role,
+                    }: role
+                )
+            }
+        },
+        [updateRole.rejected]: (state, {payload})=>{
+            console.log("rejected")
+        },
+        [fetchAsyncShops.pending]: (state)=>{
             state.loadingShop = 'pending'
         },
         [fetchAsyncShops.fulfilled]: (state, action)=>{
-            console.log('shops: ', action.payload)
             const loadedShops = action.payload.map(shop=>{
                 return shop
             })
@@ -172,10 +196,10 @@ const entitySlice = createSlice({
             console.log("pending")
         },
         [postShop.fulfilled]: (state, action)=>{
-            console.log("fulfilled")
-            action.payload.name = action.payload.shop.name
-            action.payload.address = action.payload.shop.address
-            action.payload.phoneNumber = action.payload.shop.phoneNumber
+            console.log(action.payload)
+            action.payload.name = action.payload.data.shop.name
+            action.payload.address = action.payload.data.shop.address
+            action.payload.phoneNumber = action.payload.data.shop.phoneNumber
             console.log(action.payload)
             state.shops.push(action.payload)
         },
@@ -187,7 +211,6 @@ const entitySlice = createSlice({
             state.loadingTown = 'pending'
         },
         [fetchAsyncTown.fulfilled]: (state, action)=>{
-            console.log("data found ", action.payload)
             const loadedRoles = action.payload.map(town=>{
                 return town
             })
@@ -268,7 +291,6 @@ const entitySlice = createSlice({
             console.log("fulfilled")
             
             action.payload.name = action.payload.data.region.name
-            console.log(action.payload)
             state.regions.push(action.payload)
         },
         [postRegion.rejected]: (state, {payload})=>{

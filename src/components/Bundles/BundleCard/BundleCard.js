@@ -14,6 +14,7 @@ import { getAllCurrencies } from '../../../store/currency-slice';
 import { getAllCategories } from '../../../store/category-slice';
 import { getAllPolicies } from '../../../store/policy-slice';
 import { getUpdateStatus, updateBundle } from '../../../store/bundle-slice';
+import { BeatLoader } from 'react-spinners';
 
 const userRole = localStorage.getItem('role')
 const bundletype = ''
@@ -43,6 +44,9 @@ const BundleCard = (props) => {
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
   const [updateStatus, setUpdateStatus] = useState('')
   const [current, setCurrent] = useState('')
+  const [success, setSuccess] = useState(false)
+  const [failed, setFailed] = useState(false)
+  const [loadingStatus, setLoadingStatus] = useState(false)
 
   const openModal = () => setIsOpen(true);
 
@@ -52,25 +56,72 @@ const BundleCard = (props) => {
 
   const closeUpdateModal = () => setIsUpdateOpen(false);
 
-  const handleUpdate = () => {
-    dispatch(updateBundle(
-      {
-        active: selectedStatus,
-        description: bundleDescription,
-        id,
-        image: bundleImage,
-        name: bundleName,
-        price: bundlePrice,
-        bundleCategoryId: categoryID,
-        currencyId: currencyID,
-        groupPolicyId: gpID,
-        bundleId
+  const handleUpdate = async (e) => {
+    e.preventDefault();      
+    setLoadingStatus(true);    
+    try {
+      const response = await dispatch(
+        updateBundle(
+          {
+            active: selectedStatus,
+            description: bundleDescription,
+            id,
+            image: bundleImage,
+            name: bundleName,
+            price: bundlePrice,
+            bundleCategoryId: categoryID,
+            currencyId: currencyID,
+            groupPolicyId: gpID,
+            bundleId
+          })
+      );
+  
+      if (response.payload) {
+        console.log(response)
+        if (response.payload.data.code === 'SUCCESS') {
+          setSuccess(true);
+        } else {
+          setFailed(true);
+        }
+      } else {
+        setFailed(true);
       }
-    ))
-    console.log(bundleUpdate)
-    closeModal()
-    closeUpdateModal()
-  }
+    } catch (error) {
+        setFailed(true);
+    } finally {
+      setTimeout(() => {
+        setSuccess(false);
+        setLoadingStatus(false);
+        setFailed(false);
+        closeModal()
+        closeUpdateModal()
+      }, 2000);
+    }
+  };
+  
+  let loadingAnimation = 
+  <div className='text-center' style={anime}>
+    <h5 style={{ color: '#155bb5' }}>
+      {loadingStatus && !success  && !failed? 
+        "Updating, Please wait" :
+        loadingStatus && success  && !failed ? 
+          "Update Successful" :
+          loadingStatus && !success  && failed ? "Update Failed" : ""}
+    </h5>
+    {
+      loadingStatus ? 
+      <BeatLoader
+        color={'#055bb5'}
+        loading={loadingStatus}
+        cssOverride={override}
+        size={15}
+        aria-label="Loading Spinner"
+        data-testid="loader"
+      />: ""
+    }      
+  </div>
+
+
   const changeBundleState = () => {
     dispatch(updateBundle({
       id: id,
@@ -310,8 +361,7 @@ const BundleCard = (props) => {
               {renderedCategory}
             </Dropdown.Menu>
           </Dropdown>
-
-          <p>{updateStatus}</p>
+          {loadingAnimation}
           <Button variant="primary" onClick={handleUpdate}>Update</Button>
         </Modal.Body>
 
@@ -329,12 +379,17 @@ const BundleCard = (props) => {
       <Modal show={isUpdateOpen} onHide={closeUpdateModal} style={{ marginTop: 200 }}>
         <Modal.Body>
           <label>Are you sure you want to {current ? "Deactivate" : "Activate"} the {bundleName} bundle&#63;</label>
-          <Button variant="info" onClick={handleUpdate} className="me-2">
-            Proceed
-          </Button>
-          <Button variant="secondary" onClick={closeUpdateModal}>
-            Cancel
-          </Button>
+          {
+            loadingStatus?loadingAnimation:
+            <>
+              <Button variant="info" onClick={handleUpdate} className="me-2">
+                Proceed
+              </Button>
+              <Button variant="secondary" onClick={closeUpdateModal}>
+                Cancel
+              </Button>
+            </>
+          }
         </Modal.Body>
       </Modal>
     </>
@@ -347,4 +402,17 @@ const tdWidth = {
   maxWidth: "180px",
   maxHeight: "150px",
   overflow: "hidden",
+}
+
+const override = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "blue",
+};
+
+const anime = {
+  textAlign: 'center', 
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  width: '100%', 
 }
