@@ -6,6 +6,7 @@ import { fetchAsyncNetworkUsageStatistics } from "../../store/statistics-slice";
 import FeaturedStats from "./FeaturedStats/FeaturedStats";
 import SalesStats from "./SalesStats/SalesStats";
 import ConnectivityStatsStats from "./ConnectivityStats/ConnectivityStats";
+import TopUsage from "./TopUsage/TopUsage";
 
 export default function Statistics(){
 
@@ -22,6 +23,8 @@ export default function Statistics(){
             <SalesStats/>
             <br/>
             <ConnectivityStatsStats/>
+            {/* <br/>
+            <TopUsage/> */}
         </>
     )
 }

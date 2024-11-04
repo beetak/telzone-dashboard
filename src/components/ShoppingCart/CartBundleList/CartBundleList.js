@@ -2,91 +2,61 @@ import React from "react";
 import { getAllBundles, getLoadingStatus } from "../../../store/bundle-slice";
 import CartBundleCard from "../CartBundleCard/CartBundleCard";
 import { useSelector } from "react-redux";
-import BeatLoader from 'react-spinners/BeatLoader'
+import BeatLoader from 'react-spinners/BeatLoader';
 
-const shopName = localStorage.getItem("shopName")
+const shopName = localStorage.getItem("shopName");
 
-const CartBundleList = ({pageType}) => {
-    console.log("page: ", pageType)
+const CartBundleList = ({ pageType }) => {
+    const bundles = useSelector(getAllBundles);
+    const loading = useSelector(getLoadingStatus);
 
-    const bundles = useSelector(getAllBundles)
+    // Function to determine if a bundle should be rendered based on shop name
+    const shouldRenderBundle = (bundle) => {
+        switch (shopName) {
+            case "CZA-Town Centre":
+                return bundle.name === "Chitungwiza Voucher";
+            case "Glen View":
+                return bundle.name === "Glenview Voucher";
+            case "BSAC":
+                return bundle.name === "BSAC";
+            case "TCFL":
+                return ["TCFL STUDENTS", "TCFL Weekly", "TCFL Daily"].includes(bundle.name);
+            case "No Shop":
+                return true; // Render all bundles
+            default:
+                return !["Chitungwiza Voucher", "Glenview Voucher", "TCFL STUDENTS", "BSAC"].includes(bundle.name);
+        }
+    };
 
-    let renderedBundles = ''
-    renderedBundles = bundles ? (
-        shopName === "CZA-Town Centre"?(
-            bundles.map((bundle, index)=>(
-                bundle.name === "Chitungwiza Voucher" &&
-                    <tr key={index}>
-                        <CartBundleCard data={bundle} page={pageType} index={index}/>
-                    </tr>
-                ))
-        ):(
-            shopName === "No Shop"? (
-                bundles.map((bundle, index)=>(
-                    <tr key={index}>
-                        <CartBundleCard data={bundle} page={pageType} index={index}/>
-                    </tr>
-                ))
-            ):(
-                shopName === "Glen View"?(
-                    bundles.map((bundle, index)=>(
-                        bundle.name === "Glenview Voucher" &&
-                            <tr key={index}>
-                                <CartBundleCard data={bundle} page={pageType} index={index}/>
-                            </tr>
-                        ))
-                ):(
-                    shopName === "TCFL"?(
-                        bundles.map((bundle, index)=>(
-                            bundle.name === "TCFL STUDENTS" ?
-                                (<tr key={index}>
-                                    <CartBundleCard data={bundle} page={pageType} index={index}/>
-                                </tr>): (
-                                    bundle.name === "TCFL Weekly" ?
-                                    (<tr key={index}>
-                                        <CartBundleCard data={bundle} page={pageType} index={index}/>
-                                    </tr>):(
-                                        bundle.name === "TCFL Daily" &&
-                                        <tr key={index}>
-                                            <CartBundleCard data={bundle} page={pageType} index={index}/>
-                                        </tr>
-                                    )
-                                )
-                            ))
-                    ):(
-                        bundles.map((bundle, index)=>(
-                            bundle.name !== "Chitungwiza Voucher" && bundle.name !== "Glenview Voucher" && bundle.name !== "TCFL STUDENTS" &&
-                                <tr key={index}>
-                                    <CartBundleCard data={bundle} page={pageType} index={index}/>
-                                </tr>
-                            ))
-                    )
-                )
-            )
-        )
-    ):(<div><h1>Error</h1></div>)
+    const renderedBundles = bundles ? (
+        bundles.filter(shouldRenderBundle).map((bundle, index) => (
+            <tr key={index}>
+                <CartBundleCard data={bundle} page={pageType} index={index} />
+            </tr>
+        ))
+    ) : (
+        <tr><td colSpan={3}><h1>Error</h1></td></tr>
+    );
 
-    const loading = useSelector(getLoadingStatus)
+    const loadingAnimation = (
+        <tr style={anime}>
+            <td colSpan={6}>
+                <BeatLoader
+                    color={'#055bb5'}
+                    loading={loading === 'pending'}
+                    cssOverride={override}
+                    size={15}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                />
+            </td>
+        </tr>
+    );
 
-  let loadingAnimation = 
-  <tr className='' style={anime}>
-    <td colspan={6}>
-      <BeatLoader
-        color={'#055bb5'}
-        loading={loading}
-        cssOverride={override}
-        size={15}
-        aria-label="Loading Spinner"
-        data-testid="loader"
-      />
-    </td>
-  </tr>
-
-  return (
-    <>
+    return (
         <div className="col-lg-5">                
             <div className="row">
-                <div className="col-12  py-4">
+                <div className="col-12 py-4">
                     <div className="card my-4">
                         <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
                             <div className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" style={Style2}>
@@ -99,15 +69,13 @@ const CartBundleList = ({pageType}) => {
                                 <table className="table align-items-center mb-0">
                                     <thead>
                                         <tr>
-                                        <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style={{width: "5%"}}>Product</th>
-                                        <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Price</th>
-                                        <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-center opacity-7 ">Add To Cart</th>
+                                            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style={{ width: "5%" }}>Product</th>
+                                            <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Price</th>
+                                            <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-center opacity-7">Add To Cart</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {loading==='pending'?
-                                            loadingAnimation: renderedBundles
-                                        }
+                                        {loading === 'pending' ? loadingAnimation : renderedBundles}
                                     </tbody>
                                 </table>
                             </div>
@@ -116,32 +84,31 @@ const CartBundleList = ({pageType}) => {
                 </div>
             </div>
         </div>
-    </>
-  );
+    );
 };
 
 export default CartBundleList;
 
-const Style1={
-    textAlign:"center"
-}
+const Style1 = {
+    textAlign: "center"
+};
 
-const Style2 ={
+const Style2 = {
     paddingTop: "1rem",
-    paddinBottom: "0.5rem",
+    paddingBottom: "0.5rem",
     cursor: "pointer"
-}
+};
+
 const override = {
     display: "block",
     margin: "0 auto",
     borderColor: "blue",
 };
-  
+
 const anime = {
     textAlign: 'center', 
     justifyContent: 'center', 
     alignItems: 'center', 
     width: '100%', 
     height: '10vh'
-}
-  
+};

@@ -135,7 +135,6 @@ const UserCard = (props) => {
       </td>
       <td className="align-middle">
         <a className="btn btn-link text-dark px-3 mb-0" onClick={() => {
-          alert("modal")
             setEmailAddress(data.emailAddress)
             setFirstname(data.firstname)
             setId(data.id)

@@ -63,8 +63,6 @@ const SMSVerification = () => {
 
   const printVouchers = (e) => {
     e.preventDefault()
-    const title = "My Awesome Report";
-    const headers = [["","Name", "Voucher Code"]]; 
     
     var doc = new jsPDF()
 
@@ -159,6 +157,7 @@ const handleVerification = async (item) => {
             })          
         }
           <button onClick={printVouchers} className="btn btn-info my-2">Print</button>
+          <button onClick={printVouchers} className="btn btn-success my-2 ms-2">Resend</button>
           <button onClick={clearVouchers} className="btn btn-danger my-2 ms-2">Clear</button>
       </div>
   }

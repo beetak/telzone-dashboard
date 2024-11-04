@@ -390,7 +390,7 @@ const FurtherDetails = () => {
                               </div>
                             </div>
                             <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                              {UnixTimestampConverter(clientDetails.firstSeen)}
+                              {clientDetails.firstSeen?UnixTimestampConverter(clientDetails.firstSeen):"Loading..."}
                             </div>
                           </li>
                           <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
@@ -400,7 +400,7 @@ const FurtherDetails = () => {
                               </div>
                             </div>
                             <div className="d-flex align-items-center text-dark text-gradient text-sm font-weight-bold">
-                              {UnixTimestampConverter(clientDetails.lastSeen)}
+                              {clientDetails.lastSeen?UnixTimestampConverter(clientDetails.lastSeen):"Loading..."}
                             </div>
                           </li>
                           <li className="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">

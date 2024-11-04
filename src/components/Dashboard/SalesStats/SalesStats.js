@@ -30,9 +30,7 @@ export default function SalesStats(){
     const date = `${today.getDate()}-${today.getMonth()+1}-${today.getFullYear()} ${today.getHours()}.${today.getMinutes()}`;
     const dateString = date.toString();
 
-    const networks = useSelector(getAllNetworks)
     const loading = useSelector(getLoadingNetwork)
-    const loginLoading = useSelector(getLoginLoading)
 
     const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset-UTF-8';
     const fileExtension = '.xlsx'
