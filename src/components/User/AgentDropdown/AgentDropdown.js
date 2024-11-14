@@ -8,7 +8,7 @@ export default function AgentDropdown(props){
         <Dropdown.Item 
             onClick={
                 () => {
-                    props.setUser(data.id, data.adminPortalUsers.firstname, data.adminPortalUsers.surname)
+                    props.setUser(data.adminPortalUsers.id, data.adminPortalUsers.firstname, data.adminPortalUsers.surname)
                     
                 }
             }

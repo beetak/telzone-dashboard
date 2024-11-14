@@ -162,45 +162,7 @@ export default function SummarySalesShopAgent() {
         )
     }
 
-    const submitRequest1 = async () => {
-        if(currencyID===''){
-          setEmpty("Please select the currency")
-        }
-        else if(adminPortalUserId===''){
-            setAgentEmpty("Please select the agent")
-        }
-        else if(startDate==='' || endDate===''){
-            setValidate("Please select the start date and reselect end date")
-        }
-        else{
-            if(startDate>endDate){
-                setValidate("Invalid Time Span")
-            }
-            else{
-                if(adminPortalUserId===0){
-                    dispatch(
-                        toggleActions.setTimeSpan({startDate, endDate})
-                    )
-                    dispatch(
-                        toggleActions.setAgent({adminPortalUserId:4})
-                    )
-                    setEmpty("")
-                }
-                else{
-                    dispatch(
-                        toggleActions.setTimeSpan({startDate, endDate})
-                    )
-                    dispatch(
-                        toggleActions.setAgent({adminPortalUserId})
-                    )
-                    setEmpty("")
-                }
-            }
-        }
-    }
-
     const submitRequest = async () => {
-        // setEndDate(endDate)
         if(currencyID===''||startDate==='' || endDate==='' || adminPortalUserId===''){
             if(startDate==='' || endDate===''){
                 setValidate("Please select the start date and end date")

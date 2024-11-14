@@ -104,10 +104,27 @@ const BulkVoucherPost = () => {
     }
   };
 
+  const formatPhoneNumber = (phoneNumber) => {
+    if (phoneNumber.startsWith('0')) {
+      // Replace leading 0 with +263
+      return `+263${phoneNumber.slice(1)}`;
+    } else if (phoneNumber.startsWith('263')) {
+      // Prepend + if it starts with 263
+      return `+${phoneNumber}`;
+    } else if (phoneNumber.startsWith('+263')) {
+      // Leave it as is
+      return phoneNumber;
+    } else {
+      // Optionally handle other cases, e.g., return null or an error message
+      return null; // or return phoneNumber to keep it unchanged
+    }
+  };
+
   const handleSubmit = (orderId) => {
     try {
+      const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
       dispatch(postBulkSMS({
-        phoneNumber, 
+        phoneNumber: formattedPhoneNumber,
         bundleId, 
         orderId
       }))
@@ -162,7 +179,14 @@ const BulkVoucherPost = () => {
                 <div style={{ color: 'red', marginBottom: '10px' }}>{empty}</div>
                 <label className="form-label" style={{ padding: 0 }}>Phone Number</label>
                 <div className="input-group input-group-dynamic" style={{ marginBottom: '10px' }}>
-                  <input type="text" name="phoneNumber" onChange={(e) => setPhoneNumber(e.target.value)} value={phoneNumber} className="form-control" style={{ padding: 0 }} />
+                  <input 
+                    type="text" 
+                    name="phoneNumber" 
+                    onChange={(e) => setPhoneNumber(e.target.value)} 
+                    value={phoneNumber} 
+                    className="form-control" 
+                    placeholder="Phone Number"
+                  />
                 </div>
 
                 {/* Bundle dropdown */}
