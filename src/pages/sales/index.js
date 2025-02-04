@@ -13,6 +13,7 @@ import { fetchAsyncFoc } from "../../store/foc-slice";
 import { fetchAsyncUser } from "../../store/user-slice";
 import BulkVoucherPost from "../../components/Vouchers/BulkVoucherPost/BulkVoucherPost";
 import BulkPostResponse from "../../components/Batches/BatchPostResponse/BulkPostResponse";
+import SessionCreate from "../../components/tabs/sessionsTabs/createSession/createSessions";
 
 const userShop = localStorage.getItem('shopName')
 
@@ -90,6 +91,9 @@ export default function Sales ({page}) {
     else if(tabState === 'bulk') {
         tabinfo = BulkSale();
     }
+    else if(tabState === 'session') {
+        tabinfo = <SessionCreate/>;
+    }
     else if(tabState === 'tcflSales'){
         tabinfo = 
         <div className="container-fluid">
@@ -146,6 +150,17 @@ export default function Sales ({page}) {
                                                 style={Style2}>
                                                 <div className="col-12 d-flex align-items-center">
                                                     <h6 className="text-white text-capitalize ps-3">SMS Distribution</h6>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div className="col-3">
+                                        <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
+                                            <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
+                                                onClick={()=>setTabState('session')}
+                                                style={Style2}>
+                                                <div className="col-12 d-flex align-items-center">
+                                                    <h6 className="text-white text-capitalize ps-3">Sessions</h6>
                                                 </div>
                                             </a>
                                         </div>

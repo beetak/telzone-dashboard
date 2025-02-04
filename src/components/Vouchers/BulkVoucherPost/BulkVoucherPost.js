@@ -4,6 +4,8 @@ import { batchActions } from '../../../store/batch-slice';
 import BundleDropdown from '../../Bundles/BundleDropdown/BundleDropdown';
 import { fetchAsyncBundles, getAllBundles } from '../../../store/bundle-slice';
 import { closeSale, postBulkSMS, postSale } from '../../../store/cart-slice';
+import Api from '../../Api/Api';
+import SessionsDropdown from '../../Session/SessionsDropdown/SessionsDropdown';
 
 const userID = localStorage.getItem("userId")
 const regionId = localStorage.getItem("regionId")
@@ -14,9 +16,12 @@ const BulkVoucherPost = () => {
 
   const [empty, setEmpty] = useState('')
   const [bundleState, setBundleState] = useState('Product')
+  const [sessionState, setSessionState] = useState('Session')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [bundleId, setBundleId] = useState('')
+  const [sessionId, setSessionId] = useState('')
   const [bundlePrice, setBundlePrice] = useState('')
+  const [sessions, setSessions] = useState([])
 
 
   const dispatch = useDispatch()
@@ -24,12 +29,38 @@ const BulkVoucherPost = () => {
 
   useEffect(() => {
     dispatch(fetchAsyncBundles(active))
+
+    const headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    };
+
+    const fetchSessions = async () => {
+      try {
+        const response = await Api.get(`/session/active`, { headers });
+        console.log("resp", response);
+        
+        if (response.data && response.data.code === 'SUCCESS') {
+          setSessions(response.data.data); 
+        }
+      } catch (error) {
+        console.error("Error fetching sessions:", error);
+      }
+    };
+    
+    fetchSessions();
   }, [dispatch, active]);
+  
 
   const getBundle = (id, name, price) => {
     setBundleId(id)
     setBundleState(name)
     setBundlePrice(price)
+  }
+
+  const getSession = (id, name, price) => {
+    setSessionId(id)
+    setSessionState(name)
   }
 
   const bundleData = useSelector(getAllBundles)
@@ -38,6 +69,15 @@ const BulkVoucherPost = () => {
     bundleData.map((bundle, index) => (
       <tr key={index}>
         <BundleDropdown data={bundle} setBundle={getBundle} />
+      </tr>
+    ))
+  ) : (<div><h1>Error</h1></div>)
+
+  let renderedSessions = ''
+  renderedSessions = sessions ? (
+    sessions.map((session, index) => (
+      <tr key={index}>
+        <SessionsDropdown data={session} setSession={getSession} />
       </tr>
     ))
   ) : (<div><h1>Error</h1></div>)
@@ -126,7 +166,8 @@ const BulkVoucherPost = () => {
       dispatch(postBulkSMS({
         phoneNumber: formattedPhoneNumber,
         bundleId, 
-        orderId
+        orderId,
+        sessionId
       }))
       .then((response) => {
         console.log("My response: ", response.payload)
@@ -202,6 +243,22 @@ const BulkVoucherPost = () => {
                   </button>
                   <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     {renderedBundle}
+                  </ul>
+                </div>
+                
+                {/* Session dropdown */}
+                <div className="dropdown">
+                  <button
+                    className="btn bg-gradient-primary dropdown-toggle"
+                    type="button"
+                    id="sessionDropdown"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    {sessionState}
+                  </button>
+                  <ul className="dropdown-menu" aria-labelledby="sessionDropDown">
+                    {renderedSessions}
                   </ul>
                 </div>
                 <button onClick={makeSale} className="btn btn-primary">Submit</button>

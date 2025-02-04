@@ -30,8 +30,6 @@ import VoucherUsageReport from "./pages/voucherUsageReport";
 const userRole = localStorage.getItem('role')
 
 function App() {
-
-  const dispatch = useDispatch()
     
     const cartItems = useSelector((state)=> state.cart.itemsList)
     console.log(cartItems)

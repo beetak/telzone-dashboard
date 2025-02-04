@@ -42,9 +42,9 @@ export const postVoucherSaleByBundleId = createAsyncThunk(
 
 export const postBulkSMS = createAsyncThunk(
     'cart/postBulkSMS',
-    async ({phoneNumber, bundleId, orderId}) => {
+    async ({phoneNumber, bundleId, orderId, sessionId}) => {
         try {
-            const response = await Api.post(`/tcfl-students/${phoneNumber}/${bundleId}/${orderId}`)
+            const response = await Api.post(`/tcfl-students/${phoneNumber}/${bundleId}/${orderId}/${sessionId}`)
             return { success: true, data: response.data };
         } catch (error) {
             console.error('postVoucher error:', error);
