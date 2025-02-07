@@ -4,8 +4,7 @@ import SideNavigation from '../../../components/NavBar/sideNav';
 import TopNavigation from '../../../components/NavBar/topNav';
 import SupervisorReportDetails from '../../../components/tabs/supervisorTabs/main';
 import { fetchAsyncCurrency, getGlobalCurrency, getGlobalSymbol } from '../../../store/currency-slice';
-import { fetchAsyncPeriodicalPayments } from '../../../store/customerPayments-slice';
-import { fetchAsyncAgentSalesByShop, fetchAsyncSalesByCurrencyId, fetchAsyncSalesByShop, saleActions } from '../../../store/sales-slice';
+import { saleActions } from '../../../store/sales-slice';
 import { getAgentId, getEndTime, getStartTime } from '../../../store/toggle-slice';
 import { fetchAsyncShopAgents, getGlobalUser } from '../../../store/user-slice';
 

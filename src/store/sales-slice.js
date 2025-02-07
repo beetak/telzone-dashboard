@@ -13,9 +13,9 @@ export const fetchAsyncSalesByPartnerId = createAsyncThunk('sale/fetchAsyncSales
     return [...response.data.data]
 })
 
-export const fetchAsyncSMSVoucher = createAsyncThunk('sale/fetchAsyncSMSVoucher', async (phoneNumber) => {
+export const fetchAsyncSMSVoucher = createAsyncThunk('sale/fetchAsyncSMSVoucher', async ({phoneNumber, sessionId}) => {
     const response = await Api
-    .get(`/tcfl-students/vouchers/${phoneNumber}`)
+    .get(`/tcfl-students/vouchers/${phoneNumber}/${sessionId}`)
     return response.data
 })
 
