@@ -11,6 +11,7 @@ const userID = localStorage.getItem("userId")
 const regionId = localStorage.getItem("regionId")
 const townId = localStorage.getItem("townId")
 const shopId = localStorage.getItem("shopId")
+const firstname = localStorage.getItem("firstname")
 
 const BulkVoucherPost = () => {
 
@@ -96,16 +97,16 @@ const BulkVoucherPost = () => {
       dispatch(postSale({
         adminPortalUserId: userID,
         bundleId,
-        businessPartnerId: 100,
+        businessPartnerId: firstname==='FOC'? 112: 100,
         currencyId: 1,
         order: {
-          amount: netTotal,
+          amount: firstname==='FOC'? 0 : netTotal,
           dateCreated: date,
-          discount: 0,
+          discount: firstname==='FOC'? netTotal :0,
           id:'',
           payingAccountNumber: "TelOne",
           quantity: 2,
-          vat: totalVat,
+          vat: firstname==='FOC'? 0 : totalVat,
           status: false,
           timeCreated: date
         },

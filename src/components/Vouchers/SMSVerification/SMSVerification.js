@@ -37,7 +37,7 @@ const SMSVerification = () => {
     setVoucherCodes([])
     dispatch(
       fetchAsyncSMSVoucher({
-        phoneNumber,
+        phoneNumber: formatPhoneNumber(phoneNumber),
         sessionId,
       }),
     )
@@ -88,6 +88,22 @@ const SMSVerification = () => {
     setSessionId(id)
     setSessionState(name)
   }
+
+  const formatPhoneNumber = (phoneNumber) => {
+    if (phoneNumber.startsWith('0')) {
+      // Replace leading 0 with +263
+      return `+263${phoneNumber.slice(1)}`;
+    } else if (phoneNumber.startsWith('263')) {
+      // Prepend + if it starts with 263
+      return `+${phoneNumber}`;
+    } else if (phoneNumber.startsWith('+263')) {
+      // Leave it as is
+      return phoneNumber;
+    } else {
+      // Optionally handle other cases, e.g., return null or an error message
+      return null; // or return phoneNumber to keep it unchanged
+    }
+  };
 
   let renderedSessions = ""
   renderedSessions = sessions ? (

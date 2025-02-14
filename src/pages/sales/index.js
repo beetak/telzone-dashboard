@@ -16,8 +16,11 @@ import BulkPostResponse from "../../components/Batches/BatchPostResponse/BulkPos
 import SessionCreate from "../../components/tabs/sessionsTabs/createSession/createSessions";
 
 const userShop = localStorage.getItem('shopName')
+const user = localStorage.getItem('firstname')
 
 export default function Sales ({page}) {
+
+    console.log("page ", page)
     
     const[tabState, setTabState] = useState('')
 
@@ -119,12 +122,59 @@ export default function Sales ({page}) {
             <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
                 {<TopNavigation title={"Sales"}/>}
                 { 
-                    page === 'sales' && userShop !== "TCFL" && userShop !== "BSAC" ?
+                    page === 'sales' && userShop !== "TCFL" && userShop !== "BSAC" && user!=='FOC' ?
                     <div className="container-fluid py-4">
                         <div className="container-fluid">
                             <div className="row">
                                 <CartBundleList pageType="sales"/>
                                 <CartItems/>      
+                            </div>
+                        </div>
+                    </div>:
+                    page==='sales' && user==='FOC' ?
+                    <div className="container-fluid m py-4">
+                        <div className="col-12">
+                            <div className="card my-4">
+                                <div className="row">
+                                    <div className="col-3">
+                                        <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
+                                            <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
+                                                onClick={()=>setTabState('tcflSales')}
+                                                style={Style2}>
+                                                <div className="col-12 d-flex align-items-center">
+                                                    <h6 className="text-white text-capitalize ps-3">POS Distribution</h6>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div className="col-3">
+                                        <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
+                                            <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
+                                                onClick={()=>setTabState('bulk')}
+                                                style={Style2}>
+                                                <div className="col-12 d-flex align-items-center">
+                                                    <h6 className="text-white text-capitalize ps-3">SMS Distribution</h6>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div className="col-3">
+                                        <div className="position-relative mt-n4 mx-3 z-index-2" style={Style2}>
+                                            <a  className="row bg-gradient-primary shadow-primary border-radius-lg mt-n4 mx-3" 
+                                                onClick={()=>setTabState('session')}
+                                                style={Style2}>
+                                                <div className="col-12 d-flex align-items-center">
+                                                    <h6 className="text-white text-capitalize ps-3">Sessions</h6>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="card-body px-0 pb-2">
+                                    <div className="table-responsive p-0">
+                                    {tabinfo}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>:

@@ -42,7 +42,6 @@ const BundleCard = (props) => {
   const [activeStatus, setActiveStatus] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
-  const [updateStatus, setUpdateStatus] = useState('')
   const [current, setCurrent] = useState('')
   const [success, setSuccess] = useState(false)
   const [failed, setFailed] = useState(false)
@@ -217,6 +216,9 @@ const BundleCard = (props) => {
       </td>
       <td>
         <p className="text-sm font-weight-bold mb-0">{data.bundleCategory.name}</p>
+      </td>
+      <td>
+        <p className="text-sm font-weight-bold mb-0">{(data.dataCap / 1024 / 1024).toFixed(2)} GB</p>
       </td>
       {
         userRole === 'Admin' ? (

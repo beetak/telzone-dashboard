@@ -15,6 +15,7 @@ const BundlePost = () => {
   const [categoryState, setCategoryState] = useState('Product Type')
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
+  const [dataCap, setDataCap] = useState('')
   const [price, setPrice] = useState('')
   const [groupPolicyId, setGroupPolicyId] = useState('')
   const [image, setImage] = useState('')
@@ -57,6 +58,7 @@ const BundlePost = () => {
             const response = await dispatch(
               postBundle({
                 bundle: {
+                  dataCap: dataCap * 1024 * 1024,
                   description,
                   groupPolicyId,
                   id: 1,
@@ -194,6 +196,10 @@ const BundlePost = () => {
                 <label className="form-label" style={{ padding: 0 }}>Description</label>
                 <div className="input-group input-group-dynamic" style={{ marginBottom: '10px' }}>
                   <input type="text" name="description" onChange={(e) => {setDescription(e.target.value);setEmpty('')}} value={description} className="form-control" style={{ padding: 0 }} />
+                </div>
+                <label className="form-label" style={{ padding: 0 }}>Data Cap in Gigabytes</label>
+                <div className="input-group input-group-dynamic" style={{ marginBottom: '10px' }}>
+                  <input type="text" name="dataCap" onChange={(e) => {setDataCap(e.target.value);setEmpty('')}} value={dataCap} className="form-control" style={{ padding: 0 }} />
                 </div>
 
                 {/* Currency dropdown */}
