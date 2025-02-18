@@ -148,11 +148,11 @@ const BulkVoucherPost = () => {
   const formatPhoneNumber = (phoneNumber) => {
     if (phoneNumber.startsWith('0')) {
       // Replace leading 0 with +263
-      return `+263${phoneNumber.slice(1)}`;
+      return `263${phoneNumber.slice(1)}`;
     } else if (phoneNumber.startsWith('263')) {
       // Prepend + if it starts with 263
-      return `+${phoneNumber}`;
-    } else if (phoneNumber.startsWith('+263')) {
+      return `${phoneNumber}`;
+    } else if (phoneNumber.startsWith('263')) {
       // Leave it as is
       return phoneNumber;
     } else {

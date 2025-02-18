@@ -92,11 +92,11 @@ const SMSVerification = () => {
   const formatPhoneNumber = (phoneNumber) => {
     if (phoneNumber.startsWith('0')) {
       // Replace leading 0 with +263
-      return `+263${phoneNumber.slice(1)}`;
+      return `263${phoneNumber.slice(1)}`;
     } else if (phoneNumber.startsWith('263')) {
       // Prepend + if it starts with 263
-      return `+${phoneNumber}`;
-    } else if (phoneNumber.startsWith('+263')) {
+      return `${phoneNumber}`;
+    } else if (phoneNumber.startsWith('263')) {
       // Leave it as is
       return phoneNumber;
     } else {
@@ -246,9 +246,6 @@ const SMSVerification = () => {
         })}
         <button onClick={printVouchers} className="btn btn-info my-2">
           Print
-        </button>
-        <button onClick={printVouchers} className="btn btn-success my-2 ms-2">
-          Resend
         </button>
         <button onClick={clearVouchers} className="btn btn-danger my-2 ms-2">
           Clear
