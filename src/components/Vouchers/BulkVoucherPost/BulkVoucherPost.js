@@ -198,6 +198,10 @@ const BulkVoucherPost = () => {
           // Clear the loading state after 5 seconds
         }
       })
+      .catch((err)=>{
+        console.log("Student already has vouchers", err)
+        dispatch(batchActions.successMessage({status: false, message: err}));
+      })
       .finally(() => {
         setTimeout(() => {
           // setLoadingSuccess(false);

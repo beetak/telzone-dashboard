@@ -13,18 +13,18 @@ const CartBundleList = ({ pageType }) => {
     // Function to determine if a bundle should be rendered based on shop name
     const shouldRenderBundle = (bundle) => {
         switch (shopName) {
-            case "CZA-Town Centre":
-                return bundle.name === "Chitungwiza Voucher";
+            // case "CZA-Town Centre":
+            //     return bundle.name === "Chitungwiza Voucher";
             case "Glen View":
                 return bundle.name === "Glenview Voucher";
             case "BSAC":
-                return bundle.name === "BSAC";
+                return bundle.name === "BSAC Students";
             case "TCFL":
                 return ["TCFL STUDENTS", "TCFL Weekly", "TCFL Daily"].includes(bundle.name);
             case "No Shop":
                 return true; // Render all bundles
             default:
-                return !["Chitungwiza Voucher", "Glenview Voucher", "TCFL STUDENTS", "BSAC"].includes(bundle.name);
+                return !["Chitungwiza Voucher", "Glenview Voucher", "TCFL STUDENTS", "BSAC Students"].includes(bundle.name);
         }
     };
 
