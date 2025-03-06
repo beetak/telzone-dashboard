@@ -13,8 +13,8 @@ const CartBundleList = ({ pageType }) => {
     // Function to determine if a bundle should be rendered based on shop name
     const shouldRenderBundle = (bundle) => {
         switch (shopName) {
-            // case "CZA-Town Centre":
-            //     return bundle.name === "Chitungwiza Voucher";
+            case "CZA-Town Centre":
+                return bundle.name === "Chitungwiza Voucher";
             case "Glen View":
                 return bundle.name === "Glenview Voucher";
             case "BSAC":
