@@ -212,10 +212,8 @@ const CartItems = () => {
         townId
       })).then(response => {
         if (response.payload && response.payload.code === "SUCCESS") {  
-          // Execute postVoucherSaleByBundleId
           saleByBundle(postBundleId, totalQty, response.payload.data.order.id, printSize);
         } else {
-          // Request was not successful
           setLoadingFailed(true)
           setError("Please check your network")
           setTimeout(() => {
