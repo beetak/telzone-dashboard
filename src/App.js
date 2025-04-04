@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { BrowserRouter, Route, Routes, useNavigate, useLocation } from "react-router-dom"
 import Adverts from "./pages/adverts"
 import Dashboard from "./pages/dashboard"
@@ -29,7 +29,7 @@ import FinanceReports from "./pages/finReports"
 import VoucherUsageReport from "./pages/voucherUsageReport"
 import { useDispatch, useSelector } from "react-redux"
 
-const IDLE_TIME_LIMIT = 300000
+const IDLE_TIME_LIMIT = 300000 // 5 minutes
 
 const LockoutScreen = ({ onLogin }) => {
   return (
@@ -45,7 +45,7 @@ const LockoutScreen = ({ onLogin }) => {
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "rgba(0, 0, 0, 0.75)",
-        zIndex: 1000,
+        zIndex: 10000,
       }}
     >
       <div
@@ -102,55 +102,59 @@ const LockoutScreen = ({ onLogin }) => {
 
 function App() {
   const [isLocked, setIsLocked] = useState(false)
-  const [timer, setTimer] = useState(null)
+  const timerRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
 
   const cartItems = useSelector((state) => state.cart.itemsList)
-  console.log(cartItems)
 
-  const resetTimer = () => {
-    if (timer) {
-      clearTimeout(timer)
+  // Use useCallback to prevent resetTimer from being recreated on every render
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
     }
 
     // Only set a new timer if the user is not locked out and not on the login page
     if (!isLocked && location.pathname !== "/") {
-      setTimer(setTimeout(lockoutUser, IDLE_TIME_LIMIT))
+      timerRef.current = setTimeout(() => {
+        lockoutUser()
+      }, IDLE_TIME_LIMIT)
     }
-  }
+  }, [isLocked, location.pathname])
 
-  const lockoutUser = () => {
+  const lockoutUser = useCallback(() => {
     // Save the current path before logging out (except if it's the login page)
     if (location.pathname !== "/") {
       sessionStorage.setItem("lastPath", location.pathname)
     }
 
-    // Clear all auth data
-    localStorage.clear()
+    // Clear auth data
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
 
     // You might need to dispatch a logout action to your Redux store
     // dispatch({ type: 'LOGOUT' });
 
     setIsLocked(true)
+  }, [location.pathname])
 
-    // Immediately navigate to login page
-    navigate("/")
-  }
-
-  const handleUserActivity = () => {
+  const handleUserActivity = useCallback(() => {
     // Only reset the timer if the user is not locked out
     if (!isLocked) {
       resetTimer()
     }
-  }
+  }, [isLocked, resetTimer])
 
-  const handleLogin = () => {
+  const handleLogin = useCallback(() => {
+    // Clear the locked state
     setIsLocked(false)
-    navigate("/")
-  }
 
+    // Navigate to login page
+    navigate("/", { replace: true })
+  }, [navigate])
+
+  // Set up event listeners for user activity
   useEffect(() => {
     // Only add event listeners if the user is not locked out and not on the login page
     if (!isLocked && location.pathname !== "/") {
@@ -159,6 +163,7 @@ function App() {
       window.addEventListener("click", handleUserActivity)
       window.addEventListener("scroll", handleUserActivity)
 
+      // Initial timer setup
       resetTimer()
 
       return () => {
@@ -166,7 +171,7 @@ function App() {
         window.removeEventListener("keydown", handleUserActivity)
         window.removeEventListener("click", handleUserActivity)
         window.removeEventListener("scroll", handleUserActivity)
-        clearTimeout(timer)
+        if (timerRef.current) clearTimeout(timerRef.current)
       }
     } else {
       // Clean up event listeners when locked or on login page
@@ -174,67 +179,57 @@ function App() {
       window.removeEventListener("keydown", handleUserActivity)
       window.removeEventListener("click", handleUserActivity)
       window.removeEventListener("scroll", handleUserActivity)
-      clearTimeout(timer)
+      if (timerRef.current) clearTimeout(timerRef.current)
     }
-  }, [isLocked, location.pathname])
+  }, [isLocked, location.pathname, handleUserActivity, resetTimer])
 
-  // Reset the lock state when navigating to a new page
+  // Handle path changes
   useEffect(() => {
+    // If we're on the login page, make sure we're not locked
+    if (location.pathname === "/") {
+      setIsLocked(false)
+    }
     // If we're not on the login page and not locked, reset the timer
-    if (location.pathname !== "/" && !isLocked) {
+    else if (!isLocked) {
       resetTimer()
     }
-  }, [location.pathname])
+  }, [location.pathname, isLocked, resetTimer])
 
   return (
     <div>
-      {isLocked ? (
-        <LockoutScreen onLogin={handleLogin} />
-      ) : (
-        <Routes>
-          <Route path={"/"} element={<UserLogin />} />
-          <Route path={"/batch"} element={<BatchList />} />
-          <Route path={"/batch/:id"} element={<BatchVoucherList />} />
-          <Route path={"/recharge"} element={<RechargeManagement />} />
-          <Route path={"/packages"} element={<BundleList />} />
-          <Route path={"/profile"} element={<Profile />} />
-          <Route path={"/dashboard"} element={<Dashboard />} />
-          <Route path={"/adverts"} element={<Adverts />} />
-          <Route path={"/sales"} element={<Sales page="sales" />} />
-          <Route path={"/foc-sales"} element={<Sales page="foc-sales" />} />
-          <Route path={"/salesdash"} element={<SalesAgent />} />
-          <Route path={"/signup"} element={<Signup />} />
-          <Route path={"/verify"} element={<VoucherVerificationPage />} />
-          <Route path={"/vouchers"} element={<SPVoucherManagement />} />
-          <Route path={"/networks"} element={<NetworkMan />} />
-          <Route path={"/business-reports"} element={<BusReports />} />
-          <Route path={"/business-entities"} element={<BusEntities />} />
-          <Route path={"/sales-reports"} element={<SPSalesReports />} />
-          <Route path={"/partners"} element={<SPBusinessPartners />} />
-          <Route path={"/hor-reports"} element={<HORSalesReport />} />
-          <Route path={"/abm-reports"} element={<ABMSalesReport />} />
-          <Route path={"/voucher-usage-report"} element={<VoucherUsageReport />} />
-          <Route path={"/regional-reports"} element={<RegionalSalesReport />} />
-          <Route path={"/customers"} element={<Customers />} />
-          <Route path={"/commission"} element={<Commission />} />
-          <Route path={"/fin-sales-report"} element={<FinanceReports />} />
-          <Route path={"/accounts-reports"} element={<Commission />} />
-          <Route path={"/foc-reports"} element={<Sales page="foc-report" />} />
-        </Routes>
-      )}
+      {isLocked && <LockoutScreen onLogin={handleLogin} />}
+      <Routes>
+        <Route path={"/"} element={<UserLogin />} />
+        <Route path={"/batch"} element={<BatchList />} />
+        <Route path={"/batch/:id"} element={<BatchVoucherList />} />
+        <Route path={"/recharge"} element={<RechargeManagement />} />
+        <Route path={"/packages"} element={<BundleList />} />
+        <Route path={"/profile"} element={<Profile />} />
+        <Route path={"/dashboard"} element={<Dashboard />} />
+        <Route path={"/adverts"} element={<Adverts />} />
+        <Route path={"/sales"} element={<Sales page="sales" />} />
+        <Route path={"/foc-sales"} element={<Sales page="foc-sales" />} />
+        <Route path={"/salesdash"} element={<SalesAgent />} />
+        <Route path={"/signup"} element={<Signup />} />
+        <Route path={"/verify"} element={<VoucherVerificationPage />} />
+        <Route path={"/vouchers"} element={<SPVoucherManagement />} />
+        <Route path={"/networks"} element={<NetworkMan />} />
+        <Route path={"/business-reports"} element={<BusReports />} />
+        <Route path={"/business-entities"} element={<BusEntities />} />
+        <Route path={"/sales-reports"} element={<SPSalesReports />} />
+        <Route path={"/partners"} element={<SPBusinessPartners />} />
+        <Route path={"/hor-reports"} element={<HORSalesReport />} />
+        <Route path={"/abm-reports"} element={<ABMSalesReport />} />
+        <Route path={"/voucher-usage-report"} element={<VoucherUsageReport />} />
+        <Route path={"/regional-reports"} element={<RegionalSalesReport />} />
+        <Route path={"/customers"} element={<Customers />} />
+        <Route path={"/commission"} element={<Commission />} />
+        <Route path={"/fin-sales-report"} element={<FinanceReports />} />
+        <Route path={"/accounts-reports"} element={<Commission />} />
+        <Route path={"/foc-reports"} element={<Sales page="foc-report" />} />
+      </Routes>
     </div>
   )
-}
-
-// Modify the UserLogin component to check for a saved path
-// This would be in your login component
-const redirectAfterLogin = () => {
-  const lastPath = sessionStorage.getItem("lastPath")
-  if (lastPath) {
-    sessionStorage.removeItem("lastPath")
-    return lastPath
-  }
-  return "/dashboard" // Default redirect after login
 }
 
 // Wrap the App component with BrowserRouter
